@@ -43,7 +43,7 @@ export default function ProgressRing() {
   const { remainingTime, session, focusDuration, breakDuration } =
     useFocusStore();
 
-  console.log("Remaining:", remainingTime);
+//   console.log("Remaining:", remainingTime);
 
   const duration = session === "focus" ? focusDuration : breakDuration;
 
@@ -61,8 +61,8 @@ export default function ProgressRing() {
 
   const strokeDashoffset = circumference - progress * circumference;
 
-  console.log("Progress:", progress);
-  console.log("Offset:", strokeDashoffset);
+//   console.log("Progress:", progress);
+//   console.log("Offset:", strokeDashoffset);
 
   return (
     <div className="flex justify-center mb-8">
