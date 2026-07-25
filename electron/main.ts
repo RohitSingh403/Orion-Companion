@@ -61,10 +61,19 @@ app.on("activate", () => {
 app.whenReady().then(() => {
   createWindow();
 
+  // Focus -> Break
   ipcMain.on("show-break-notification", () => {
     new Notification({
       title: "☕ Break Time!",
-      body: "Stand up, stretch, and drink some water.",
+      body: "Great work! Stand up, stretch, and drink some water.",
+    }).show();
+  });
+
+  // Break -> Focus
+  ipcMain.on("show-focus-notification", () => {
+    new Notification({
+      title: "🧠 Focus Time!",
+      body: "Your break is over. Ready for another deep focus session?",
     }).show();
   });
 });

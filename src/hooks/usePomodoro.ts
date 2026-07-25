@@ -5,6 +5,7 @@ declare global {
   interface Window {
     focusAPI?: {
       showBreakNotification: () => void;
+      showFocusNotification: () => void;
     };
   }
 }
@@ -14,18 +15,30 @@ export default function usePomodoro() {
   const tick = useFocusStore((s) => s.tick);
   const session = useFocusStore((s) => s.session);
 
-  // Remember the previous session so we can detect
-  // when Focus -> Break happens.
   const previousSession = useRef(session);
 
+  // Detect session changes
   useEffect(() => {
-    if (previousSession.current === "focus" && session === "break") {
+    // Focus -> Break
+    if (
+      previousSession.current === "focus" &&
+      session === "break"
+    ) {
       window.focusAPI?.showBreakNotification();
+    }
+
+    // Break -> Focus
+    if (
+      previousSession.current === "break" &&
+      session === "focus"
+    ) {
+      window.focusAPI?.showFocusNotification();
     }
 
     previousSession.current = session;
   }, [session]);
 
+  // Timer
   useEffect(() => {
     if (!running) return;
 

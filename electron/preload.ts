@@ -34,4 +34,8 @@ contextBridge.exposeInMainWorld("focusAPI", {
   showBreakNotification() {
     ipcRenderer.send("show-break-notification");
   },
+
+  showFocusNotification() {
+    ipcRenderer.send("show-focus-notification");
+  },
 });

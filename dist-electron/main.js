@@ -49,7 +49,13 @@ app.whenReady().then(() => {
   ipcMain.on("show-break-notification", () => {
     new Notification({
       title: "☕ Break Time!",
-      body: "Stand up, stretch, and drink some water."
+      body: "Great work! Stand up, stretch, and drink some water."
+    }).show();
+  });
+  ipcMain.on("show-focus-notification", () => {
+    new Notification({
+      title: "🧠 Focus Time!",
+      body: "Your break is over. Ready for another deep focus session?"
     }).show();
   });
 });

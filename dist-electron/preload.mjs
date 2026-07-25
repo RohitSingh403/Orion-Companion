@@ -24,5 +24,8 @@ electron.contextBridge.exposeInMainWorld("ipcRenderer", {
 electron.contextBridge.exposeInMainWorld("focusAPI", {
   showBreakNotification() {
     electron.ipcRenderer.send("show-break-notification");
+  },
+  showFocusNotification() {
+    electron.ipcRenderer.send("show-focus-notification");
   }
 });
