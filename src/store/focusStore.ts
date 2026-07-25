@@ -8,6 +8,8 @@ interface FocusState {
   focusDuration: number;
   breakDuration: number;
 
+  dailyGoal: number;
+
   remainingTime: number;
 
   running: boolean;
@@ -19,17 +21,21 @@ interface FocusState {
   reset: () => void;
 
   tick: () => void;
+
+  setFocusDuration: (minutes: number) => void;
+  setBreakDuration: (minutes: number) => void;
+  setDailyGoal: (goal: number) => void;
 }
 
 export const useFocusStore = create<FocusState>((set, get) => ({
   session: "focus",
 
-  // focusDuration: 25 * 60,
-  focusDuration:20 ,
-
+  // Testing values (20 seconds)
+  focusDuration: 20,
   breakDuration: 5 * 60,
 
-  // remainingTime: 25 * 60,
+  dailyGoal: 8,
+
   remainingTime: 20,
 
   running: false,
@@ -41,12 +47,12 @@ export const useFocusStore = create<FocusState>((set, get) => ({
   pause: () => set({ running: false }),
 
   reset: () =>
-    set({
+    set((state) => ({
       session: "focus",
       running: false,
-      remainingTime: 25 * 60,
+      remainingTime: state.focusDuration,
       completedSessions: 0,
-    }),
+    })),
 
   tick: () => {
     const state = get();
@@ -57,7 +63,6 @@ export const useFocusStore = create<FocusState>((set, get) => ({
       set({
         remainingTime: state.remainingTime - 1,
       });
-
       return;
     }
 
@@ -67,7 +72,6 @@ export const useFocusStore = create<FocusState>((set, get) => ({
         remainingTime: state.breakDuration,
         completedSessions: state.completedSessions + 1,
       });
-
       return;
     }
 
@@ -76,4 +80,27 @@ export const useFocusStore = create<FocusState>((set, get) => ({
       remainingTime: state.focusDuration,
     });
   },
+
+  setFocusDuration: (minutes) =>
+    set((state) => ({
+      focusDuration: minutes * 60,
+      remainingTime:
+        state.session === "focus"
+          ? minutes * 60
+          : state.remainingTime,
+    })),
+
+  setBreakDuration: (minutes) =>
+    set((state) => ({
+      breakDuration: minutes * 60,
+      remainingTime:
+        state.session === "break"
+          ? minutes * 60
+          : state.remainingTime,
+    })),
+
+  setDailyGoal: (goal) =>
+    set({
+      dailyGoal: goal,
+    }),
 }));
