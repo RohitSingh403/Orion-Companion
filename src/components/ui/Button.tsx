@@ -1,6 +1,7 @@
-import { ButtonHTMLAttributes, ReactNode } from "react";
+import { ReactNode } from "react";
+import { motion, HTMLMotionProps } from "framer-motion";
 
-interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends HTMLMotionProps<"button"> {
   children: ReactNode;
 }
 
@@ -8,23 +9,35 @@ export default function Button({
   children,
   className = "",
   ...props
-}: Props) {
+}: ButtonProps) {
   return (
-    <button
+    <motion.button
+      whileHover={{
+        scale: 1.05,
+        y: -2,
+      }}
+      whileTap={{
+        scale: 0.95,
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 400,
+        damping: 20,
+      }}
       {...props}
       className={`
-        px-7
+        px-8
         py-3
         rounded-xl
         font-semibold
-        transition-all
+        text-white
+        shadow-lg
+        transition-colors
         duration-200
-        hover:scale-105
-        active:scale-95
         ${className}
       `}
     >
       {children}
-    </button>
+    </motion.button>
   );
 }

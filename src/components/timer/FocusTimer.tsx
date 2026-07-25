@@ -1,5 +1,6 @@
 import Card from "../ui/Card";
 import Button from "../ui/Button";
+import { FaPlay, FaPause, FaRedo } from "react-icons/fa";
 
 import { useFocusStore } from "../../store/focusStore";
 import ProgressRing from "./ProgressRing";
@@ -26,29 +27,32 @@ export default function FocusTimer() {
       <ProgressRing></ProgressRing>
 
       <div className="flex justify-center gap-4">
-        {!running ? (
-          <Button
-            onClick={start}
-            className="bg-green-600 hover:bg-green-700"
-          >
-            Start
-          </Button>
-        ) : (
-          <Button
-            onClick={pause}
-            className="bg-yellow-500 hover:bg-yellow-600"
-          >
-            Pause
-          </Button>
-        )}
+  {!running ? (
+    <Button
+      onClick={start}
+      className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+    >
+      <FaPlay />
+      Start
+    </Button>
+  ) : (
+    <Button
+      onClick={pause}
+      className="bg-yellow-500 hover:bg-yellow-600 flex items-center gap-2"
+    >
+      <FaPause />
+      Pause
+    </Button>
+  )}
 
-        <Button
-          onClick={reset}
-          className="bg-red-600 hover:bg-red-700"
-        >
-          Reset
-        </Button>
-      </div>
+  <Button
+    onClick={reset}
+    className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+  >
+    <FaRedo />
+    Reset
+  </Button>
+</div>
 
       <p className="text-center text-zinc-400 mt-10">
         🔥 Completed Sessions: {completedSessions}
