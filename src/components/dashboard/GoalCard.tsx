@@ -9,29 +9,49 @@ export default function GoalCard({
   completedSessions,
   goal,
 }: GoalCardProps) {
-  const percentage = Math.min(
-    (completedSessions / goal) * 100,
-    100
-  );
+  const percentage =
+    goal === 0
+      ? 0
+      : Math.min((completedSessions / goal) * 100, 100);
 
   return (
-    <Card className="mb-6">
-      <h2 className="text-xl font-semibold mb-4">
-        🎯 Today's Goal
-      </h2>
+    <Card>
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">
+            Daily Goal
+          </p>
 
-      <div className="w-full h-4 bg-zinc-800 rounded-full overflow-hidden">
+          <h2 className="text-2xl font-bold text-white mt-1">
+            {completedSessions} / {goal}
+          </h2>
+
+          <p className="text-sm text-zinc-400 mt-1">
+            Sessions Completed
+          </p>
+        </div>
+
+        <div className="text-4xl">🎯</div>
+      </div>
+
+      <div className="h-3 w-full rounded-full bg-zinc-800 overflow-hidden">
         <div
-          className="h-full bg-green-500 transition-all duration-500"
+          className="h-full rounded-full bg-emerald-500 transition-all duration-700"
           style={{
             width: `${percentage}%`,
           }}
         />
       </div>
 
-      <p className="mt-4 text-zinc-400">
-        {completedSessions} / {goal} Sessions
-      </p>
+      <div className="flex justify-between mt-3 text-sm">
+        <span className="text-zinc-500">
+          Progress
+        </span>
+
+        <span className="font-semibold text-emerald-400">
+          {Math.round(percentage)}%
+        </span>
+      </div>
     </Card>
   );
 }
