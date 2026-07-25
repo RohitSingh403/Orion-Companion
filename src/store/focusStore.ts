@@ -17,7 +17,6 @@ interface FocusState {
 
   completedSessions: number;
 
-  // NEW
   currentStreak: number;
   lastCompletedDate: string | null;
 
@@ -49,7 +48,6 @@ export const useFocusStore = create<FocusState>()(
 
       completedSessions: 0,
 
-      // NEW
       currentStreak: 0,
       lastCompletedDate: null,
 
@@ -63,12 +61,12 @@ export const useFocusStore = create<FocusState>()(
           running: false,
         }),
 
+      // Reset ONLY resets the timer
       reset: () =>
         set((state) => ({
           session: "focus",
           running: false,
           remainingTime: state.focusDuration,
-          completedSessions: 0,
         })),
 
       tick: () => {
@@ -83,7 +81,7 @@ export const useFocusStore = create<FocusState>()(
           return;
         }
 
-        // Focus session finished
+        // Focus session completed
         if (state.session === "focus") {
           set({
             session: "break",
@@ -94,7 +92,7 @@ export const useFocusStore = create<FocusState>()(
           return;
         }
 
-        // Break finished
+        // Break completed
         set({
           session: "focus",
           remainingTime: state.focusDuration,
@@ -131,9 +129,8 @@ export const useFocusStore = create<FocusState>()(
         focusDuration: state.focusDuration,
         breakDuration: state.breakDuration,
         dailyGoal: state.dailyGoal,
-        completedSessions: state.completedSessions,
 
-        // NEW
+        completedSessions: state.completedSessions,
         currentStreak: state.currentStreak,
         lastCompletedDate: state.lastCompletedDate,
       }),
