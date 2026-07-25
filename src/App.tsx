@@ -1,10 +1,17 @@
+import { useState } from "react";
+
+import DashboardLayout from "./layouts/DashboardLayout";
+
 import GreetingCard from "./components/dashboard/GreetingCard";
 import GoalCard from "./components/dashboard/GoalCard";
 import StatsCard from "./components/dashboard/StatsCard";
-import SettingsPanel from "./components/settings/SettingsPanel";
-import Companion from "./components/companion/Companion";
+
+import Card from "./components/ui/Card";
+
+import SettingsModal from "./components/settings/SettingsModal";
 
 import FocusTimer from "./components/timer/FocusTimer";
+import Companion from "./components/companion/Companion";
 import BreakOverlay from "./components/overlay/BreakOverlay";
 
 import usePomodoro from "./hooks/usePomodoro";
@@ -12,6 +19,8 @@ import { useFocusStore } from "./store/focusStore";
 
 export default function App() {
   usePomodoro();
+
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const {
     session,
@@ -24,52 +33,58 @@ export default function App() {
 
   return (
     <>
-      <main className="h-screen bg-zinc-950 overflow-hidden p-8">
-        <div className="mx-auto max-w-7xl h-full grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* LEFT SIDEBAR */}
-          <aside
-            className="
-    space-y-4
-    overflow-y-auto
-    no-scrollbar
-    pr-2
-    h-full
-  "
-          >
+      <DashboardLayout
+        left={
+          <>
             <GreetingCard />
 
-            <GoalCard completedSessions={completedSessions} goal={dailyGoal} />
+            <GoalCard
+              completedSessions={completedSessions}
+              goal={dailyGoal}
+            />
 
             <StatsCard
               completedSessions={completedSessions}
               focusMinutes={Math.floor(
-                (completedSessions * focusDuration) / 60,
+                (completedSessions * focusDuration) / 60
               )}
             />
 
-            <SettingsPanel />
-          </aside>
-
-          {/* RIGHT CONTENT */}
-         <section
-  className="
-    lg:col-span-2
-    h-full
-    overflow-y-auto
-    no-scrollbar
-    flex
-    flex-col
-    items-center
-    gap-6
-    py-4
-  "
->
+            <Card>
+              <button
+                onClick={() => setSettingsOpen(true)}
+                className="
+                  w-full
+                  rounded-xl
+                  bg-zinc-800
+                  hover:bg-zinc-700
+                  transition-colors
+                  p-4
+                  text-lg
+                  font-semibold
+                "
+              >
+                ⚙️ Open Settings
+              </button>
+            </Card>
+          </>
+        }
+        right={
+          <div className="flex flex-col items-center gap-6 w-full">
             <FocusTimer />
 
-            <Companion session={session} running={running} />
-          </section>
-        </div>
-      </main>
+            <Companion
+              session={session}
+              running={running}
+            />
+          </div>
+        }
+      />
+
+      <SettingsModal
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+      />
 
       <BreakOverlay
         visible={session === "break"}
