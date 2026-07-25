@@ -2,18 +2,17 @@ import Card from "../ui/Card";
 import Button from "../ui/Button";
 
 import { useFocusStore } from "../../store/focusStore";
-import { formatTime } from "../../utils/time";
+import ProgressRing from "./ProgressRing";
 
 export default function FocusTimer() {
   const {
     session,
-    remainingTime,
-    running,
-    completedSessions,
-    start,
-    pause,
-    reset,
-  } = useFocusStore();
+  running,
+  completedSessions,
+  start,
+  pause,
+  reset,
+} = useFocusStore();
 
   return (
     <Card>
@@ -21,9 +20,10 @@ export default function FocusTimer() {
         {session} Session
       </h2>
 
-      <h1 className="text-center text-8xl font-bold tracking-tight mb-10">
+      {/* <h1 className="text-center text-8xl font-bold tracking-tight mb-10">
         {formatTime(remainingTime)}
-      </h1>
+      </h1> */}
+      <ProgressRing></ProgressRing>
 
       <div className="flex justify-center gap-4">
         {!running ? (
