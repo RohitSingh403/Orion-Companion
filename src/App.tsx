@@ -8,6 +8,7 @@ import GoalCard from "./components/dashboard/GoalCard";
 import StatsCard from "./components/dashboard/StatsCard";
 import AdvancedStats from "./components/dashboard/AdvancedStats";
 import AchievementCard from "./components/dashboard/AchievementCard";
+import DashboardTabs from "./components/dashboard/DashboardTabs";
 
 import SettingsModal from "./components/settings/SettingsModal";
 
@@ -50,16 +51,23 @@ export default function App() {
               goal={dailyGoal}
             />
 
-            <StatsCard
-              completedSessions={completedSessions}
-              focusMinutes={Math.floor(
-                (completedSessions * focusDuration) / 60
-              )}
+            <DashboardTabs
+              dashboard={
+                <>
+                  <StatsCard
+                    completedSessions={completedSessions}
+                    focusMinutes={Math.floor(
+                      (completedSessions * focusDuration) / 60
+                    )}
+                  />
+
+                  <div className="mt-4">
+                    <AdvancedStats />
+                  </div>
+                </>
+              }
+              achievements={<AchievementCard />}
             />
-
-            <AdvancedStats />
-
-            <AchievementCard />
           </>
         }
         right={
