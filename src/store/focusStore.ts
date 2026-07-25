@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { getTodayString, getYesterdayString } from "../utils/date";
 
 export type SessionType = "focus" | "break";
 
@@ -37,6 +38,7 @@ interface FocusState {
   tick: () => void;
 
   addHistory: () => void;
+  updateStreak: () => void;
 
   setFocusDuration: (minutes: number) => void;
   setBreakDuration: (minutes: number) => void;
@@ -98,8 +100,8 @@ export const useFocusStore = create<FocusState>()(
 
         // Focus session completed
         if (state.session === "focus") {
-          // ⭐ NEW
           get().addHistory();
+          get().updateStreak();
 
           set({
             session: "break",
@@ -137,6 +139,34 @@ export const useFocusStore = create<FocusState>()(
         });
       },
 
+      updateStreak: () => {
+        const state = get();
+
+        const today = getTodayString();
+        const yesterday = getYesterdayString();
+
+        // Already counted today
+        if (state.lastCompletedDate === today) {
+          return;
+        }
+
+        // Consecutive day
+        if (state.lastCompletedDate === yesterday) {
+          set({
+            currentStreak: state.currentStreak + 1,
+            lastCompletedDate: today,
+          });
+
+          return;
+        }
+
+        // First session or streak reset
+        set({
+          currentStreak: 1,
+          lastCompletedDate: today,
+        });
+      },
+
       setFocusDuration: (minutes) =>
         set((state) => ({
           focusDuration: minutes * 60,
@@ -169,11 +199,8 @@ export const useFocusStore = create<FocusState>()(
         dailyGoal: state.dailyGoal,
 
         completedSessions: state.completedSessions,
-
-        // Persist session history
         history: state.history,
 
-        // Persist streak
         currentStreak: state.currentStreak,
         lastCompletedDate: state.lastCompletedDate,
       }),

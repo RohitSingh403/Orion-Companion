@@ -1,35 +1,77 @@
 import Card from "../ui/Card";
+import { useFocusStore } from "../../store/focusStore";
 
 export default function AdvancedStats() {
+  const {
+    completedSessions,
+    focusDuration,
+    dailyGoal,
+    currentStreak,
+    history,
+  } = useFocusStore();
+
+  const totalFocusMinutes = Math.floor(
+    (completedSessions * focusDuration) / 60
+  );
+
+  const goalPercentage = Math.min(
+    Math.round((completedSessions / dailyGoal) * 100),
+    100
+  );
+
   return (
     <Card>
-      <h2 className="text-xl font-bold mb-4">
+      <h2 className="text-xl font-bold mb-6">
         📊 Advanced Statistics
       </h2>
 
       <div className="space-y-4">
 
-        <div className="flex justify-between">
-          <span>Today's Focus</span>
-          <span>0 Sessions</span>
-        </div>
+        <StatRow
+          label="Today's Sessions"
+          value={`${completedSessions}`}
+        />
 
-        <div className="flex justify-between">
-          <span>Total Focus Time</span>
-          <span>0 min</span>
-        </div>
+        <StatRow
+          label="Focus Time"
+          value={`${totalFocusMinutes} min`}
+        />
 
-        <div className="flex justify-between">
-          <span>Daily Goal</span>
-          <span>0%</span>
-        </div>
+        <StatRow
+          label="Daily Goal"
+          value={`${goalPercentage}%`}
+        />
 
-        <div className="flex justify-between">
-          <span>Current Streak</span>
-          <span>0 Days</span>
-        </div>
+        <StatRow
+          label="Current Streak"
+          value={`${currentStreak} Days`}
+        />
+
+        <StatRow
+          label="History Entries"
+          value={`${history.length}`}
+        />
 
       </div>
     </Card>
+  );
+}
+
+interface StatRowProps {
+  label: string;
+  value: string;
+}
+
+function StatRow({ label, value }: StatRowProps) {
+  return (
+    <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
+      <span className="text-zinc-400">
+        {label}
+      </span>
+
+      <span className="font-semibold">
+        {value}
+      </span>
+    </div>
   );
 }
