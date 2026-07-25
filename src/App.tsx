@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import DashboardLayout from "./layouts/DashboardLayout";
 
 import Header from "./components/dashboard/Header";
@@ -10,6 +11,7 @@ import SettingsModal from "./components/settings/SettingsModal";
 
 import FocusTimer from "./components/timer/FocusTimer";
 import Companion from "./components/companion/Companion";
+import SessionHistory from "./components/history/SessionHistory";
 import BreakOverlay from "./components/overlay/BreakOverlay";
 
 import usePomodoro from "./hooks/usePomodoro";
@@ -52,10 +54,14 @@ export default function App() {
           </>
         }
         right={
-          <div className="flex flex-col items-center gap-6 w-full">
+          <div className="w-full flex flex-col gap-6">
             <FocusTimer />
 
-            <Companion session={session} running={running} />
+            <div className="grid grid-cols-2 gap-6">
+              <Companion session={session} running={running} />
+
+              <SessionHistory />
+            </div>
           </div>
         }
       />

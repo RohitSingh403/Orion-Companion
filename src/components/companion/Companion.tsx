@@ -32,7 +32,7 @@ export default function Companion({ session, running }: CompanionProps) {
       transition={{
         duration: 0.35,
       }}
-      className="mt-8 rounded-2xl border border-zinc-800 bg-zinc-800/60 p-5"
+      className=" rounded-2xl border border-zinc-800 bg-zinc-800/60 p-5"
     >
       <AnimatePresence mode="wait">
         <motion.div

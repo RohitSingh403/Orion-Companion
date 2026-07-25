@@ -7,26 +7,34 @@ import { FaPlay, FaPause, FaRedo } from "react-icons/fa";
 import { useFocusStore } from "../../store/focusStore";
 
 export default function FocusTimer() {
-  const { session, running, completedSessions, start, pause, reset } =
-    useFocusStore();
+  const {
+    session,
+    running,
+    completedSessions,
+    start,
+    pause,
+    reset,
+  } = useFocusStore();
 
   return (
-    <Card className="w-full max-w-2xl">
+    <Card className="w-full max-w-4xl">
       {/* Title */}
-      <h1 className="text-center text-4xl font-bold mb-2">
+      <h1 className="text-center text-3xl font-bold">
         🧠 Focus Companion
       </h1>
 
       {/* Session */}
-      <p className="text-center text-zinc-400 text-lg capitalize mb-8">
+      <p className="mt-1 text-center text-zinc-400 capitalize">
         {session} Session
       </p>
 
       {/* Timer */}
-      <ProgressRing />
+      <div className="my-5 flex justify-center">
+        <ProgressRing />
+      </div>
 
       {/* Controls */}
-      <div className="flex justify-center gap-4 mt-6">
+      <div className="flex justify-center gap-3">
         {!running ? (
           <Button
             onClick={start}
@@ -54,15 +62,22 @@ export default function FocusTimer() {
         </Button>
       </div>
 
-      {/* Progress */}
-      <div className="mt-8 border-t border-zinc-800 pt-5">
-        <h3 className="text-center text-zinc-400">🔥 Today's Progress</h3>
+      {/* Divider */}
+      <div className="my-6 h-px bg-zinc-800" />
 
-        <p className="text-center text-3xl font-bold mt-2">
+      {/* Progress */}
+      <div className="text-center">
+        <p className="text-zinc-400">
+          🔥 Today's Progress
+        </p>
+
+        <p className="mt-1 text-4xl font-bold">
           {completedSessions}
         </p>
 
-        <p className="text-center text-zinc-500">Completed Sessions</p>
+        <p className="text-sm text-zinc-500">
+          Completed Sessions
+        </p>
       </div>
     </Card>
   );
