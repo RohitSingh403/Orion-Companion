@@ -7,6 +7,7 @@ import GreetingCard from "./components/dashboard/GreetingCard";
 import GoalCard from "./components/dashboard/GoalCard";
 import StatsCard from "./components/dashboard/StatsCard";
 import AdvancedStats from "./components/dashboard/AdvancedStats";
+import AchievementCard from "./components/dashboard/AchievementCard";
 
 import SettingsModal from "./components/settings/SettingsModal";
 
@@ -57,6 +58,8 @@ export default function App() {
             />
 
             <AdvancedStats />
+
+            <AchievementCard />
           </>
         }
         right={
