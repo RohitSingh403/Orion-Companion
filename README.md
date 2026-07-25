@@ -1,252 +1,158 @@
+# Focus Companion
 
-# 🚀 Focus Companion
+A desktop productivity app for building consistent focus habits — structured work sessions, progress tracking, achievements, and productivity insights, all in one distraction-free workspace.
 
-> Your AI-powered desktop companion for deep work, productivity, and mindful breaks.
-
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
-![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black)
-![Electron](https://img.shields.io/badge/Electron-47848F?logo=electron&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?logo=tailwindcss&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green)
+![version](https://img.shields.io/badge/version-1.0.0-blue)
+![platform](https://img.shields.io/badge/platform-desktop-lightgrey)
+![license](https://img.shields.io/badge/license-MIT-green)
 
 ---
 
-## 📖 Overview
+## Why Focus Companion?
 
-Focus Companion is a modern desktop productivity application built with **Electron**, **React**, **TypeScript**, and **Tailwind CSS**.
+Most Pomodoro apps stop at the timer. Focus Companion treats the timer as a starting point instead of the whole product — it's meant to grow into a centralized productivity workspace where you can track sessions, review history, and actually see your progress build up over time instead of resetting to zero every day.
 
-It is designed to help users maintain focus, develop productive work habits, and reduce burnout through intelligent work sessions, break reminders, and future AI-powered assistance.
+v1.0.0 lays that foundation: timer management, progress tracking, achievements, session history, notifications, and a dashboard that ties it all together.
 
-Unlike a traditional Pomodoro timer, Focus Companion aims to become an intelligent productivity partner that understands your workflow and supports deep work.
+## Features
 
----
+**Focus Timer**
+- Automatic Focus → Break → Focus cycling, no manual switching required
+- Start / pause / reset controls
+- Custom animated SVG progress ring with a glowing stroke and pulse animation
+- Ring color shifts as time runs down (green → orange → red for focus, blue for breaks) so urgency is visible at a glance
 
-## ✨ Features
+**Progress & Tracking**
+- Daily session count and total focus minutes tracked live on the dashboard
+- Configurable daily session goal, with progress shown against it
+- Streak system — one productive day builds a streak, missing a day resets it
 
-- ✅ Modern desktop application
-- ✅ Beautiful and responsive UI
-- ✅ Custom focus sessions
-- ✅ Smart break reminders
-- ✅ Deep work timer
-- ✅ Session history
-- ✅ Productivity dashboard
-- ✅ Custom settings
-- ✅ Dark mode
-- ✅ Local data persistence
-- 🚧 AI productivity assistant
-- 🚧 Daily insights
-- 🚧 Productivity analytics
-- 🚧 Goal tracking
-- 🚧 Cross-platform support
+**Session History**
+- Every completed session is logged with a timestamp and session type
+- History persists across app restarts
 
----
+**Achievements**
+- Milestones for First Focus Session, 10 Sessions, 50 Sessions, and 100 Sessions
+- Unlocks happen automatically during normal use
+- Animated toast notifications on unlock, plus a dashboard view of locked/unlocked achievements
 
-## 🛠 Tech Stack
+**Notifications & Audio**
+- Native desktop notifications when a focus session ends or a break starts (and vice versa) — these fire independently of the app window
+- Contextual sound cues on session transitions, so you don't have to keep an eye on the timer
 
-### Frontend
+**Companion**
+- A panel that reacts visually to the current timer state (focus / break / idle)
+- Currently presentational — planned to evolve into an AI productivity assistant in a future release
 
-- React
-- TypeScript
-- Vite
-- Tailwind CSS
-- Zustand
+**Settings & Persistence**
+- Focus duration, break duration, and daily goal are all configurable
+- Everything (settings, history, achievements, streaks) persists locally via Zustand's persist middleware, so nothing resets when you close the app
 
-### Desktop
+## Tech Stack
 
-- Electron
-- Electron Builder
+| Layer | Tech |
+|---|---|
+| UI | React + TypeScript |
+| Styling | Tailwind CSS |
+| Animation | Framer Motion |
+| Desktop shell | Electron |
+| State management | Zustand |
+| Build tool | Vite |
 
-### Tools
+## Architecture
 
-- ESLint
-- npm
-
----
-
-## 📂 Project Structure
+The app follows a modular, component-based architecture with a clear split between logic and presentation:
 
 ```
-focus-companion/
-│
-├── electron/
-│   ├── main.ts
-│   ├── preload.ts
-│
-├── src/
-│   ├── components/
-│   ├── pages/
-│   ├── hooks/
-│   ├── store/
-│   ├── utils/
-│   ├── assets/
-│   ├── styles/
-│   └── App.tsx
-│
-├── public/
-├── docs/
-├── package.json
-├── tsconfig.json
-└── README.md
+src/
+├── components/
+│   ├── dashboard/
+│   ├── timer/
+│   ├── history/
+│   ├── companion/
+│   ├── overlay/
+│   ├── settings/
+│   ├── ui/
+│   └── animations/
+├── hooks/
+├── layouts/
+├── store/
+└── utils/
 ```
 
----
+- **Stores own the logic.** All business logic — timer state, session recording, streak calculation, achievement checks — lives in Zustand stores, not in components.
+- **Components stay presentational.** UI components render state and dispatch actions; they don't own business rules.
+- **Three stores today:**
+  - `focusStore` — timer, sessions, settings, streaks, history, progress
+  - `achievementStore` — achievement unlock status and persistence
+  - `toastStore` — transient notifications and achievement popups
 
-## 🚀 Getting Started
+This separation is deliberate — it keeps the codebase easy to extend as new productivity modules get added, without having to untangle UI code from logic later.
 
-### Clone the repository
+## Application Flow
+
+```
+Launch → Dashboard → Start Focus → Timer Runs → Focus Completes
+   → History Updated → Progress Updated → Streak Updated
+   → Achievement Checked → Desktop Notification → Break Starts
+   → Break Ends → Next Focus Session
+```
+
+## Design Notes
+
+The UI leans into a glassmorphism-style dark theme — blurred cards, rounded corners, soft shadows — built primarily around a MacBook Air M2, 13" Retina display. It's responsive, but the priority is a polished desktop-first experience over adapting to every screen size.
+
+Design principles guiding the app:
+
+- **Simplicity** — the next action should always be obvious
+- **Positive reinforcement** — achievements, stats, and animations encourage consistency instead of guilt-tripping missed days
+- **Desktop-first** — built for focused desktop work, not a mobile port
+- **Modular by default** — every feature is isolated so it can be extended without a rewrite
+
+## What's in v1.0.0
+
+- Configurable focus/break timer with automatic cycling
+- Session history
+- Daily goals and progress tracking
+- Streaks
+- Achievement system with toast notifications
+- Native desktop notifications
+- Audio feedback on transitions
+- Dashboard with statistics and history views
+- Local persistence — no account or cloud sync required
+
+## Roadmap
+
+The architecture is intentionally built to support these without major rework:
+
+- Task management and daily planner
+- Project organization
+- GitHub-style productivity heatmap
+- Weekly/monthly analytics and advanced insights
+- Markdown notes
+- Task reminders
+- AI productivity coach (the Companion's next evolution)
+- Data export
+- Cloud sync
+- Custom themes
+
+## Getting Started
 
 ```bash
-git clone https://github.com/yourusername/focus-companion.git
-```
-
-### Navigate into the project
-
-```bash
+# clone the repo
+git clone https://github.com/RohitSingh403/focus-companion.git
 cd focus-companion
-```
 
-### Install dependencies
-
-```bash
+# install dependencies
 npm install
-```
 
-### Start development
-
-```bash
+# run in development
 npm run dev
-```
 
-### Build the application
-
-```bash
+# build for production
 npm run build
 ```
 
----
+## Vision
 
-## 📌 Roadmap
-
-### Version 1
-
-- Focus Timer
-- Break Reminder
-- Settings
-- Notifications
-- Session History
-
-### Version 2
-
-- AI Productivity Coach
-- Focus Analytics
-- Smart Suggestions
-- Habit Tracking
-
-### Version 3
-
-- Cloud Sync
-- Calendar Integration
-- AI Reports
-- Team Focus Rooms
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome!
-
-If you'd like to contribute:
-
-1. Fork the repository
-2. Create a new branch
-
-```
-git checkout -b feature/amazing-feature
-```
-
-3. Commit your changes
-
-```
-git commit -m "Add amazing feature"
-```
-
-4. Push your branch
-
-```
-git push origin feature/amazing-feature
-```
-
-5. Open a Pull Request
-
----
-
-## 📄 License
-N/A
-
----
-
-## 👨‍💻 Author
-
-**Rohit Singh**
-
-Computer Science Engineer
-
-Fullstack Developer
-
-Aspiring Software Engineer
-
-GitHub: https://github.com/yourusername
-
-LinkedIn: https://linkedin.com/in/yourprofile
-
-Portfolio: https://yourportfolio.com
-
----
-
-## ⭐ Support
-
-If you like this project:
-
-⭐ Star the repository
-
-🍴 Fork it
-
-🛠️ Contribute
-
-📢 Share it with others
-
----
-
-Made with ❤️ using Electron, React, TypeScript, and Tailwind CSS.
-
-<!-- # React + TypeScript + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list -->
+Focus Companion's long-term goal is to grow past being "another Pomodoro app" into a full desktop productivity platform — one place for focus sessions, task planning, progress visualization, and productivity insight, built with the same attention to polish and feedback from day one.
