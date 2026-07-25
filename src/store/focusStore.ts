@@ -24,13 +24,13 @@ interface FocusState {
 export const useFocusStore = create<FocusState>((set, get) => ({
   session: "focus",
 
-  // focusDuration: 25 * 60,
-  focusDuration:20 ,
+  focusDuration: 25 * 60,
+  // focusDuration:20 ,
 
   breakDuration: 5 * 60,
 
-  // remainingTime: 25 * 60,
-  remainingTime: 20,
+  remainingTime: 25 * 60,
+  // remainingTime: 20,
 
   running: false,
 
