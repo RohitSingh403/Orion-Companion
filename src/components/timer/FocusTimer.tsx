@@ -1,7 +1,6 @@
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 import ProgressRing from "./ProgressRing";
-import Companion from "../companion/Companion";
 
 import { FaPlay, FaPause, FaRedo } from "react-icons/fa";
 
@@ -18,21 +17,21 @@ export default function FocusTimer() {
   } = useFocusStore();
 
   return (
-    <Card>
+    <Card className="w-full max-w-2xl">
       {/* Title */}
       <h1 className="text-center text-4xl font-bold mb-2">
         🧠 Focus Companion
       </h1>
 
-      {/* Current Session */}
+      {/* Session */}
       <p className="text-center text-zinc-400 text-lg capitalize mb-8">
         {session} Session
       </p>
 
-      {/* Progress Ring */}
+      {/* Timer */}
       <ProgressRing />
 
-      {/* Buttons */}
+      {/* Controls */}
       <div className="flex justify-center gap-4 mt-6">
         {!running ? (
           <Button
@@ -62,8 +61,8 @@ export default function FocusTimer() {
       </div>
 
       {/* Progress */}
-      <div className="mt-10 border-t border-zinc-800 pt-6">
-        <h3 className="text-center text-zinc-400 text-lg">
+      <div className="mt-8 border-t border-zinc-800 pt-5">
+        <h3 className="text-center text-zinc-400">
           🔥 Today's Progress
         </h3>
 
@@ -75,12 +74,6 @@ export default function FocusTimer() {
           Completed Sessions
         </p>
       </div>
-
-      {/* Companion */}
-      <Companion
-        session={session}
-        running={running}
-      />
     </Card>
   );
 }

@@ -16,7 +16,7 @@ export default function Card({
         border-zinc-800
         rounded-3xl
         shadow-2xl
-        p-10
+        p-8
         ${className}
       `}
     >

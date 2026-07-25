@@ -11,40 +11,32 @@ export default function StatsCard({
 }: StatsCardProps) {
   return (
     <Card>
-      <h2 className="text-xl font-semibold mb-5">
-        📊 Today's Stats
+      <h2 className="text-lg font-semibold mb-5">
+        📊 Today's Progress
       </h2>
 
-      <div className="space-y-4">
-        <div className="flex justify-between">
-          <span className="text-zinc-400">
-            Sessions
-          </span>
+      <div className="grid grid-cols-2 gap-4">
 
-          <span className="font-semibold">
+        <div className="rounded-xl bg-zinc-800 p-4 text-center">
+          <p className="text-3xl font-bold text-green-400">
             {completedSessions}
-          </span>
+          </p>
+
+          <p className="text-sm text-zinc-400 mt-2">
+            Sessions
+          </p>
         </div>
 
-        <div className="flex justify-between">
-          <span className="text-zinc-400">
-            Focus Time
-          </span>
+        <div className="rounded-xl bg-zinc-800 p-4 text-center">
+          <p className="text-3xl font-bold text-blue-400">
+            {focusMinutes}
+          </p>
 
-          <span className="font-semibold">
-            {focusMinutes} min
-          </span>
+          <p className="text-sm text-zinc-400 mt-2">
+            Minutes
+          </p>
         </div>
 
-        <div className="flex justify-between">
-          <span className="text-zinc-400">
-            Productivity
-          </span>
-
-          <span className="text-green-400 font-semibold">
-            Great 🚀
-          </span>
-        </div>
       </div>
     </Card>
   );
