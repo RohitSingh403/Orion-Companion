@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, Notification } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 const __dirname$1 = path.dirname(fileURLToPath(import.meta.url));
@@ -41,7 +41,14 @@ app.on("activate", () => {
     createWindow();
   }
 });
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  createWindow();
+  const breakNotification = new Notification({
+    title: "☕ Break Time!",
+    body: "Stand up, stretch, and drink some water."
+  });
+  breakNotification.show();
+});
 export {
   MAIN_DIST,
   RENDERER_DIST,

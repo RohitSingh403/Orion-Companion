@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, Notification } from "electron";
 // import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -72,4 +72,13 @@ app.on('activate', () => {
   }
 })
 
-app.whenReady().then(createWindow)
+app.whenReady().then(() => {
+  createWindow();
+
+  const breakNotification = new Notification({
+    title: "☕ Break Time!",
+    body: "Stand up, stretch, and drink some water.",
+  });
+
+  breakNotification.show();
+});
