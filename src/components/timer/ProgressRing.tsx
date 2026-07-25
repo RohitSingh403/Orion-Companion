@@ -3,31 +3,21 @@ import { useFocusStore } from "../../store/focusStore";
 import { formatTime } from "../../utils/time";
 
 export default function ProgressRing() {
-  const {
-    remainingTime,
-    session,
-    focusDuration,
-    breakDuration,
-    running,
-  } = useFocusStore();
+  const { remainingTime, session, focusDuration, breakDuration, running } =
+    useFocusStore();
 
-  const duration =
-    session === "focus"
-      ? focusDuration
-      : breakDuration;
+  const duration = session === "focus" ? focusDuration : breakDuration;
 
   const radius = 110;
   const stroke = 12;
 
   const normalizedRadius = radius - stroke / 2;
 
-  const circumference =
-    2 * Math.PI * normalizedRadius;
+  const circumference = 2 * Math.PI * normalizedRadius;
 
   const progress = remainingTime / duration;
 
-  const strokeDashoffset =
-    circumference * (1 - progress);
+  const strokeDashoffset = circumference * (1 - progress);
 
   // Dynamic Color
   let color = "#22c55e";
@@ -39,10 +29,7 @@ export default function ProgressRing() {
     if (progress < 0.2) color = "#ef4444";
   }
 
-  const isEnding =
-    running &&
-    remainingTime <= 10 &&
-    session === "focus";
+  const isEnding = running && remainingTime <= 10 && session === "focus";
 
   return (
     <div className="flex justify-center mb-8">
@@ -61,7 +48,6 @@ export default function ProgressRing() {
         className="relative w-[260px] h-[260px]"
       >
         <svg width="260" height="260">
-
           {/* Background */}
 
           <circle
@@ -97,13 +83,11 @@ export default function ProgressRing() {
               filter: `drop-shadow(0 0 12px ${color})`,
             }}
           />
-
         </svg>
 
         {/* Center */}
 
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-
           <motion.h1
             key={remainingTime}
             initial={{
@@ -144,11 +128,8 @@ export default function ProgressRing() {
               }
             `}
           >
-            {session === "focus"
-              ? "🎯 Focus Session"
-              : "☕ Break Time"}
+            {session === "focus" ? "🎯 Focus Session" : "☕ Break Time"}
           </motion.div>
-
         </div>
 
         {/* Activity Dot */}
@@ -171,7 +152,6 @@ export default function ProgressRing() {
             }}
           />
         )}
-
       </motion.div>
     </div>
   );

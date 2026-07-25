@@ -4,9 +4,7 @@ interface FadeInProps {
   children: React.ReactNode;
 }
 
-export default function FadeIn({
-  children,
-}: FadeInProps) {
+export default function FadeIn({ children }: FadeInProps) {
   return (
     <motion.div
       initial={{

@@ -180,18 +180,14 @@ export const useFocusStore = create<FocusState>()(
         set((state) => ({
           focusDuration: minutes * 60,
           remainingTime:
-            state.session === "focus"
-              ? minutes * 60
-              : state.remainingTime,
+            state.session === "focus" ? minutes * 60 : state.remainingTime,
         })),
 
       setBreakDuration: (minutes) =>
         set((state) => ({
           breakDuration: minutes * 60,
           remainingTime:
-            state.session === "break"
-              ? minutes * 60
-              : state.remainingTime,
+            state.session === "break" ? minutes * 60 : state.remainingTime,
         })),
 
       setDailyGoal: (goal) =>
@@ -261,6 +257,6 @@ export const useFocusStore = create<FocusState>()(
         currentStreak: state.currentStreak,
         lastCompletedDate: state.lastCompletedDate,
       }),
-    }
-  )
+    },
+  ),
 );

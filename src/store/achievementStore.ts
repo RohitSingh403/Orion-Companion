@@ -20,9 +20,7 @@ export const useAchievementStore = create<AchievementState>()(
       achievements: defaultAchievements,
 
       unlockAchievement: (id) => {
-        const achievement = get().achievements.find(
-          (a) => a.id === id
-        );
+        const achievement = get().achievements.find((a) => a.id === id);
 
         if (!achievement || achievement.unlocked) {
           return;
@@ -35,16 +33,14 @@ export const useAchievementStore = create<AchievementState>()(
                   ...achievement,
                   unlocked: true,
                 }
-              : achievement
+              : achievement,
           ),
         }));
       },
 
       isUnlocked: (id) => {
         return get().achievements.some(
-          (achievement) =>
-            achievement.id === id &&
-            achievement.unlocked
+          (achievement) => achievement.id === id && achievement.unlocked,
         );
       },
 
@@ -57,6 +53,6 @@ export const useAchievementStore = create<AchievementState>()(
     }),
     {
       name: "achievement-storage",
-    }
-  )
+    },
+  ),
 );

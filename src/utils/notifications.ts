@@ -6,10 +6,7 @@ export async function requestNotificationPermission() {
   }
 }
 
-export function showNotification(
-  title: string,
-  body: string
-) {
+export function showNotification(title: string, body: string) {
   if (Notification.permission !== "granted") return;
 
   new Notification(title, {

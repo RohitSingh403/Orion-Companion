@@ -13,9 +13,7 @@ export default function SessionHistory() {
         <FaHistory className="text-emerald-400 text-xl" />
 
         <div>
-          <h2 className="text-xl font-bold">
-            Session History
-          </h2>
+          <h2 className="text-xl font-bold">Session History</h2>
 
           <p className="text-sm text-zinc-400">
             Today's completed focus sessions
@@ -47,19 +45,13 @@ export default function SessionHistory() {
                 <FaCheckCircle className="text-emerald-400" />
 
                 <div>
-                  <p className="font-medium">
-                    {session.type}
-                  </p>
+                  <p className="font-medium">{session.type}</p>
 
-                  <p className="text-xs text-zinc-400">
-                    {session.time}
-                  </p>
+                  <p className="text-xs text-zinc-400">{session.time}</p>
                 </div>
               </div>
 
-              <span className="text-xs text-emerald-400">
-                Completed
-              </span>
+              <span className="text-xs text-emerald-400">Completed</span>
             </div>
           ))}
         </div>

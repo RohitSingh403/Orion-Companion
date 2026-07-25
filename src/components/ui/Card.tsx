@@ -5,10 +5,7 @@ interface CardProps {
   className?: string;
 }
 
-export default function Card({
-  children,
-  className = "",
-}: CardProps) {
+export default function Card({ children, className = "" }: CardProps) {
   return (
     <FadeIn>
       <div

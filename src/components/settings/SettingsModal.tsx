@@ -8,10 +8,7 @@ interface SettingsModalProps {
   onClose: () => void;
 }
 
-export default function SettingsModal({
-  open,
-  onClose,
-}: SettingsModalProps) {
+export default function SettingsModal({ open, onClose }: SettingsModalProps) {
   return (
     <AnimatePresence>
       {open && (
@@ -47,9 +44,7 @@ export default function SettingsModal({
             <Card>
               <div className="mb-6 flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold">
-                    ⚙️ Settings
-                  </h2>
+                  <h2 className="text-2xl font-bold">⚙️ Settings</h2>
 
                   <p className="text-sm text-zinc-400">
                     Customize your focus experience

@@ -30,13 +30,9 @@ export default function AchievementToast() {
         <FaTrophy className="text-yellow-400 text-2xl" />
 
         <div>
-          <h3 className="font-bold">
-            {title}
-          </h3>
+          <h3 className="font-bold">{title}</h3>
 
-          <p className="text-sm text-zinc-400">
-            {message}
-          </p>
+          <p className="text-sm text-zinc-400">{message}</p>
         </div>
       </div>
     </div>

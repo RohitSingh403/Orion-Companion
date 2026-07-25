@@ -4,9 +4,7 @@ import { FaLock, FaTrophy } from "react-icons/fa";
 import { useAchievementStore } from "../../store/achievementStore";
 
 export default function AchievementCard() {
-  const achievements = useAchievementStore(
-    (state) => state.achievements
-  );
+  const achievements = useAchievementStore((state) => state.achievements);
 
   return (
     <Card>
@@ -14,9 +12,7 @@ export default function AchievementCard() {
         <FaTrophy className="text-yellow-400 text-xl" />
 
         <div>
-          <h2 className="text-xl font-bold">
-            Achievements
-          </h2>
+          <h2 className="text-xl font-bold">Achievements</h2>
 
           <p className="text-sm text-zinc-400">
             Unlock milestones as you focus
@@ -39,13 +35,9 @@ export default function AchievementCard() {
             "
           >
             <div>
-              <p className="font-medium">
-                {achievement.title}
-              </p>
+              <p className="font-medium">{achievement.title}</p>
 
-              <p className="text-xs text-zinc-400">
-                {achievement.description}
-              </p>
+              <p className="text-xs text-zinc-400">{achievement.description}</p>
             </div>
 
             {achievement.unlocked ? (

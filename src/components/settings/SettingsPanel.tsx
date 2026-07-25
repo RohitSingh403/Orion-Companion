@@ -19,34 +19,26 @@ export default function SettingsPanel() {
     resetSettings,
   } = useFocusStore();
 
-  const resetAchievements =
-    useAchievementStore(
-      (state) => state.resetAchievements
-    );
+  const resetAchievements = useAchievementStore(
+    (state) => state.resetAchievements,
+  );
 
   // -------------------------
   // Reset Checkboxes
   // -------------------------
 
-  const [historyChecked, setHistoryChecked] =
-    useState(true);
+  const [historyChecked, setHistoryChecked] = useState(true);
 
-  const [progressChecked, setProgressChecked] =
-    useState(true);
+  const [progressChecked, setProgressChecked] = useState(true);
 
-  const [streakChecked, setStreakChecked] =
-    useState(false);
+  const [streakChecked, setStreakChecked] = useState(false);
 
-  const [achievementChecked, setAchievementChecked] =
-    useState(false);
+  const [achievementChecked, setAchievementChecked] = useState(false);
 
-  const [settingsChecked, setSettingsChecked] =
-    useState(false);
+  const [settingsChecked, setSettingsChecked] = useState(false);
 
   const handleReset = () => {
-    const confirmed = window.confirm(
-      "Reset the selected data?"
-    );
+    const confirmed = window.confirm("Reset the selected data?");
 
     if (!confirmed) return;
 
@@ -62,42 +54,29 @@ export default function SettingsPanel() {
   };
 
   const changeFocus = (amount: number) => {
-    const value = Math.max(
-      5,
-      focusDuration / 60 + amount
-    );
+    const value = Math.max(5, focusDuration / 60 + amount);
 
     setFocusDuration(value);
   };
 
   const changeBreak = (amount: number) => {
-    const value = Math.max(
-      1,
-      breakDuration / 60 + amount
-    );
+    const value = Math.max(1, breakDuration / 60 + amount);
 
     setBreakDuration(value);
   };
 
   const changeGoal = (amount: number) => {
-    const value = Math.max(
-      1,
-      dailyGoal + amount
-    );
+    const value = Math.max(1, dailyGoal + amount);
 
     setDailyGoal(value);
   };
 
   return (
     <div className="space-y-6">
-
       {/* Focus Settings */}
 
       <Card>
-
-        <h3 className="text-xl font-bold mb-5">
-          ⏱ Focus Settings
-        </h3>
+        <h3 className="text-xl font-bold mb-5">⏱ Focus Settings</h3>
 
         <SettingRow
           title="Focus Duration"
@@ -119,16 +98,12 @@ export default function SettingsPanel() {
           onDecrease={() => changeGoal(-1)}
           onIncrease={() => changeGoal(1)}
         />
-
       </Card>
 
       {/* Data Management */}
 
       <Card>
-
-        <h3 className="text-xl font-bold mb-5">
-          🧹 Data Management
-        </h3>
+        <h3 className="text-xl font-bold mb-5">🧹 Data Management</h3>
 
         <Checkbox
           label="Session History"
@@ -175,9 +150,7 @@ export default function SettingsPanel() {
         >
           Reset Selected
         </button>
-
       </Card>
-
     </div>
   );
 }
@@ -189,25 +162,16 @@ interface SettingRowProps {
   onDecrease: () => void;
 }
 
-function SettingRow({
-  title,
-  value,
-  onIncrease,
-  onDecrease,
-}: SettingRowProps) {
+function SettingRow({ title, value, onIncrease, onDecrease }: SettingRowProps) {
   return (
     <div className="mb-5 flex items-center justify-between">
-
       <div>
         <p className="font-medium">{title}</p>
 
-        <p className="text-sm text-zinc-400">
-          {value}
-        </p>
+        <p className="text-sm text-zinc-400">{value}</p>
       </div>
 
       <div className="flex gap-2">
-
         <button
           onClick={onDecrease}
           className="rounded-lg bg-zinc-800 px-3 py-2 hover:bg-zinc-700"
@@ -221,9 +185,7 @@ function SettingRow({
         >
           +
         </button>
-
       </div>
-
     </div>
   );
 }
@@ -234,24 +196,16 @@ interface CheckboxProps {
   onChange: (value: boolean) => void;
 }
 
-function Checkbox({
-  label,
-  checked,
-  onChange,
-}: CheckboxProps) {
+function Checkbox({ label, checked, onChange }: CheckboxProps) {
   return (
     <label className="mb-3 flex items-center gap-3">
-
       <input
         type="checkbox"
         checked={checked}
-        onChange={(e) =>
-          onChange(e.target.checked)
-        }
+        onChange={(e) => onChange(e.target.checked)}
       />
 
       <span>{label}</span>
-
     </label>
   );
 }

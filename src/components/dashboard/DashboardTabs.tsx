@@ -9,9 +9,7 @@ export default function DashboardTabs({
   dashboard,
   achievements,
 }: DashboardTabsProps) {
-  const [tab, setTab] = useState<"dashboard" | "achievements">(
-    "dashboard"
-  );
+  const [tab, setTab] = useState<"dashboard" | "achievements">("dashboard");
 
   return (
     <>
@@ -39,9 +37,7 @@ export default function DashboardTabs({
         </button>
       </div>
 
-      {tab === "dashboard"
-        ? dashboard
-        : achievements}
+      {tab === "dashboard" ? dashboard : achievements}
     </>
   );
 }

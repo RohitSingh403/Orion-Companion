@@ -9,14 +9,8 @@ import { FaPlay, FaPause, FaRedo } from "react-icons/fa";
 import { useFocusStore } from "../../store/focusStore";
 
 export default function FocusTimer() {
-  const {
-    session,
-    running,
-    completedSessions,
-    start,
-    pause,
-    reset,
-  } = useFocusStore();
+  const { session, running, completedSessions, start, pause, reset } =
+    useFocusStore();
 
   return (
     <Card className="w-full max-w-4xl">
@@ -40,9 +34,7 @@ export default function FocusTimer() {
             duration: 0.3,
           }}
         >
-          <h1 className="text-center text-3xl font-bold">
-            🧠 Focus Companion
-          </h1>
+          <h1 className="text-center text-3xl font-bold">🧠 Focus Companion</h1>
 
           <p className="mt-1 text-center text-zinc-400 capitalize">
             {session} Session
@@ -64,15 +56,9 @@ export default function FocusTimer() {
       </motion.div>
 
       {/* Animated Controls */}
-      <motion.div
-        layout
-        className="flex justify-center gap-3"
-      >
+      <motion.div layout className="flex justify-center gap-3">
         {!running ? (
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
               onClick={start}
               className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
@@ -82,10 +68,7 @@ export default function FocusTimer() {
             </Button>
           </motion.div>
         ) : (
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
               onClick={pause}
               className="bg-yellow-500 hover:bg-yellow-600 flex items-center gap-2"
@@ -96,10 +79,7 @@ export default function FocusTimer() {
           </motion.div>
         )}
 
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Button
             onClick={reset}
             className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
@@ -114,13 +94,8 @@ export default function FocusTimer() {
       <div className="my-6 h-px bg-zinc-800" />
 
       {/* Animated Stats */}
-      <motion.div
-        layout
-        className="text-center"
-      >
-        <p className="text-zinc-400">
-          🔥 Today's Progress
-        </p>
+      <motion.div layout className="text-center">
+        <p className="text-zinc-400">🔥 Today's Progress</p>
 
         <motion.p
           key={completedSessions}
@@ -132,9 +107,7 @@ export default function FocusTimer() {
           {completedSessions}
         </motion.p>
 
-        <p className="text-sm text-zinc-500">
-          Completed Sessions
-        </p>
+        <p className="text-sm text-zinc-500">Completed Sessions</p>
       </motion.div>
     </Card>
   );

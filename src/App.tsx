@@ -48,10 +48,7 @@ export default function App() {
 
             <GreetingCard />
 
-            <GoalCard
-              completedSessions={completedSessions}
-              goal={dailyGoal}
-            />
+            <GoalCard completedSessions={completedSessions} goal={dailyGoal} />
 
             <DashboardTabs
               dashboard={
@@ -59,7 +56,7 @@ export default function App() {
                   <StatsCard
                     completedSessions={completedSessions}
                     focusMinutes={Math.floor(
-                      (completedSessions * focusDuration) / 60
+                      (completedSessions * focusDuration) / 60,
                     )}
                   />
 
@@ -77,10 +74,7 @@ export default function App() {
             <FocusTimer />
 
             <div className="grid grid-cols-2 gap-6">
-              <Companion
-                session={session}
-                running={running}
-              />
+              <Companion session={session} running={running} />
 
               <SessionHistory />
             </div>
