@@ -15,14 +15,22 @@ export default function GreetingCard() {
   }
 
   return (
-    <Card className="mb-6">
-      <h2 className="text-3xl font-bold">
-        {emoji} {greeting}
-      </h2>
+    <Card>
+      <div className="flex items-center gap-4">
+        <div className="text-5xl">
+          {emoji}
+        </div>
 
-      <p className="mt-2 text-zinc-400">
-        Ready to make today productive?
-      </p>
+        <div>
+          <h2 className="text-2xl font-bold">
+            {greeting}
+          </h2>
+
+          <p className="text-zinc-400 mt-1">
+            Ready to make today count?
+          </p>
+        </div>
+      </div>
     </Card>
   );
 }

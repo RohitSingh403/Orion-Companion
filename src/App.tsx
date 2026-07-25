@@ -2,11 +2,11 @@ import { useState } from "react";
 
 import DashboardLayout from "./layouts/DashboardLayout";
 
+import Header from "./components/dashboard/Header";
 import GreetingCard from "./components/dashboard/GreetingCard";
 import GoalCard from "./components/dashboard/GoalCard";
 import StatsCard from "./components/dashboard/StatsCard";
 
-import Card from "./components/ui/Card";
 
 import SettingsModal from "./components/settings/SettingsModal";
 
@@ -36,6 +36,11 @@ export default function App() {
       <DashboardLayout
         left={
           <>
+            <Header
+              completedSessions={completedSessions}
+              onSettings={() => setSettingsOpen(true)}
+            />
+
             <GreetingCard />
 
             <GoalCard
@@ -50,23 +55,7 @@ export default function App() {
               )}
             />
 
-            <Card>
-              <button
-                onClick={() => setSettingsOpen(true)}
-                className="
-                  w-full
-                  rounded-xl
-                  bg-zinc-800
-                  hover:bg-zinc-700
-                  transition-colors
-                  p-4
-                  text-lg
-                  font-semibold
-                "
-              >
-                ⚙️ Open Settings
-              </button>
-            </Card>
+            
           </>
         }
         right={
