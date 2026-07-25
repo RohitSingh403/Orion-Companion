@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Notification } from "electron";
+import { app, BrowserWindow, ipcMain, Notification } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 const __dirname$1 = path.dirname(fileURLToPath(import.meta.url));
@@ -22,7 +22,10 @@ function createWindow() {
     }
   });
   win.webContents.on("did-finish-load", () => {
-    win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
+    win == null ? void 0 : win.webContents.send(
+      "main-process-message",
+      (/* @__PURE__ */ new Date()).toLocaleString()
+    );
   });
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL);
@@ -43,11 +46,12 @@ app.on("activate", () => {
 });
 app.whenReady().then(() => {
   createWindow();
-  const breakNotification = new Notification({
-    title: "☕ Break Time!",
-    body: "Stand up, stretch, and drink some water."
+  ipcMain.on("show-break-notification", () => {
+    new Notification({
+      title: "☕ Break Time!",
+      body: "Stand up, stretch, and drink some water."
+    }).show();
   });
-  breakNotification.show();
 });
 export {
   MAIN_DIST,
