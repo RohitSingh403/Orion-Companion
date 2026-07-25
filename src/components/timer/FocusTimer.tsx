@@ -1,3 +1,5 @@
+import { motion, AnimatePresence } from "framer-motion";
+
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 import ProgressRing from "./ProgressRing";
@@ -5,7 +7,6 @@ import ProgressRing from "./ProgressRing";
 import { FaPlay, FaPause, FaRedo } from "react-icons/fa";
 
 import { useFocusStore } from "../../store/focusStore";
-import { playSound } from "../../utils/audio";
 
 export default function FocusTimer() {
   const {
@@ -19,76 +20,122 @@ export default function FocusTimer() {
 
   return (
     <Card className="w-full max-w-4xl">
-      {/* Title */}
-      <h1 className="text-center text-3xl font-bold">
-        🧠 Focus Companion
-      </h1>
+      {/* Animated Header */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={session}
+          initial={{
+            opacity: 0,
+            y: -15,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          exit={{
+            opacity: 0,
+            y: 15,
+          }}
+          transition={{
+            duration: 0.3,
+          }}
+        >
+          <h1 className="text-center text-3xl font-bold">
+            🧠 Focus Companion
+          </h1>
 
-      {/* Session */}
-      <p className="mt-1 text-center text-zinc-400 capitalize">
-        {session} Session
-      </p>
+          <p className="mt-1 text-center text-zinc-400 capitalize">
+            {session} Session
+          </p>
+        </motion.div>
+      </AnimatePresence>
 
-      {/* Timer */}
-      <div className="my-5 flex justify-center">
+      {/* Animated Progress Ring */}
+      <motion.div
+        className="my-5 flex justify-center"
+        animate={{
+          scale: running ? 1.03 : 1,
+        }}
+        transition={{
+          duration: 0.4,
+        }}
+      >
         <ProgressRing />
-      </div>
+      </motion.div>
 
-      {/* Controls */}
-      <div className="flex justify-center gap-3">
+      {/* Animated Controls */}
+      <motion.div
+        layout
+        className="flex justify-center gap-3"
+      >
         {!running ? (
-          <Button
-            onClick={() => {
-              playSound("start.mp3");
-              start();
-            }}
-            className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <FaPlay />
-            Start
-          </Button>
+            <Button
+              onClick={start}
+              className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+            >
+              <FaPlay />
+              Start
+            </Button>
+          </motion.div>
         ) : (
-          <Button
-            onClick={() => {
-              playSound("click.mp3");
-              pause();
-            }}
-            className="bg-yellow-500 hover:bg-yellow-600 flex items-center gap-2"
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <FaPause />
-            Pause
-          </Button>
+            <Button
+              onClick={pause}
+              className="bg-yellow-500 hover:bg-yellow-600 flex items-center gap-2"
+            >
+              <FaPause />
+              Pause
+            </Button>
+          </motion.div>
         )}
 
-        <Button
-          onClick={() => {
-            playSound("click.mp3");
-            reset();
-          }}
-          className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
-          <FaRedo />
-          Reset
-        </Button>
-      </div>
+          <Button
+            onClick={reset}
+            className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+          >
+            <FaRedo />
+            Reset
+          </Button>
+        </motion.div>
+      </motion.div>
 
       {/* Divider */}
       <div className="my-6 h-px bg-zinc-800" />
 
-      {/* Progress */}
-      <div className="text-center">
+      {/* Animated Stats */}
+      <motion.div
+        layout
+        className="text-center"
+      >
         <p className="text-zinc-400">
           🔥 Today's Progress
         </p>
 
-        <p className="mt-1 text-4xl font-bold">
+        <motion.p
+          key={completedSessions}
+          initial={{ scale: 0.8 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.2 }}
+          className="mt-1 text-4xl font-bold"
+        >
           {completedSessions}
-        </p>
+        </motion.p>
 
         <p className="text-sm text-zinc-500">
           Completed Sessions
         </p>
-      </div>
+      </motion.div>
     </Card>
   );
 }

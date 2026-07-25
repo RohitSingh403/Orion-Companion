@@ -10,6 +10,14 @@ export interface SessionHistoryItem {
   type: "Focus Session";
 }
 
+// ----------------------
+// Default Values
+// ----------------------
+
+const DEFAULT_FOCUS_DURATION = 25 * 60;
+const DEFAULT_BREAK_DURATION = 5 * 60;
+const DEFAULT_DAILY_GOAL = 8;
+
 interface FocusState {
   session: SessionType;
 
@@ -43,6 +51,16 @@ interface FocusState {
   setFocusDuration: (minutes: number) => void;
   setBreakDuration: (minutes: number) => void;
   setDailyGoal: (goal: number) => void;
+
+  // ----------------------
+  // Reset Actions
+  // ----------------------
+
+  resetHistory: () => void;
+  resetTodayProgress: () => void;
+  resetStreak: () => void;
+  resetSettings: () => void;
+  resetAllData: () => void;
 }
 
 export const useFocusStore = create<FocusState>()(
@@ -50,22 +68,19 @@ export const useFocusStore = create<FocusState>()(
     (set, get) => ({
       session: "focus",
 
-      // Testing values
-      focusDuration: 20,
-      breakDuration: 5 * 60,
+      focusDuration: DEFAULT_FOCUS_DURATION,
+      breakDuration: DEFAULT_BREAK_DURATION,
 
-      dailyGoal: 8,
+      dailyGoal: DEFAULT_DAILY_GOAL,
 
-      remainingTime: 20,
+      remainingTime: DEFAULT_FOCUS_DURATION,
 
       running: false,
 
       completedSessions: 0,
 
-      // Session History
       history: [],
 
-      // Streak
       currentStreak: 0,
       lastCompletedDate: null,
 
@@ -98,7 +113,7 @@ export const useFocusStore = create<FocusState>()(
           return;
         }
 
-        // Focus session completed
+        // Focus completed
         if (state.session === "focus") {
           get().addHistory();
           get().updateStreak();
@@ -145,22 +160,16 @@ export const useFocusStore = create<FocusState>()(
         const today = getTodayString();
         const yesterday = getYesterdayString();
 
-        // Already counted today
-        if (state.lastCompletedDate === today) {
-          return;
-        }
+        if (state.lastCompletedDate === today) return;
 
-        // Consecutive day
         if (state.lastCompletedDate === yesterday) {
           set({
             currentStreak: state.currentStreak + 1,
             lastCompletedDate: today,
           });
-
           return;
         }
 
-        // First session or streak reset
         set({
           currentStreak: 1,
           lastCompletedDate: today,
@@ -188,6 +197,54 @@ export const useFocusStore = create<FocusState>()(
       setDailyGoal: (goal) =>
         set({
           dailyGoal: goal,
+        }),
+
+      // ----------------------
+      // Reset Actions
+      // ----------------------
+
+      resetHistory: () =>
+        set({
+          history: [],
+        }),
+
+      resetTodayProgress: () =>
+        set({
+          completedSessions: 0,
+        }),
+
+      resetStreak: () =>
+        set({
+          currentStreak: 0,
+          lastCompletedDate: null,
+        }),
+
+      resetSettings: () =>
+        set({
+          focusDuration: DEFAULT_FOCUS_DURATION,
+          breakDuration: DEFAULT_BREAK_DURATION,
+          dailyGoal: DEFAULT_DAILY_GOAL,
+          remainingTime: DEFAULT_FOCUS_DURATION,
+        }),
+
+      resetAllData: () =>
+        set({
+          session: "focus",
+          running: false,
+
+          focusDuration: DEFAULT_FOCUS_DURATION,
+          breakDuration: DEFAULT_BREAK_DURATION,
+
+          dailyGoal: DEFAULT_DAILY_GOAL,
+
+          remainingTime: DEFAULT_FOCUS_DURATION,
+
+          completedSessions: 0,
+
+          history: [],
+
+          currentStreak: 0,
+          lastCompletedDate: null,
         }),
     }),
     {

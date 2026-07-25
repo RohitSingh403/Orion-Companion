@@ -14,39 +14,49 @@ interface AchievementState {
   resetAchievements: () => void;
 }
 
-export const useAchievementStore =
-  create<AchievementState>()(
-    persist(
-      (set, get) => ({
-        achievements: defaultAchievements,
+export const useAchievementStore = create<AchievementState>()(
+  persist(
+    (set, get) => ({
+      achievements: defaultAchievements,
 
-        unlockAchievement: (id) =>
-          set((state) => ({
-            achievements: state.achievements.map((achievement) =>
-              achievement.id === id
-                ? {
-                    ...achievement,
-                    unlocked: true,
-                  }
-                : achievement
-            ),
+      unlockAchievement: (id) => {
+        const achievement = get().achievements.find(
+          (a) => a.id === id
+        );
+
+        if (!achievement || achievement.unlocked) {
+          return;
+        }
+
+        set((state) => ({
+          achievements: state.achievements.map((achievement) =>
+            achievement.id === id
+              ? {
+                  ...achievement,
+                  unlocked: true,
+                }
+              : achievement
+          ),
+        }));
+      },
+
+      isUnlocked: (id) => {
+        return get().achievements.some(
+          (achievement) =>
+            achievement.id === id &&
+            achievement.unlocked
+        );
+      },
+
+      resetAchievements: () =>
+        set({
+          achievements: defaultAchievements.map((achievement) => ({
+            ...achievement,
           })),
-
-        isUnlocked: (id) => {
-          return get().achievements.some(
-            (achievement) =>
-              achievement.id === id &&
-              achievement.unlocked
-          );
-        },
-
-        resetAchievements: () =>
-          set({
-            achievements: defaultAchievements,
-          }),
-      }),
-      {
-        name: "achievement-storage",
-      }
-    )
-  );
+        }),
+    }),
+    {
+      name: "achievement-storage",
+    }
+  )
+);

@@ -1,3 +1,5 @@
+import { AnimatePresence, motion } from "framer-motion";
+
 import Card from "../ui/Card";
 import SettingsPanel from "./SettingsPanel";
 
@@ -6,33 +8,67 @@ interface SettingsModalProps {
   onClose: () => void;
 }
 
-export default function SettingsModal({ open, onClose }: SettingsModalProps) {
-  if (!open) return null;
-
+export default function SettingsModal({
+  open,
+  onClose,
+}: SettingsModalProps) {
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-lg px-4"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Card>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">⚙️ Settings</h2>
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          onClick={onClose}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="w-full max-w-xl px-4"
+            onClick={(e) => e.stopPropagation()}
+            initial={{
+              opacity: 0,
+              scale: 0.92,
+              y: 30,
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              y: 0,
+            }}
+            exit={{
+              opacity: 0,
+              scale: 0.92,
+              y: 30,
+            }}
+            transition={{
+              duration: 0.25,
+            }}
+          >
+            <Card>
+              <div className="mb-6 flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold">
+                    ⚙️ Settings
+                  </h2>
 
-            <button
-              onClick={onClose}
-              className="text-zinc-400 hover:text-white text-2xl"
-            >
-              ×
-            </button>
-          </div>
+                  <p className="text-sm text-zinc-400">
+                    Customize your focus experience
+                  </p>
+                </div>
 
-          <SettingsPanel />
-        </Card>
-      </div>
-    </div>
+                <button
+                  onClick={onClose}
+                  className="text-3xl text-zinc-400 transition hover:text-white"
+                >
+                  ×
+                </button>
+              </div>
+
+              <SettingsPanel />
+            </Card>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
