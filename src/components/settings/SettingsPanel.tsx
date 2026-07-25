@@ -13,12 +13,9 @@ export default function SettingsPanel() {
 
   return (
     <Card>
-      <h2 className="text-xl font-bold mb-6">
-        ⚙️ Settings
-      </h2>
+      <h2 className="text-xl font-bold mb-6">⚙️ Settings</h2>
 
       <div className="space-y-5">
-
         {/* Focus Duration */}
 
         <div>
@@ -30,9 +27,7 @@ export default function SettingsPanel() {
             type="number"
             min={1}
             value={focusDuration / 60}
-            onChange={(e) =>
-              setFocusDuration(Number(e.target.value))
-            }
+            onChange={(e) => setFocusDuration(Number(e.target.value))}
             className="w-full rounded-lg bg-zinc-800 p-3"
           />
         </div>
@@ -48,9 +43,7 @@ export default function SettingsPanel() {
             type="number"
             min={1}
             value={breakDuration / 60}
-            onChange={(e) =>
-              setBreakDuration(Number(e.target.value))
-            }
+            onChange={(e) => setBreakDuration(Number(e.target.value))}
             className="w-full rounded-lg bg-zinc-800 p-3"
           />
         </div>
@@ -66,13 +59,10 @@ export default function SettingsPanel() {
             type="number"
             min={1}
             value={dailyGoal}
-            onChange={(e) =>
-              setDailyGoal(Number(e.target.value))
-            }
+            onChange={(e) => setDailyGoal(Number(e.target.value))}
             className="w-full rounded-lg bg-zinc-800 p-3"
           />
         </div>
-
       </div>
     </Card>
   );

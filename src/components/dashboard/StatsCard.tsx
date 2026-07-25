@@ -14,10 +14,10 @@ export default function StatsCard({
     completedSessions >= 8
       ? "Excellent"
       : completedSessions >= 4
-      ? "Great"
-      : completedSessions >= 2
-      ? "Good"
-      : "Starting";
+        ? "Great"
+        : completedSessions >= 2
+          ? "Good"
+          : "Starting";
 
   return (
     <Card>
@@ -32,9 +32,7 @@ export default function StatsCard({
             <span className="text-zinc-300">Focus Sessions</span>
           </div>
 
-          <span className="font-bold text-white">
-            {completedSessions}
-          </span>
+          <span className="font-bold text-white">{completedSessions}</span>
         </div>
 
         <div className="h-px bg-zinc-800" />
@@ -45,9 +43,7 @@ export default function StatsCard({
             <span className="text-zinc-300">Focus Minutes</span>
           </div>
 
-          <span className="font-bold text-white">
-            {focusMinutes}m
-          </span>
+          <span className="font-bold text-white">{focusMinutes}m</span>
         </div>
 
         <div className="h-px bg-zinc-800" />
@@ -58,9 +54,7 @@ export default function StatsCard({
             <span className="text-zinc-300">Productivity</span>
           </div>
 
-          <span className="font-semibold text-emerald-400">
-            {productivity}
-          </span>
+          <span className="font-semibold text-emerald-400">{productivity}</span>
         </div>
       </div>
     </Card>

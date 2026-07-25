@@ -6,10 +6,7 @@ interface SettingsModalProps {
   onClose: () => void;
 }
 
-export default function SettingsModal({
-  open,
-  onClose,
-}: SettingsModalProps) {
+export default function SettingsModal({ open, onClose }: SettingsModalProps) {
   if (!open) return null;
 
   return (
@@ -23,9 +20,7 @@ export default function SettingsModal({
       >
         <Card>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">
-              ⚙️ Settings
-            </h2>
+            <h2 className="text-2xl font-bold">⚙️ Settings</h2>
 
             <button
               onClick={onClose}

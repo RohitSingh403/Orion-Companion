@@ -7,14 +7,8 @@ import { FaPlay, FaPause, FaRedo } from "react-icons/fa";
 import { useFocusStore } from "../../store/focusStore";
 
 export default function FocusTimer() {
-  const {
-    session,
-    running,
-    completedSessions,
-    start,
-    pause,
-    reset,
-  } = useFocusStore();
+  const { session, running, completedSessions, start, pause, reset } =
+    useFocusStore();
 
   return (
     <Card className="w-full max-w-2xl">
@@ -62,17 +56,13 @@ export default function FocusTimer() {
 
       {/* Progress */}
       <div className="mt-8 border-t border-zinc-800 pt-5">
-        <h3 className="text-center text-zinc-400">
-          🔥 Today's Progress
-        </h3>
+        <h3 className="text-center text-zinc-400">🔥 Today's Progress</h3>
 
         <p className="text-center text-3xl font-bold mt-2">
           {completedSessions}
         </p>
 
-        <p className="text-center text-zinc-500">
-          Completed Sessions
-        </p>
+        <p className="text-center text-zinc-500">Completed Sessions</p>
       </div>
     </Card>
   );

@@ -19,10 +19,7 @@ export default function usePomodoro() {
   const previousSession = useRef(session);
 
   useEffect(() => {
-    if (
-      previousSession.current === "focus" &&
-      session === "break"
-    ) {
+    if (previousSession.current === "focus" && session === "break") {
       window.focusAPI?.showBreakNotification();
     }
 

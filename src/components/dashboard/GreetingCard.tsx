@@ -17,18 +17,12 @@ export default function GreetingCard() {
   return (
     <Card>
       <div className="flex items-center gap-4">
-        <div className="text-5xl">
-          {emoji}
-        </div>
+        <div className="text-5xl">{emoji}</div>
 
         <div>
-          <h2 className="text-2xl font-bold">
-            {greeting}
-          </h2>
+          <h2 className="text-2xl font-bold">{greeting}</h2>
 
-          <p className="text-zinc-400 mt-1">
-            Ready to make today count?
-          </p>
+          <p className="text-zinc-400 mt-1">Ready to make today count?</p>
         </div>
       </div>
     </Card>

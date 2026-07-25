@@ -6,7 +6,6 @@ import GreetingCard from "./components/dashboard/GreetingCard";
 import GoalCard from "./components/dashboard/GoalCard";
 import StatsCard from "./components/dashboard/StatsCard";
 
-
 import SettingsModal from "./components/settings/SettingsModal";
 
 import FocusTimer from "./components/timer/FocusTimer";
@@ -42,29 +41,21 @@ export default function App() {
 
             <GreetingCard />
 
-            <GoalCard
-              completedSessions={completedSessions}
-              goal={dailyGoal}
-            />
+            <GoalCard completedSessions={completedSessions} goal={dailyGoal} />
 
             <StatsCard
               completedSessions={completedSessions}
               focusMinutes={Math.floor(
-                (completedSessions * focusDuration) / 60
+                (completedSessions * focusDuration) / 60,
               )}
             />
-
-            
           </>
         }
         right={
           <div className="flex flex-col items-center gap-6 w-full">
             <FocusTimer />
 
-            <Companion
-              session={session}
-              running={running}
-            />
+            <Companion session={session} running={running} />
           </div>
         }
       />

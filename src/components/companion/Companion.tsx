@@ -5,10 +5,7 @@ interface CompanionProps {
   running: boolean;
 }
 
-export default function Companion({
-  session,
-  running,
-}: CompanionProps) {
+export default function Companion({ session, running }: CompanionProps) {
   let emoji = "😴";
   let message = "Ready when you are.";
 
@@ -46,13 +43,9 @@ export default function Companion({
           transition={{ duration: 0.25 }}
           className="text-center"
         >
-          <div className="text-5xl">
-            {emoji}
-          </div>
+          <div className="text-5xl">{emoji}</div>
 
-          <p className="mt-3 text-zinc-300">
-            {message}
-          </p>
+          <p className="mt-3 text-zinc-300">{message}</p>
         </motion.div>
       </AnimatePresence>
     </motion.div>

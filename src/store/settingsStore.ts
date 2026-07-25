@@ -15,28 +15,27 @@ interface SettingsState {
   toggleSound: () => void;
 }
 
-export const useSettingsStore =
-  create<SettingsState>((set) => ({
-    focusMinutes: 25,
-    breakMinutes: 5,
+export const useSettingsStore = create<SettingsState>((set) => ({
+  focusMinutes: 25,
+  breakMinutes: 5,
 
-    autoStartBreak: false,
-    autoStartFocus: false,
+  autoStartBreak: false,
+  autoStartFocus: false,
 
-    soundEnabled: true,
+  soundEnabled: true,
 
-    setFocusMinutes: (minutes) =>
-      set({
-        focusMinutes: minutes,
-      }),
+  setFocusMinutes: (minutes) =>
+    set({
+      focusMinutes: minutes,
+    }),
 
-    setBreakMinutes: (minutes) =>
-      set({
-        breakMinutes: minutes,
-      }),
+  setBreakMinutes: (minutes) =>
+    set({
+      breakMinutes: minutes,
+    }),
 
-    toggleSound: () =>
-      set((state) => ({
-        soundEnabled: !state.soundEnabled,
-      })),
-  }));
+  toggleSound: () =>
+    set((state) => ({
+      soundEnabled: !state.soundEnabled,
+    })),
+}));

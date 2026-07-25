@@ -3,18 +3,10 @@ import { useFocusStore } from "../../store/focusStore";
 import { formatTime } from "../../utils/time";
 
 export default function ProgressRing() {
-  const {
-    remainingTime,
-    session,
-    focusDuration,
-    breakDuration,
-    running,
-  } = useFocusStore();
+  const { remainingTime, session, focusDuration, breakDuration, running } =
+    useFocusStore();
 
-  const duration =
-    session === "focus"
-      ? focusDuration
-      : breakDuration;
+  const duration = session === "focus" ? focusDuration : breakDuration;
 
   const radius = 110;
   const stroke = 12;
@@ -25,8 +17,7 @@ export default function ProgressRing() {
 
   const progress = remainingTime / duration;
 
-  const strokeDashoffset =
-    circumference * (1 - progress);
+  const strokeDashoffset = circumference * (1 - progress);
 
   let color = "#22c55e";
 
@@ -36,14 +27,8 @@ export default function ProgressRing() {
 
   return (
     <div className="flex justify-center mb-10">
-
       <div className="relative w-[250px] h-[250px]">
-
-        <svg
-          width="250"
-          height="250"
-        >
-
+        <svg width="250" height="250">
           {/* Background Ring */}
 
           <circle
@@ -78,13 +63,11 @@ export default function ProgressRing() {
               filter: `drop-shadow(0px 0px 8px ${color})`,
             }}
           />
-
         </svg>
 
         {/* Timer */}
 
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-
           <motion.h1
             key={remainingTime}
             initial={{
@@ -103,10 +86,7 @@ export default function ProgressRing() {
             {formatTime(remainingTime)}
           </motion.h1>
 
-          <p className="text-zinc-400 mt-2 capitalize">
-            {session} Session
-          </p>
-
+          <p className="text-zinc-400 mt-2 capitalize">{session} Session</p>
         </div>
 
         {/* Pulsing Dot */}
@@ -127,9 +107,7 @@ export default function ProgressRing() {
             }}
           />
         )}
-
       </div>
-
     </div>
   );
 }

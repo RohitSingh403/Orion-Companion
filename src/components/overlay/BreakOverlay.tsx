@@ -35,9 +35,7 @@ export default function BreakOverlay({
           >
             <div className="text-8xl mb-6">☕</div>
 
-            <h1 className="text-5xl font-bold">
-              Break Time
-            </h1>
+            <h1 className="text-5xl font-bold">Break Time</h1>
 
             <p className="mt-3 text-zinc-400 text-xl">
               Relax for a few minutes.

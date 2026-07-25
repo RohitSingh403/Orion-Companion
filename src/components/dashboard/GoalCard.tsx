@@ -5,14 +5,9 @@ interface GoalCardProps {
   goal: number;
 }
 
-export default function GoalCard({
-  completedSessions,
-  goal,
-}: GoalCardProps) {
+export default function GoalCard({ completedSessions, goal }: GoalCardProps) {
   const percentage =
-    goal === 0
-      ? 0
-      : Math.min((completedSessions / goal) * 100, 100);
+    goal === 0 ? 0 : Math.min((completedSessions / goal) * 100, 100);
 
   return (
     <Card>
@@ -26,9 +21,7 @@ export default function GoalCard({
             {completedSessions} / {goal}
           </h2>
 
-          <p className="text-sm text-zinc-400 mt-1">
-            Sessions Completed
-          </p>
+          <p className="text-sm text-zinc-400 mt-1">Sessions Completed</p>
         </div>
 
         <div className="text-4xl">🎯</div>
@@ -44,9 +37,7 @@ export default function GoalCard({
       </div>
 
       <div className="flex justify-between mt-3 text-sm">
-        <span className="text-zinc-500">
-          Progress
-        </span>
+        <span className="text-zinc-500">Progress</span>
 
         <span className="font-semibold text-emerald-400">
           {Math.round(percentage)}%

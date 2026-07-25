@@ -5,10 +5,7 @@ interface HeaderProps {
   onSettings: () => void;
 }
 
-export default function Header({
-  completedSessions,
-  onSettings,
-}: HeaderProps) {
+export default function Header({ completedSessions, onSettings }: HeaderProps) {
   return (
     <div className="mb-6">
       <div className="flex items-start justify-between">
@@ -53,13 +50,9 @@ export default function Header({
       <div className="mt-5 flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3">
         <FaFire className="text-orange-500" />
 
-        <span className="font-semibold text-white">
-          {completedSessions}
-        </span>
+        <span className="font-semibold text-white">{completedSessions}</span>
 
-        <span className="text-zinc-400">
-          Sessions Today
-        </span>
+        <span className="text-zinc-400">Sessions Today</span>
       </div>
     </div>
   );
