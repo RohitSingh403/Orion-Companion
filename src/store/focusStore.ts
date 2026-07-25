@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export type SessionType = "focus" | "break";
 
@@ -16,6 +17,10 @@ interface FocusState {
 
   completedSessions: number;
 
+  // NEW
+  currentStreak: number;
+  lastCompletedDate: string | null;
+
   start: () => void;
   pause: () => void;
   reset: () => void;
@@ -27,80 +32,111 @@ interface FocusState {
   setDailyGoal: (goal: number) => void;
 }
 
-export const useFocusStore = create<FocusState>((set, get) => ({
-  session: "focus",
-
-  // Testing values (20 seconds)
-  focusDuration: 20,
-  breakDuration: 5 * 60,
-
-  dailyGoal: 8,
-
-  remainingTime: 20,
-
-  running: false,
-
-  completedSessions: 0,
-
-  start: () => set({ running: true }),
-
-  pause: () => set({ running: false }),
-
-  reset: () =>
-    set((state) => ({
+export const useFocusStore = create<FocusState>()(
+  persist(
+    (set, get) => ({
       session: "focus",
+
+      // Testing values (20 seconds)
+      focusDuration: 20,
+      breakDuration: 5 * 60,
+
+      dailyGoal: 8,
+
+      remainingTime: 20,
+
       running: false,
-      remainingTime: state.focusDuration,
+
       completedSessions: 0,
-    })),
 
-  tick: () => {
-    const state = get();
+      // NEW
+      currentStreak: 0,
+      lastCompletedDate: null,
 
-    if (!state.running) return;
+      start: () =>
+        set({
+          running: true,
+        }),
 
-    if (state.remainingTime > 1) {
-      set({
-        remainingTime: state.remainingTime - 1,
-      });
-      return;
-    }
+      pause: () =>
+        set({
+          running: false,
+        }),
 
-    if (state.session === "focus") {
-      set({
-        session: "break",
-        remainingTime: state.breakDuration,
-        completedSessions: state.completedSessions + 1,
-      });
-      return;
-    }
+      reset: () =>
+        set((state) => ({
+          session: "focus",
+          running: false,
+          remainingTime: state.focusDuration,
+          completedSessions: 0,
+        })),
 
-    set({
-      session: "focus",
-      remainingTime: state.focusDuration,
-    });
-  },
+      tick: () => {
+        const state = get();
 
-  setFocusDuration: (minutes) =>
-    set((state) => ({
-      focusDuration: minutes * 60,
-      remainingTime:
-        state.session === "focus"
-          ? minutes * 60
-          : state.remainingTime,
-    })),
+        if (!state.running) return;
 
-  setBreakDuration: (minutes) =>
-    set((state) => ({
-      breakDuration: minutes * 60,
-      remainingTime:
-        state.session === "break"
-          ? minutes * 60
-          : state.remainingTime,
-    })),
+        if (state.remainingTime > 1) {
+          set({
+            remainingTime: state.remainingTime - 1,
+          });
+          return;
+        }
 
-  setDailyGoal: (goal) =>
-    set({
-      dailyGoal: goal,
+        // Focus session finished
+        if (state.session === "focus") {
+          set({
+            session: "break",
+            remainingTime: state.breakDuration,
+            completedSessions: state.completedSessions + 1,
+          });
+
+          return;
+        }
+
+        // Break finished
+        set({
+          session: "focus",
+          remainingTime: state.focusDuration,
+        });
+      },
+
+      setFocusDuration: (minutes) =>
+        set((state) => ({
+          focusDuration: minutes * 60,
+          remainingTime:
+            state.session === "focus"
+              ? minutes * 60
+              : state.remainingTime,
+        })),
+
+      setBreakDuration: (minutes) =>
+        set((state) => ({
+          breakDuration: minutes * 60,
+          remainingTime:
+            state.session === "break"
+              ? minutes * 60
+              : state.remainingTime,
+        })),
+
+      setDailyGoal: (goal) =>
+        set({
+          dailyGoal: goal,
+        }),
     }),
-}));
+    {
+      name: "focus-companion-storage",
+
+      partialize: (state) => ({
+        focusDuration: state.focusDuration,
+        breakDuration: state.breakDuration,
+        dailyGoal: state.dailyGoal,
+        completedSessions: state.completedSessions,
+
+        // NEW
+        currentStreak: state.currentStreak,
+        lastCompletedDate: state.lastCompletedDate,
+      }),
+    }
+  )
+);
