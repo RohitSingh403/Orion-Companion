@@ -17,6 +17,8 @@ import Companion from "./components/companion/Companion";
 import SessionHistory from "./components/history/SessionHistory";
 import BreakOverlay from "./components/overlay/BreakOverlay";
 
+import AchievementToast from "./components/ui/AchievementToast";
+
 import usePomodoro from "./hooks/usePomodoro";
 import { useFocusStore } from "./store/focusStore";
 
@@ -90,6 +92,9 @@ export default function App() {
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
       />
+
+      {/* Achievement Toast */}
+      <AchievementToast />
 
       <BreakOverlay
         visible={session === "break"}
