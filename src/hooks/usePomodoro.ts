@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useFocusStore } from "../store/focusStore";
+import { playSound } from "../utils/audio";
 
 declare global {
   interface Window {
@@ -24,6 +25,7 @@ export default function usePomodoro() {
       previousSession.current === "focus" &&
       session === "break"
     ) {
+      playSound("break.mp3");
       window.focusAPI?.showBreakNotification();
     }
 
@@ -32,6 +34,7 @@ export default function usePomodoro() {
       previousSession.current === "break" &&
       session === "focus"
     ) {
+      playSound("complete.mp3");
       window.focusAPI?.showFocusNotification();
     }
 

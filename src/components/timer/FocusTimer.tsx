@@ -5,6 +5,7 @@ import ProgressRing from "./ProgressRing";
 import { FaPlay, FaPause, FaRedo } from "react-icons/fa";
 
 import { useFocusStore } from "../../store/focusStore";
+import { playSound } from "../../utils/audio";
 
 export default function FocusTimer() {
   const {
@@ -37,7 +38,10 @@ export default function FocusTimer() {
       <div className="flex justify-center gap-3">
         {!running ? (
           <Button
-            onClick={start}
+            onClick={() => {
+              playSound("start.mp3");
+              start();
+            }}
             className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
           >
             <FaPlay />
@@ -45,7 +49,10 @@ export default function FocusTimer() {
           </Button>
         ) : (
           <Button
-            onClick={pause}
+            onClick={() => {
+              playSound("click.mp3");
+              pause();
+            }}
             className="bg-yellow-500 hover:bg-yellow-600 flex items-center gap-2"
           >
             <FaPause />
@@ -54,7 +61,10 @@ export default function FocusTimer() {
         )}
 
         <Button
-          onClick={reset}
+          onClick={() => {
+            playSound("click.mp3");
+            reset();
+          }}
           className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
         >
           <FaRedo />
