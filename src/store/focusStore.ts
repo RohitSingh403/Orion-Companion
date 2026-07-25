@@ -3,6 +3,12 @@ import { persist } from "zustand/middleware";
 
 export type SessionType = "focus" | "break";
 
+export interface SessionHistoryItem {
+  id: string;
+  time: string;
+  type: "Focus Session";
+}
+
 interface FocusState {
   session: SessionType;
 
@@ -17,6 +23,10 @@ interface FocusState {
 
   completedSessions: number;
 
+  // Session History
+  history: SessionHistoryItem[];
+
+  // Streak
   currentStreak: number;
   lastCompletedDate: string | null;
 
@@ -25,6 +35,8 @@ interface FocusState {
   reset: () => void;
 
   tick: () => void;
+
+  addHistory: () => void;
 
   setFocusDuration: (minutes: number) => void;
   setBreakDuration: (minutes: number) => void;
@@ -36,7 +48,7 @@ export const useFocusStore = create<FocusState>()(
     (set, get) => ({
       session: "focus",
 
-      // Testing values (20 seconds)
+      // Testing values
       focusDuration: 20,
       breakDuration: 5 * 60,
 
@@ -48,6 +60,10 @@ export const useFocusStore = create<FocusState>()(
 
       completedSessions: 0,
 
+      // Session History
+      history: [],
+
+      // Streak
       currentStreak: 0,
       lastCompletedDate: null,
 
@@ -61,7 +77,6 @@ export const useFocusStore = create<FocusState>()(
           running: false,
         }),
 
-      // Reset ONLY resets the timer
       reset: () =>
         set((state) => ({
           session: "focus",
@@ -83,6 +98,9 @@ export const useFocusStore = create<FocusState>()(
 
         // Focus session completed
         if (state.session === "focus") {
+          // ⭐ NEW
+          get().addHistory();
+
           set({
             session: "break",
             remainingTime: state.breakDuration,
@@ -99,18 +117,42 @@ export const useFocusStore = create<FocusState>()(
         });
       },
 
+      addHistory: () => {
+        const state = get();
+
+        const currentTime = new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        set({
+          history: [
+            {
+              id: crypto.randomUUID(),
+              time: currentTime,
+              type: "Focus Session",
+            },
+            ...state.history,
+          ],
+        });
+      },
+
       setFocusDuration: (minutes) =>
         set((state) => ({
           focusDuration: minutes * 60,
           remainingTime:
-            state.session === "focus" ? minutes * 60 : state.remainingTime,
+            state.session === "focus"
+              ? minutes * 60
+              : state.remainingTime,
         })),
 
       setBreakDuration: (minutes) =>
         set((state) => ({
           breakDuration: minutes * 60,
           remainingTime:
-            state.session === "break" ? minutes * 60 : state.remainingTime,
+            state.session === "break"
+              ? minutes * 60
+              : state.remainingTime,
         })),
 
       setDailyGoal: (goal) =>
@@ -127,9 +169,14 @@ export const useFocusStore = create<FocusState>()(
         dailyGoal: state.dailyGoal,
 
         completedSessions: state.completedSessions,
+
+        // Persist session history
+        history: state.history,
+
+        // Persist streak
         currentStreak: state.currentStreak,
         lastCompletedDate: state.lastCompletedDate,
       }),
-    },
-  ),
+    }
+  )
 );
