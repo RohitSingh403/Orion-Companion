@@ -13,7 +13,7 @@ export default function FocusTimer() {
     useFocusStore();
 
   return (
-    <Card className="w-full max-w-4xl">
+    <Card className="w-full max-w-2xl">
       {/* Animated Header */}
       <AnimatePresence mode="wait">
         <motion.div

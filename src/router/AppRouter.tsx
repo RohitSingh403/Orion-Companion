@@ -9,6 +9,7 @@ import {
 
 import DashboardContent from "../components/dashboard/DashboardContent";
 
+import FocusPage from "../pages/Focus/FocusPage";
 import TasksPage from "../pages/Tasks/TasksPage";
 
 function PlaceholderPage({
@@ -40,7 +41,7 @@ export default function AppRouter() {
 
         <Route
           path="/focus"
-          element={<PlaceholderPage title="Focus" />}
+          element={<FocusPage />}
         />
 
         <Route

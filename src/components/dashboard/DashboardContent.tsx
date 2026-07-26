@@ -20,11 +20,11 @@ import BreakOverlay from "../overlay/BreakOverlay";
 
 import AchievementToast from "../ui/AchievementToast";
 
-import usePomodoro from "../../hooks/usePomodoro";
+// import usePomodoro from "../../hooks/usePomodoro";
 import { useFocusStore } from "../../store/focusStore";
 
 export default function DashboardContent() {
-  usePomodoro();
+  // usePomodoro();
 
   const [settingsOpen, setSettingsOpen] = useState(false);
 
