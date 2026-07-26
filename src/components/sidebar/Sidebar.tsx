@@ -41,37 +41,43 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex flex-1 flex-col gap-2">
         <SidebarItem
+          to="/"
           icon={<FaHome />}
           label="Dashboard"
-          active
         />
 
         <SidebarItem
+          to="/focus"
           icon={<FaBullseye />}
           label="Focus"
         />
 
         <SidebarItem
+          to="/tasks"
           icon={<FaCheckSquare />}
           label="Tasks"
         />
 
         <SidebarItem
+          to="/notes"
           icon={<FaStickyNote />}
           label="Notes"
         />
 
         <SidebarItem
+          to="/analytics"
           icon={<FaChartBar />}
           label="Analytics"
         />
 
         <SidebarItem
+          to="/achievements"
           icon={<FaTrophy />}
           label="Achievements"
         />
 
         <SidebarItem
+          to="/settings"
           icon={<FaCog />}
           label="Settings"
         />

@@ -9,6 +9,8 @@ import {
 
 import DashboardContent from "../components/dashboard/DashboardContent";
 
+import TasksPage from "../pages/Tasks/TasksPage";
+
 function PlaceholderPage({
   title,
 }: {
@@ -19,6 +21,7 @@ function PlaceholderPage({
       <h1 className="text-4xl font-bold">
         {title}
         <span className="ml-2 text-lg text-zinc-500">
+          {" "}
           (Coming Soon)
         </span>
       </h1>
@@ -42,7 +45,7 @@ export default function AppRouter() {
 
         <Route
           path="/tasks"
-          element={<PlaceholderPage title="Tasks" />}
+          element={<TasksPage />}
         />
 
         <Route
