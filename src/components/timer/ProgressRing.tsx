@@ -1,3 +1,5 @@
+// src/components/timer/ProgressRing.tsx
+
 import { motion } from "framer-motion";
 import { useFocusStore } from "../../store/focusStore";
 import { formatTime } from "../../utils/time";
@@ -8,148 +10,136 @@ export default function ProgressRing() {
 
   const duration = session === "focus" ? focusDuration : breakDuration;
 
-  const radius = 110;
-  const stroke = 12;
+  // Ring geometry
+  const SIZE = 280;
+  const CENTER = SIZE / 2;
+  const RADIUS = 115;
+  const STROKE = 10;
+  const NORMALIZED_RADIUS = RADIUS - STROKE / 2;
+  const CIRCUMFERENCE = 2 * Math.PI * NORMALIZED_RADIUS;
 
-  const normalizedRadius = radius - stroke / 2;
+  const progress = Math.max(0, remainingTime / duration);
+  const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
 
-  const circumference = 2 * Math.PI * normalizedRadius;
-
-  const progress = remainingTime / duration;
-
-  const strokeDashoffset = circumference * (1 - progress);
-
-  // Dynamic Color
-  let color = "#22c55e";
+  // Dynamic ring color: green → amber → red for focus; blue for break
+  let ringColor = "#22c55e";
+  let labelBg = "bg-emerald-500/15";
+  let labelText = "text-emerald-400";
 
   if (session === "break") {
-    color = "#3b82f6";
+    ringColor = "#3b82f6";
+    labelBg = "bg-blue-500/15";
+    labelText = "text-blue-400";
   } else {
-    if (progress < 0.5) color = "#f59e0b";
-    if (progress < 0.2) color = "#ef4444";
+    if (progress < 0.5) {
+      ringColor = "#f59e0b";
+      labelBg = "bg-amber-500/15";
+      labelText = "text-amber-400";
+    }
+    if (progress < 0.2) {
+      ringColor = "#ef4444";
+      labelBg = "bg-red-500/15";
+      labelText = "text-red-400";
+    }
   }
 
   const isEnding = running && remainingTime <= 10 && session === "focus";
 
-  return (
-    <div className="flex justify-center mb-8">
-      <motion.div
-        animate={
-          isEnding
-            ? {
-                scale: [1, 1.03, 1],
-              }
-            : {}
-        }
-        transition={{
-          repeat: Infinity,
-          duration: 0.8,
-        }}
-        className="relative w-[260px] h-[260px]"
-      >
-        <svg width="260" height="260">
-          {/* Background */}
+  const sessionLabel = session === "focus" ? "🎯 Focus Time" : "☕ Break Time";
 
+  return (
+    <div className="flex items-center justify-center">
+      <motion.div
+        animate={isEnding ? { scale: [1, 1.025, 1] } : {}}
+        transition={{ repeat: Infinity, duration: 0.8 }}
+        className="relative"
+        style={{ width: SIZE, height: SIZE }}
+      >
+        <svg
+          width={SIZE}
+          height={SIZE}
+          className="overflow-visible"
+        >
+          {/* Outer ambient glow ring (subtle) */}
           <circle
-            cx="130"
-            cy="130"
-            r={normalizedRadius}
-            stroke="#27272a"
-            strokeWidth={stroke}
+            cx={CENTER}
+            cy={CENTER}
+            r={NORMALIZED_RADIUS + 8}
+            stroke={ringColor}
+            strokeWidth={1}
+            fill="none"
+            opacity={0.08}
+          />
+
+          {/* Track ring */}
+          <circle
+            cx={CENTER}
+            cy={CENTER}
+            r={NORMALIZED_RADIUS}
+            stroke="#1c1c1f"
+            strokeWidth={STROKE}
             fill="none"
           />
 
-          {/* Progress */}
-
+          {/* Animated progress arc */}
           <motion.circle
-            cx="130"
-            cy="130"
-            r={normalizedRadius}
+            cx={CENTER}
+            cy={CENTER}
+            r={NORMALIZED_RADIUS}
             fill="none"
-            stroke={color}
-            strokeWidth={stroke}
+            stroke={ringColor}
+            strokeWidth={STROKE}
             strokeLinecap="round"
-            strokeDasharray={circumference}
+            strokeDasharray={CIRCUMFERENCE}
             animate={{
               strokeDashoffset,
-              stroke: color,
+              stroke: ringColor,
             }}
-            transition={{
-              duration: 0.5,
-              ease: "easeInOut",
-            }}
-            transform="rotate(-90 130 130)"
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+            transform={`rotate(-90 ${CENTER} ${CENTER})`}
             style={{
-              filter: `drop-shadow(0 0 12px ${color})`,
+              filter: `drop-shadow(0 0 14px ${ringColor}99)`,
             }}
           />
         </svg>
 
-        {/* Center */}
-
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <motion.h1
+        {/* Center content */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+          {/* Timer digits */}
+          <motion.span
             key={remainingTime}
-            initial={{
-              opacity: 0.4,
-              scale: 0.92,
-            }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-            }}
-            transition={{
-              duration: 0.18,
-            }}
-            className="text-6xl font-extrabold tracking-tight"
+            initial={{ opacity: 0.5, scale: 0.94 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.15 }}
+            className="text-6xl font-extrabold tracking-tighter text-zinc-50 font-mono leading-none"
           >
             {formatTime(remainingTime)}
-          </motion.h1>
+          </motion.span>
 
+          {/* Session label pill */}
           <motion.div
-            animate={{
-              opacity: [0.7, 1, 0.7],
-            }}
-            transition={{
-              repeat: Infinity,
-              duration: 2,
-            }}
-            className={`
-              mt-4
-              px-4
-              py-1.5
-              rounded-full
-              text-sm
-              font-semibold
-              ${
-                session === "focus"
-                  ? "bg-green-500/20 text-green-400"
-                  : "bg-blue-500/20 text-blue-400"
-              }
-            `}
+            animate={{ opacity: [0.75, 1, 0.75] }}
+            transition={{ repeat: Infinity, duration: 2.5 }}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold ${labelBg} ${labelText} border border-current/20`}
           >
-            {session === "focus" ? "🎯 Focus Session" : "☕ Break Time"}
+            {sessionLabel}
           </motion.div>
         </div>
 
-        {/* Activity Dot */}
-
+        {/* Live activity dot at top of ring */}
         {running && (
           <motion.div
-            className="absolute top-2 left-1/2 w-4 h-4 rounded-full"
+            className="absolute rounded-full"
             style={{
-              marginLeft: "-8px",
-              backgroundColor: color,
-              boxShadow: `0 0 15px ${color}`,
+              width: 10,
+              height: 10,
+              top: CENTER - NORMALIZED_RADIUS - STROKE / 2,
+              left: CENTER - 5,
+              backgroundColor: ringColor,
+              boxShadow: `0 0 12px ${ringColor}`,
             }}
-            animate={{
-              scale: [1, 1.7, 1],
-              opacity: [1, 0.3, 1],
-            }}
-            transition={{
-              repeat: Infinity,
-              duration: 1.3,
-            }}
+            animate={{ scale: [1, 1.8, 1], opacity: [1, 0.3, 1] }}
+            transition={{ repeat: Infinity, duration: 1.4 }}
           />
         )}
       </motion.div>
