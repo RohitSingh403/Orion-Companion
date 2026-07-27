@@ -1,8 +1,11 @@
+// src/hooks/usePomodoro.ts
+
 import { useEffect, useRef } from "react";
 
 import { useFocusStore } from "../store/focusStore";
 import { useAchievementStore } from "../store/achievementStore";
 import { useToastStore } from "../store/toastStore";
+import { useTaskStore } from "../store/taskStore";
 
 import { playSound } from "../utils/audio";
 
@@ -21,8 +24,12 @@ export default function usePomodoro() {
   const session = useFocusStore((s) => s.session);
   const completedSessions = useFocusStore((s) => s.completedSessions);
 
-  const unlockAchievement = useAchievementStore((s) => s.unlockAchievement);
+  const activeTaskId = useTaskStore((s) => s.activeTaskId);
+  const incrementTaskFocusSession = useTaskStore(
+    (s) => s.incrementTaskFocusSession
+  );
 
+  const unlockAchievement = useAchievementStore((s) => s.unlockAchievement);
   const isUnlocked = useAchievementStore((s) => s.isUnlocked);
 
   const showToast = useToastStore((s) => s.showToast);
@@ -37,31 +44,29 @@ export default function usePomodoro() {
 
       window.focusAPI?.showBreakNotification();
 
-      // First Focus
+      // Automatically increment task focus session if active task is selected
+      if (activeTaskId) {
+        incrementTaskFocusSession(activeTaskId);
+      }
+
+      // Achievement checks
       if (completedSessions === 1 && !isUnlocked("first-session")) {
         unlockAchievement("first-session");
-
         showToast("🏆 First Focus", "Completed your first focus session!");
       }
 
-      // 10 Sessions
       if (completedSessions === 10 && !isUnlocked("ten-sessions")) {
         unlockAchievement("ten-sessions");
-
         showToast("🥈 Getting Started", "Completed 10 focus sessions!");
       }
 
-      // 50 Sessions
       if (completedSessions === 50 && !isUnlocked("fifty-sessions")) {
         unlockAchievement("fifty-sessions");
-
         showToast("🥇 Focus Master", "Completed 50 focus sessions!");
       }
 
-      // 100 Sessions
       if (completedSessions === 100 && !isUnlocked("hundred-sessions")) {
         unlockAchievement("hundred-sessions");
-
         showToast("👑 Deep Worker", "Completed 100 focus sessions!");
       }
     }
@@ -74,9 +79,17 @@ export default function usePomodoro() {
     }
 
     previousSession.current = session;
-  }, [session, completedSessions, unlockAchievement, isUnlocked, showToast]);
+  }, [
+    session,
+    completedSessions,
+    activeTaskId,
+    incrementTaskFocusSession,
+    unlockAchievement,
+    isUnlocked,
+    showToast,
+  ]);
 
-  // Timer
+  // Timer tick interval
   useEffect(() => {
     if (!running) return;
 
