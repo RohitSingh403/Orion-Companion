@@ -8,148 +8,354 @@ A complete personal productivity operating system built around Focus Sessions (P
 
 ---
 
-## Core Philosophy
+## Current Progress
 
-**Normal Todo App:** Task → Complete
+Focus Companion v2.0 is currently in active development with significant progress across all core modules. The application features a complete productivity ecosystem with real-time data integration, persistent state management, and a polished dark glassmorphism UI.
 
-**Focus Companion:** Task → Estimated Focus Sessions → Focus Timer → Session Completed → Task Progress Updated → Analytics Updated → Heatmap Updated → Achievements Updated
+### ✅ Fully Implemented Modules
 
-Everything is connected. The Focus Timer is the core engine of the application.
+**Dashboard**
+- Daily productivity overview with personalized greeting
+- Today's Goal tracker with real-time progress bar
+- Focus Score sparkline widget with trend visualization
+- Current Streak counter with visual day indicators
+- Central Focus Timer widget with session controls
+- Today's Tasks checklist with live session progress indicators
+- Session History logs with detailed session records
+- Responsive grid layout with mobile-first design
 
----
-
-## Vision
-
-Focus Companion is inspired by Apple Reminders, TickTick, Todoist, Notion, GitHub Contributions, Forest, Obsidian, and Raycast — but with one unique idea: everything revolves around Focus Sessions.
-
-The goal is not to build another Pomodoro timer or another Todo app. The goal is to build a complete personal productivity operating system.
-
-## Current Build Status (v2.0 In Development)
-
-### ✅ Completed Modules
-
-**Module 1: Dashboard**
-- Daily productivity overview with greeting
-- Today's Goal tracker with progress bar
-- Focus Score sparkline widget
-- Current Streak counter with visual indicators
-- Central Focus Timer widget
-- Today's Tasks checklist with live session indicators
-- Session History logs
-
-**Module 2: Focus (Deep Work Mode)**
+**Focus (Deep Work Mode)**
 - Dedicated distraction-free focus environment
-- Focus Mode toggle
-- Large animated Focus Timer ring
-- Current Task progress card
-- Today's Progress stats (sessions, time, tasks, productivity)
-- Background Sound player with visualizer
+- Focus Mode toggle for session type switching
+- Large animated Focus Timer ring with smooth transitions
+- Current Task progress card with priority badges, progress percentage, visual progress bar, and tags
+- Today's Progress stats (sessions, time, tasks, productivity) with real-time calculations
+- Background Sound player with visualizer controls
+- "Select a task" link when no active task is present
 
-**Module 3: Workspace (Tasks)**
-- Workspace sub-sidebar (Today, Upcoming, Important, Completed)
-- Project support (Project Apollo)
+**Workspace (Tasks)**
+- Workspace sub-sidebar with smart filters (Today, Upcoming, Important, Completed)
+- Project support with color-coded project badges
 - Tag filters (Work, Personal, Study, Health)
-- Task creation with Priority selection (High/Medium/Low)
+- Task creation with Priority selection (High/Medium/Low) with color indicators
 - Estimated Focus Sessions selector (1-4 sessions)
 - Active task selection for timer integration
-- Task progress tracking (completed/estimated sessions)
+- Task progress tracking (completed/estimated sessions) with visual progress
+- Due date support with calendar integration
 
-**Module 4: Calendar**
-- Initial page structure created
-- Placeholder for hourly scheduling timeline
+**Calendar**
+- Hourly scheduling timeline view (6 AM - 10 PM)
+- Real date navigation with prev/next week controls
+- Today button for quick navigation to current week
+- Task calendar integration (weekly task filtering by due date)
+- Interactive time slots with hover states and "+ Add" indicators
+- Week view with day headers and active day highlighting
+- Tasks This Week section showing scheduled tasks with priority indicators
 
-**Module 5: Notes**
-- Initial page structure created
-- Placeholder for rich notes and markdown editor
+**Notes**
+- Complete notesStore with full CRUD operations and persist middleware
+- Rich text editor with markdown support
+- Search functionality (title, content, tags) with real-time filtering
+- Edit/Save/Delete note functionality with confirmation dialogs
+- Empty state handling with "Create your first note" call-to-action
+- Note list with timestamps and active state highlighting
+- Tags display with emerald accent styling
 
-**Module 6: Analytics**
-- Initial page structure created
-- Placeholder for charts, heatmaps, and productivity reports
+**Analytics**
+- Daily statistics from real store data (total focus time, sessions, tasks completed)
+- Weekly overview with avg sessions/day, avg focus/day, and best day metrics
+- GitHub-style contribution heatmap with real session-based activity levels
+- Focus time trend chart with recency-based data (last 7 days)
+- Current streak display with day counter
+- Task completion rate calculation
+- Productivity score based on daily goal progress
 
-**Module 7: Achievements**
-- Basic achievement system implemented
-- Milestone unlocks (First Session, 10, 50, 100 sessions)
-- Animated toast notifications on unlock
-- Achievement view page structure
+**Achievements**
+- Expanded achievementStore with XP system and level progression
+- Level progression system (1000 XP per level, 10 unique titles)
+- Dynamic level titles (Novice → Zen Master)
+- Real-time XP progress bar with percentage calculation
+- Achievement unlock logic with XP rewards
+- Achievement filtering (All, Unlocked, Locked)
+- Achievement grid with unlock status indicators
+- Persistent achievement state with local storage
 
-**Module 8: Settings**
-- Initial page structure created
-- Placeholder for timer settings and preferences
+**Settings**
+- Comprehensive settingsStore with persist middleware
+- Focus Settings tab (focus duration, break duration, daily goal)
+- Sounds tab (sound enabled toggle, break/focus sound selection)
+- Notifications tab (desktop notifications, break reminder toggles)
+- Appearance tab (theme selection)
+- All settings persist across app restarts
+- Real-time UI updates on setting changes
 
 ### 🏗 Architecture & Design System
 
 **Global Design System**
 - Ultra-dark glassmorphism theme (#09090b base)
-- Custom glass-card components with backdrop blur
+- Custom glass-card components with backdrop blur (12px)
 - Ambient glow effects (glow-emerald, glow-blue)
-- GitHub-style heatmap color levels
-- Custom scrollbars
-- Responsive grid layouts
+- GitHub-style heatmap color levels (0-4 intensity)
+- Custom scrollbars (8px width, rounded, active state)
+- Responsive grid layouts with mobile breakpoints
+- Smooth animations with cubic-bezier easing (0.3s duration)
 
 **Navigation & Layout**
-- Fixed left Sidebar with 8 module navigation
+- Fixed left Sidebar with 8 module navigation and hover animations
 - Global Topbar with search, quick add, notifications
-- AppLayout wrapper for consistent page structure
+- AppLayout wrapper with Framer Motion page transitions
 - Client-side routing with React Router v7
+- Sub-sidebar navigation for Settings and Workspace
 
 **State Management (Zustand)**
 - `focusStore` — Timer, sessions, settings, streaks, history, progress
-- `taskStore` — Task management with session estimates, priorities, tags
-- `achievementStore` — Achievement unlock status and persistence
+- `taskStore` — Task management with session estimates, priorities, tags, due dates
+- `achievementStore` — Achievement unlock status, XP, level progression
 - `toastStore` — Transient notifications and achievement popups
-- `settingsStore` — App settings configuration
+- `settingsStore` — App settings configuration with persist middleware
+- `notesStore` — Notes CRUD operations with search and tags
 
 **Integration Engine**
 - `usePomodoro` hook — Central timer engine at App level
 - Automatic task progress increment on focus session completion
+- Real-time focus time calculations (hours/minutes display)
+- Productivity score calculation based on daily goal
 - Desktop notifications via Electron IPC
 - Audio cues on session transitions
 
-### 🚧 In Progress / Planned Features
+---
 
-**Task Management**
-- TaskCard and TaskList components
-- Due dates and reminders
-- Project organization
-- Advanced filtering and sorting
+## Roadmap
 
-**Calendar**
-- Hourly scheduling timeline
-- Task calendar integration
-- Recurring events
+### 🚧 In Progress
 
-**Notes**
-- Rich text editor
-- Markdown support
-- Linked tasks
-- Search and tags
+**Achievement Integration**
+- Integrate achievement unlock triggers into focus timer completion
+- Add XP rewards for session completions
+- Level-up notifications with toast animations
 
-**Analytics**
-- Daily/Weekly/Monthly/Yearly statistics
-- GitHub-style contribution heatmap
-- Focus trends and productivity charts
-- Advanced insights
+### 📋 Planned Features
+
+**Calendar Enhancements**
+- Drag-and-drop task scheduling
+- Recurring events support
+- Calendar view filters (day/week/month views)
+- Event creation modal with time picker
+- Calendar export functionality
+
+**Notes Enhancements**
+- Markdown preview rendering
+- Quick notes capture
+- Linked tasks integration
+- Attachments support
+- Advanced search with filters
+
+**Analytics Enhancements**
+- Monthly and yearly reports
+- Advanced productivity insights
+- Focus patterns analysis
+- Comparative statistics (week-over-week, month-over-month)
+- Export analytics data
 
 **Reminder System**
-- Desktop notifications
-- Repeating tasks
-- Recurring reminders
+- Desktop notifications with custom sounds
+- Repeating tasks with intervals
+- Recurring reminders (daily, weekly, monthly)
 - Snooze functionality
+- Time-based triggers
 
 **AI Companion**
-- Task suggestions
-- Daily summary
-- Motivation
-- Smart planning
-- Focus advice
+- Task suggestions based on productivity patterns
+- Daily summary generation
+- Motivation messages
+- Smart planning assistance
+- Focus advice and productivity coaching
 
 **Desktop Features**
-- Auto start
-- Tray icon
-- Global shortcuts
-- Mini timer
-- Quick add task
+- Auto start on login
+- System tray icon with quick actions
+- Global keyboard shortcuts
+- Mini timer widget (always on top)
+- Quick add task shortcut
 - Floating focus widget
+- Window management and multi-monitor support
+
+### 🎯 Future Phases
+
+**Phase 8: AI Companion**
+- Task suggestions
+- Daily summary generation
+- Motivation messages
+- Smart planning assistance
+- Focus advice
+- Productivity coaching
+
+**Phase 9: Desktop Features**
+- Auto start on login
+- System tray icon
+- Global keyboard shortcuts
+- Mini timer widget
+- Quick add task shortcut
+- Floating focus widget
+- Window management
+
+**Phase 10: Polish & Launch**
+- Comprehensive testing
+- Performance optimization
+- Accessibility improvements
+- Documentation completion
+- Beta testing
+- v2.0 launch
+
+---
+
+## Completed Work
+
+### Core Features Implemented
+
+**Timer System**
+- Complete Pomodoro timer with focus/break sessions
+- Visual progress ring with smooth animations
+- Session state management (idle, focus, break, complete)
+- Auto-start options for focus and break sessions
+- Sound notifications on session transitions
+- Desktop notification integration
+- Session history logging with timestamps
+
+**Task Management**
+- Full CRUD operations for tasks
+- Priority system (High/Medium/Low) with color coding
+- Estimated focus sessions per task
+- Automatic task progress tracking
+- Task completion on session completion
+- Due date support
+- Tag system for organization
+- Project support with grouping
+- Active task selection for timer integration
+
+**Achievement System**
+- Achievement definitions with XP rewards
+- Unlock status tracking
+- Level progression system (1000 XP per level)
+- 10 unique level titles (Novice → Zen Master)
+- Achievement filtering and display
+- Toast notifications on unlock
+- Persistent achievement state
+
+**Notes System**
+- Note creation with markdown support
+- Note editing with auto-save
+- Note deletion with confirmation
+- Search across titles, content, and tags
+- Tag system for organization
+- Timestamp tracking (created/updated)
+- Empty state handling
+
+**Calendar System**
+- Weekly calendar view with day headers
+- Hourly time slot grid (6 AM - 10 PM)
+- Date navigation (prev/next week, today)
+- Task filtering by due date
+- Interactive time slots
+- Week date range display
+
+**Analytics System**
+- Real-time statistics from store data
+- Total focus time calculation
+- Session count tracking
+- Task completion rate
+- GitHub-style contribution heatmap
+- Weekly trend charts
+- Streak tracking
+- Productivity scoring
+
+**Settings System**
+- Focus duration configuration (15-60 minutes)
+- Break duration configuration (3-15 minutes)
+- Daily goal setting (4-12 sessions)
+- Auto-start toggles (focus/break)
+- Sound enabled toggle
+- Sound selection (break/focus sounds)
+- Desktop notification toggles
+- Theme selection
+- All settings persisted
+
+### Architecture Achievements
+
+**Modular Architecture**
+- Clear separation between UI and business logic
+- Zustand stores as single source of truth
+- Component-based design with reusable elements
+- Consistent layout patterns across pages
+
+**State Management**
+- 6 Zustand stores with persist middleware
+- Reactive state updates across components
+- Local storage persistence for all user data
+- Type-safe state management with TypeScript
+
+**Design System**
+- Ultra-dark glassmorphism theme
+- Custom CSS utilities for glass effects
+- Consistent color palette (emerald, amber, blue accents)
+- Custom scrollbar styling
+- Responsive grid layouts
+- Smooth animations and transitions
+
+**Integration Engine**
+- Central timer engine at App level
+- Automatic task progress updates
+- Real-time UI synchronization
+- Cross-module data flow
+- Event-driven architecture
+
+### Major Milestones
+
+**Sprint 1: Component Cleanup** ✅
+- Removed 8 unused dashboard components
+- Cleaned up redundant code
+- Streamlined component structure
+
+**Sprint 2: Integration & Deep Connections** ✅
+- Enhanced FocusPage active task integration
+- Expanded settingsStore with comprehensive settings
+- Connected Settings page to store
+- Wired up real daily stats to Analytics
+- Implemented real focus time calculations
+
+**Sprint 3: UI Polish Sprint** ✅
+- Dashboard spacing refinement with responsive breakpoints
+- Sidebar hover animations with smooth transitions
+- Framer Motion page transitions
+- Scrollbar behavior tuning
+- Animation timing adjustments
+
+**Phase 4: Calendar Module** ✅
+- Hourly scheduling timeline view
+- Real date navigation
+- Task calendar integration
+- Interactive time slots
+
+**Phase 5: Notes Module** ✅
+- Created notesStore with full CRUD
+- Rich text editor implementation
+- Search functionality
+- Edit/Save/Delete operations
+
+**Phase 6: Analytics Module** ✅
+- Daily statistics from real data
+- Weekly overview calculations
+- GitHub-style heatmap with real activity levels
+- Focus time trend charts
+
+**Phase 7: Achievements Module** ✅
+- XP system implementation
+- Level progression
+- Dynamic level titles
+- Achievement unlock logic
+- Real-time progress display
+
+---
 
 ## Tech Stack
 
@@ -164,6 +370,8 @@ The goal is not to build another Pomodoro timer or another Todo app. The goal is
 | State management | Zustand v5 + Persist |
 | Routing | React Router DOM v7 |
 | Build tool | Vite 5 + vite-plugin-electron |
+
+---
 
 ## Architecture
 
@@ -209,12 +417,14 @@ src/
 - **Global services at App level.** `usePomodoro` runs at App.tsx, not in pages.
 - **One source of truth.** No duplicate logic or components.
 
+---
+
 ## Application Flow
 
 ```
 Launch → Dashboard → Start Focus → Timer Runs → Focus Completes
    → Task Progress Updated → History Updated → Streak Updated
-   → Achievement Checked → Desktop Notification → Break Starts
+   → Achievement Checked → XP Awarded → Desktop Notification → Break Starts
    → Break Ends → Next Focus Session
 ```
 
@@ -225,6 +435,10 @@ Launch → Dashboard → Start Focus → Timer Runs → Focus Completes
 4. `usePomodoro` automatically increments task's `completedFocusSessions`
 5. Task progress updates (2/4 → 3/4)
 6. If task reaches estimated sessions, it auto-completes
+7. Achievement system checks for unlocks
+8. XP is awarded for session completion
+
+---
 
 ## Design System
 
@@ -238,9 +452,9 @@ The UI features an ultra-dark glassmorphism theme built for desktop-first experi
 
 **Components:**
 - `.glass-card` - Standard card with backdrop blur
-- `.glass-card-hover` - Hover state with subtle lift
+- `.glass-card-hover` - Hover state with subtle lift and shadow
 - `.glow-emerald` / `.glow-blue` - Ambient glow effects
-- Custom scrollbars (6px width, zinc-900 track)
+- Custom scrollbars (8px width, zinc-900 track, rounded)
 - GitHub-style heatmap levels (0-4 intensity)
 
 **Design Principles:**
@@ -249,109 +463,7 @@ The UI features an ultra-dark glassmorphism theme built for desktop-first experi
 - **Desktop-first** — built for focused desktop work, not a mobile port
 - **Modular by default** — every feature is isolated for easy extension
 
-## Development Roadmap
-
-### ✅ Phase 1: Foundation (Complete)
-- Folder structure finalized
-- Routing configured (8 modules)
-- Sidebar navigation
-- Dashboard with metrics and timer
-- Focus Timer with progress ring
-- Store architecture (Zustand)
-- AppLayout wrapper
-
-### ✅ Phase 2: Workspace Foundation (Complete)
-- Task type definitions
-- TaskStore with full CRUD
-- TaskInput component
-- TaskCard component
-- TaskList component
-- Priority badges (High/Medium/Low)
-- Estimated Focus Sessions selector
-- Due dates support
-- Tags support
-- Project support
-- Timer-Task integration (auto-increment on session complete)
-
-### 🚧 Phase 3: Workspace Completion (In Progress)
-- **Sprint 1: Component Cleanup** ✅ Complete
-  - SessionHistory redesign ✅
-  - Companion widget redesign ✅
-  - ProgressRing polish ✅
-  - Removed 8 unused dashboard components ✅
-
-- **Sprint 2: Integration & Deep Connections** (Next)
-  - Connect TasksPage active task → auto-shown on FocusPage right panel
-  - Wire up real daily stats to Analytics charts
-  - Expand settingsStore + connect to Settings page sliders
-  - Implement real focus time calculations
-
-- **Sprint 3: UI Polish Sprint** (Planned)
-  - Dashboard spacing refinement
-  - Responsive scaling improvements
-  - Sidebar hover animations
-  - Framer Motion page transitions
-  - Final scrollbar behavior tuning
-  - Animation timing adjustments
-
-### 📋 Phase 4: Calendar Module (Planned)
-- Hourly scheduling timeline view
-- Task calendar integration
-- Drag-and-drop task scheduling
-- Recurring events support
-- Calendar view filters (day/week/month)
-
-### 📋 Phase 5: Notes Module (Planned)
-- Rich text editor
-- Markdown support
-- Quick notes
-- Attachments support
-- Linked tasks
-- Search functionality
-- Tags and organization
-
-### 📋 Phase 6: Analytics Module (Planned)
-- Daily statistics
-- Weekly reports
-- Monthly reports
-- Yearly overview
-- GitHub-style contribution heatmap
-- Focus trends charts
-- Productivity insights
-- Advanced analytics
-
-### 📋 Phase 7: Reminder System (Planned)
-- Desktop notifications
-- Repeating tasks
-- Recurring reminders
-- Snooze functionality
-- Reminder scheduling
-- Time-based triggers
-
-### 📋 Phase 8: AI Companion (Planned)
-- Task suggestions
-- Daily summary generation
-- Motivation messages
-- Smart planning assistance
-- Focus advice
-- Productivity coaching
-
-### 📋 Phase 9: Desktop Features (Planned)
-- Auto start on login
-- System tray icon
-- Global keyboard shortcuts
-- Mini timer widget
-- Quick add task shortcut
-- Floating focus widget
-- Window management
-
-### 📋 Phase 10: Polish & Launch (Planned)
-- Comprehensive testing
-- Performance optimization
-- Accessibility improvements
-- Documentation completion
-- Beta testing
-- v2.0 launch
+---
 
 ## Getting Started
 
@@ -369,6 +481,8 @@ npm run dev
 # build for production
 npm run build
 ```
+
+---
 
 ## Development Rules
 
@@ -389,12 +503,14 @@ The project follows strict development rules to maintain code quality and archit
 13. **Keep Explanations Concise** - Implementation-focused
 14. **Explain Structural Changes** - Before making them
 
+---
+
 ## Current Status
 
 **Version:** v2.0.0 (In Development)
 
 **Last Updated:** July 28, 2026
 
-**Active Sprint:** Sprint 2 - Integration & Deep Connections
+**Active Phase:** Phase 7 - Achievements Module Expansion (Complete)
 
-**Next Priority:** Connect TasksPage active task → auto-shown on FocusPage right panel
+**Next Priority:** Integrate achievement unlock triggers into focus timer completion
