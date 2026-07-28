@@ -61,18 +61,18 @@ export default function Sidebar() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 ${
+                className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 ${
                   isActive
                     ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-sm"
-                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 hover:translate-x-0.5"
                 }`}
               >
                 <Icon
-                  className={`w-4 h-4 ${
+                  className={`w-4 h-4 transition-transform duration-200 group-hover:scale-110 ${
                     isActive ? "text-emerald-400" : "text-zinc-400"
                   }`}
                 />
-                <span>{item.label}</span>
+                <span className="transition-opacity duration-200">{item.label}</span>
               </Link>
             );
           })}

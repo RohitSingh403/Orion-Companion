@@ -1,21 +1,51 @@
 // src/pages/Focus/FocusPage.tsx
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import AppLayout from "../../layouts/AppLayout";
 import Topbar from "../../components/topbar/Topbar";
 import FocusTimer from "../../components/timer/FocusTimer";
 import { useTaskStore } from "../../store/taskStore";
 import { useFocusStore } from "../../store/focusStore";
-import { FiMusic, FiPlay, FiPause } from "react-icons/fi";
+import { FiMusic, FiPlay, FiPause, FiArrowRight, FiTarget } from "react-icons/fi";
 
 export default function FocusPage() {
   const [focusMode, setFocusMode] = useState(true);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const { tasks, activeTaskId } = useTaskStore();
-  const { completedSessions, focusDuration } = useFocusStore();
+  const { completedSessions, focusDuration, dailyGoal } = useFocusStore();
 
-  const activeTask = tasks.find((t) => t.id === activeTaskId) || tasks[0];
+  const activeTask = tasks.find((t) => t.id === activeTaskId);
   const completedMinutes = Math.floor((completedSessions * focusDuration) / 60);
+  const completedHours = Math.floor(completedMinutes / 60);
+  const completedMinutesRemainder = completedMinutes % 60;
+  const focusTimeDisplay = completedHours > 0 ? `${completedHours}h ${completedMinutesRemainder}m` : `${completedMinutes}m`;
+
+  // Calculate productivity score based on daily goal completion
+  const productivityScore = dailyGoal > 0 ? Math.min(Math.round((completedSessions / dailyGoal) * 100), 100) : 0;
+
+  // Calculate task progress percentage
+  const getTaskProgress = () => {
+    if (!activeTask) return 0;
+    return Math.min(
+      Math.round((activeTask.completedFocusSessions / activeTask.estimatedFocusSessions) * 100),
+      100
+    );
+  };
+
+  // Get priority color
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "bg-red-500/10 text-red-400 border-red-500/30";
+      case "medium":
+        return "bg-amber-500/10 text-amber-400 border-amber-500/30";
+      case "low":
+        return "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
+      default:
+        return "bg-zinc-500/10 text-zinc-400 border-zinc-500/30";
+    }
+  };
 
   return (
     <AppLayout>
@@ -58,20 +88,60 @@ export default function FocusPage() {
             <div className="glass-card p-5 rounded-2xl space-y-3">
               <div className="flex items-center justify-between text-xs text-zinc-400">
                 <span className="font-semibold uppercase tracking-wider">Current Task</span>
-                <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20 text-[10px]">
-                  In Progress
-                </span>
+                {activeTask ? (
+                  <span className={`px-2 py-0.5 rounded font-semibold border text-[10px] ${getPriorityColor(activeTask.priority)}`}>
+                    {activeTask.priority.toUpperCase()}
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded bg-zinc-500/10 text-zinc-400 font-semibold border border-zinc-500/20 text-[10px]">
+                    NONE
+                  </span>
+                )}
               </div>
 
               {activeTask ? (
-                <div>
-                  <h3 className="text-base font-bold text-zinc-100">{activeTask.title}</h3>
-                  <p className="text-xs text-zinc-400 mt-1">
-                    {activeTask.completedFocusSessions} of {activeTask.estimatedFocusSessions} sessions completed
-                  </p>
+                <div className="space-y-3">
+                  <div>
+                    <h3 className="text-base font-bold text-zinc-100">{activeTask.title}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-zinc-400">
+                        {activeTask.completedFocusSessions} of {activeTask.estimatedFocusSessions} sessions
+                      </span>
+                      <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700/60">
+                        {getTaskProgress()}%
+                      </span>
+                    </div>
+                  </div>
+                  {/* Progress Bar */}
+                  <div className="w-full h-2 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800">
+                    <div
+                      style={{ width: `${getTaskProgress()}%` }}
+                      className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-300"
+                    />
+                  </div>
+                  {/* Tags */}
+                  {activeTask.tags.length > 0 && (
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {activeTask.tags.map((tag) => (
+                        <span key={tag} className="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ) : (
-                <p className="text-xs text-zinc-500">No active task selected.</p>
+                <div className="space-y-3">
+                  <p className="text-xs text-zinc-500">No active task selected.</p>
+                  <Link
+                    to="/tasks"
+                    className="flex items-center gap-2 text-xs text-emerald-400 hover:text-emerald-300 font-semibold transition"
+                  >
+                    <FiTarget className="w-3.5 h-3.5" />
+                    <span>Select a task</span>
+                    <FiArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
               )}
             </div>
 
@@ -83,11 +153,11 @@ export default function FocusPage() {
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="bg-zinc-900/60 p-3 rounded-xl border border-zinc-800/80">
                   <span className="text-zinc-500 text-[10px] block">Focus Sessions</span>
-                  <span className="text-base font-bold text-zinc-100 mt-0.5 block">{completedSessions} / 6</span>
+                  <span className="text-base font-bold text-zinc-100 mt-0.5 block">{completedSessions} / {dailyGoal}</span>
                 </div>
                 <div className="bg-zinc-900/60 p-3 rounded-xl border border-zinc-800/80">
                   <span className="text-zinc-500 text-[10px] block">Focus Time</span>
-                  <span className="text-base font-bold text-emerald-400 mt-0.5 block">{completedMinutes}m</span>
+                  <span className="text-base font-bold text-emerald-400 mt-0.5 block">{focusTimeDisplay}</span>
                 </div>
                 <div className="bg-zinc-900/60 p-3 rounded-xl border border-zinc-800/80">
                   <span className="text-zinc-500 text-[10px] block">Tasks Completed</span>
@@ -97,7 +167,7 @@ export default function FocusPage() {
                 </div>
                 <div className="bg-zinc-900/60 p-3 rounded-xl border border-zinc-800/80">
                   <span className="text-zinc-500 text-[10px] block">Productivity</span>
-                  <span className="text-base font-bold text-emerald-400 mt-0.5 block">85%</span>
+                  <span className="text-base font-bold text-emerald-400 mt-0.5 block">{productivityScore}%</span>
                 </div>
               </div>
             </div>
