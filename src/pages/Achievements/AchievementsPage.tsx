@@ -9,12 +9,35 @@ import { useAchievementStore } from "../../store/achievementStore";
 export default function AchievementsPage() {
   const [filter, setFilter] = useState<"all" | "unlocked" | "locked">("all");
   const achievements = useAchievementStore((s) => s.achievements);
+  const { totalXP, level, xpToNextLevel } = useAchievementStore((s) => ({
+    totalXP: s.totalXP,
+    level: s.level,
+    xpToNextLevel: s.xpToNextLevel,
+  }));
 
   const filteredAchievements = achievements.filter((a) => {
     if (filter === "unlocked") return a.unlocked;
     if (filter === "locked") return !a.unlocked;
     return true;
   });
+
+  const progressPercentage = xpToNextLevel > 0 
+    ? Math.round(((level * 1000 - xpToNextLevel) / 1000) * 100)
+    : 0;
+
+  const levelTitles = [
+    "Novice",
+    "Apprentice",
+    "Journeyman",
+    "Expert",
+    "Master",
+    "Grandmaster",
+    "Deep Worker",
+    "Focus Legend",
+    "Productivity Sage",
+    "Zen Master",
+  ];
+  const levelTitle = levelTitles[Math.min(level - 1, levelTitles.length - 1)];
 
   return (
     <AppLayout>
@@ -28,12 +51,12 @@ export default function AchievementsPage() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold text-zinc-100">Level 7 Deep Worker</h2>
+                <h2 className="text-xl font-bold text-zinc-100">Level {level} {levelTitle}</h2>
                 <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-semibold border border-emerald-500/20">
-                  Top 5%
+                  {totalXP} XP
                 </span>
               </div>
-              <p className="text-xs text-zinc-400 mt-0.5">850 / 1000 XP to Level 8</p>
+              <p className="text-xs text-zinc-400 mt-0.5">{xpToNextLevel} XP to Level {level + 1}</p>
             </div>
           </div>
 
@@ -41,10 +64,10 @@ export default function AchievementsPage() {
           <div className="w-64 space-y-1.5 relative z-10">
             <div className="flex justify-between text-[10px] font-semibold text-zinc-400">
               <span>Progress</span>
-              <span>85%</span>
+              <span>{progressPercentage}%</span>
             </div>
             <div className="w-full h-2.5 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800">
-              <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full w-[85%] transition-all" />
+              <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all" style={{ width: `${progressPercentage}%` }} />
             </div>
           </div>
         </div>
