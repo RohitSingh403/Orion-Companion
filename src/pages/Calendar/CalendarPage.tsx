@@ -4,7 +4,9 @@ import { useState, useMemo } from "react";
 import AppLayout from "../../layouts/AppLayout";
 import Topbar from "../../components/topbar/Topbar";
 import { useTaskStore } from "../../store/taskStore";
-import { FiChevronLeft, FiChevronRight, FiClock, FiPlus, FiMoreVertical } from "react-icons/fi";
+import { useEventStore } from "../../store/eventStore";
+import type { EventType } from "../../types/event";
+import { FiChevronLeft, FiChevronRight, FiClock, FiPlus, FiMoreVertical, FiX } from "react-icons/fi";
 
 export default function CalendarPage() {
   const [viewMode, setViewMode] = useState<"month" | "week" | "day">("week");
@@ -29,6 +31,14 @@ export default function CalendarPage() {
   });
 
   const { tasks, updateTask } = useTaskStore();
+  const { events, addEvent, getEventsForDate, getEventsForRange } = useEventStore();
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [eventTitle, setEventTitle] = useState("");
+  const [eventDescription, setEventDescription] = useState("");
+  const [eventDate, setEventDate] = useState("");
+  const [eventStartTime, setEventStartTime] = useState("09:00");
+  const [eventEndTime, setEventEndTime] = useState("10:00");
+  const [eventType, setEventType] = useState<EventType>("meeting");
 
   // Generate week dates
   const weekDates = useMemo(() => {
@@ -103,6 +113,40 @@ export default function CalendarPage() {
     setCurrentMonth(new Date(now));
   };
 
+  const handleCreateEvent = () => {
+    if (!eventTitle.trim() || !eventDate) return;
+
+    const startDateTime = new Date(`${eventDate}T${eventStartTime}`);
+    const endDateTime = new Date(`${eventDate}T${eventEndTime}`);
+
+    addEvent({
+      title: eventTitle,
+      description: eventDescription,
+      startDate: startDateTime.toISOString(),
+      endDate: endDateTime.toISOString(),
+      type: eventType,
+    });
+
+    // Reset form
+    setEventTitle("");
+    setEventDescription("");
+    setEventDate("");
+    setEventStartTime("09:00");
+    setEventEndTime("10:00");
+    setEventType("meeting");
+    setShowEventModal(false);
+  };
+
+  const handleCancelEvent = () => {
+    setEventTitle("");
+    setEventDescription("");
+    setEventDate("");
+    setEventStartTime("09:00");
+    setEventEndTime("10:00");
+    setEventType("meeting");
+    setShowEventModal(false);
+  };
+
   const handleDrop = (e: React.DragEvent, dayIndex: number, hour: number) => {
     e.preventDefault();
     const taskId = e.dataTransfer.getData("taskId");
@@ -147,6 +191,23 @@ export default function CalendarPage() {
     }
     return tasks;
   }, [tasks, viewMode, currentWeekStart, currentDay, currentMonth]);
+
+  // Filter events for the current view
+  const filteredEvents = useMemo(() => {
+    if (viewMode === "week") {
+      const endOfWeek = new Date(currentWeekStart);
+      endOfWeek.setDate(endOfWeek.getDate() + 7);
+      return getEventsForRange(currentWeekStart, endOfWeek);
+    } else if (viewMode === "day") {
+      return getEventsForDate(currentDay);
+    } else if (viewMode === "month") {
+      const endOfMonth = new Date(currentMonth);
+      endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+      endOfMonth.setDate(0);
+      return getEventsForRange(currentMonth, endOfMonth);
+    }
+    return events;
+  }, [events, viewMode, currentWeekStart, currentDay, currentMonth, getEventsForDate, getEventsForRange]);
 
   // Generate month calendar grid
   const monthGrid = useMemo(() => {
@@ -267,7 +328,10 @@ export default function CalendarPage() {
                 <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
                   <FiClock className="text-emerald-400" /> Hourly Schedule
                 </h3>
-                <button className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40 rounded-xl text-xs font-semibold transition">
+                <button 
+                  onClick={() => setShowEventModal(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40 rounded-xl text-xs font-semibold transition"
+                >
                   <FiPlus className="w-3.5 h-3.5" />
                   <span>Add Event</span>
                 </button>
@@ -285,6 +349,32 @@ export default function CalendarPage() {
                           className="absolute inset-0"
                         />
                       ))}
+                      {/* Render events for this time slot */}
+                      {filteredEvents
+                        .filter((event) => {
+                          const eventDate = new Date(event.startDate);
+                          const eventHour = eventDate.getHours();
+                          const eventDay = eventDate.getDay();
+                          const dayIndex = eventDay === 0 ? 6 : eventDay - 1;
+                          return eventHour === timeIdx + 6 && dayIndex === weekDates.findIndex((_, idx) => {
+                            const d = new Date(currentWeekStart);
+                            d.setDate(d.getDate() + idx);
+                            return d.getDay() === eventDay;
+                          });
+                        })
+                        .map((event) => (
+                          <div
+                            key={event.id}
+                            className="mb-1 p-2 rounded-lg text-xs font-medium shadow-sm border"
+                            style={{
+                              backgroundColor: `${event.color}20`,
+                              borderColor: event.color,
+                              color: event.color
+                            }}
+                          >
+                            {event.title}
+                          </div>
+                        ))}
                       {timeIdx === 2 && (
                         <div className="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 p-2.5 rounded-lg text-xs font-medium shadow-sm">
                           🎯 Deep Focus Session — Build Workspace UI (9:00 AM - 11:00 AM)
@@ -354,6 +444,24 @@ export default function CalendarPage() {
                                   {task.title}
                                 </div>
                               ))}
+                            {filteredEvents
+                              .filter((event) => {
+                                const eventDate = new Date(event.startDate);
+                                return eventDate.toDateString() === day.date.toDateString();
+                              })
+                              .slice(0, 1)
+                              .map((event) => (
+                                <div
+                                  key={event.id}
+                                  className="text-[9px] truncate px-1 py-0.5 rounded"
+                                  style={{
+                                    backgroundColor: `${event.color}40`,
+                                    color: event.color
+                                  }}
+                                >
+                                  {event.title}
+                                </div>
+                              ))}
                           </div>
                         </>
                       )}
@@ -372,7 +480,10 @@ export default function CalendarPage() {
               <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
                 <FiClock className="text-emerald-400" /> Daily Schedule
               </h3>
-              <button className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40 rounded-xl text-xs font-semibold transition">
+              <button 
+                onClick={() => setShowEventModal(true)}
+                className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40 rounded-xl text-xs font-semibold transition"
+              >
                 <FiPlus className="w-3.5 h-3.5" />
                 <span>Add Event</span>
               </button>
@@ -382,6 +493,29 @@ export default function CalendarPage() {
                 <div key={time} className="flex items-start gap-4 pt-2 border-t border-zinc-800/50">
                   <span className="w-16 text-xs text-zinc-500 font-medium">{time}</span>
                   <div className="flex-1 min-h-[48px] rounded-xl bg-zinc-900/40 border border-dashed border-zinc-800/80 p-2 relative hover:border-zinc-700/60 transition cursor-pointer group">
+                    {/* Render events for this time slot */}
+                    {filteredEvents
+                      .filter((event) => {
+                        const eventDate = new Date(event.startDate);
+                        const eventHour = eventDate.getHours();
+                        return eventHour === timeIdx + 6 &&
+                               eventDate.getDate() === currentDay.getDate() &&
+                               eventDate.getMonth() === currentDay.getMonth() &&
+                               eventDate.getFullYear() === currentDay.getFullYear();
+                      })
+                      .map((event) => (
+                        <div
+                          key={event.id}
+                          className="mb-1 p-2 rounded-lg text-xs font-medium shadow-sm border"
+                          style={{
+                            backgroundColor: `${event.color}20`,
+                            borderColor: event.color,
+                            color: event.color
+                          }}
+                        >
+                          {event.title}
+                        </div>
+                      ))}
                     {filteredTasks
                       .filter((task) => {
                         if (!task.dueDate) return false;
@@ -448,6 +582,108 @@ export default function CalendarPage() {
             </div>
           )}
         </div>
+
+        {/* Event Creation Modal */}
+        {showEventModal && (
+          <div className="fixed inset-0 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="glass-card p-6 rounded-2xl w-full max-w-md space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-zinc-100">Create Event</h3>
+                <button 
+                  onClick={handleCancelEvent}
+                  className="text-zinc-400 hover:text-zinc-200 transition"
+                >
+                  <FiX className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs font-medium text-zinc-400 mb-1 block">Title</label>
+                  <input
+                    type="text"
+                    value={eventTitle}
+                    onChange={(e) => setEventTitle(e.target.value)}
+                    placeholder="Event title"
+                    className="w-full h-9 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-emerald-500/50"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-zinc-400 mb-1 block">Description</label>
+                  <textarea
+                    value={eventDescription}
+                    onChange={(e) => setEventDescription(e.target.value)}
+                    placeholder="Event description (optional)"
+                    rows={3}
+                    className="w-full px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-emerald-500/50 resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-zinc-400 mb-1 block">Date</label>
+                  <input
+                    type="date"
+                    value={eventDate}
+                    onChange={(e) => setEventDate(e.target.value)}
+                    className="w-full h-9 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-emerald-500/50"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-medium text-zinc-400 mb-1 block">Start Time</label>
+                    <input
+                      type="time"
+                      value={eventStartTime}
+                      onChange={(e) => setEventStartTime(e.target.value)}
+                      className="w-full h-9 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-emerald-500/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-zinc-400 mb-1 block">End Time</label>
+                    <input
+                      type="time"
+                      value={eventEndTime}
+                      onChange={(e) => setEventEndTime(e.target.value)}
+                      className="w-full h-9 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-emerald-500/50"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-zinc-400 mb-1 block">Event Type</label>
+                  <select
+                    value={eventType}
+                    onChange={(e) => setEventType(e.target.value as EventType)}
+                    className="w-full h-9 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-emerald-500/50"
+                  >
+                    <option value="meeting">Meeting</option>
+                    <option value="focus">Focus Session</option>
+                    <option value="break">Break</option>
+                    <option value="reminder">Reminder</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 pt-2">
+                <button
+                  onClick={handleCancelEvent}
+                  className="flex-1 px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs font-semibold text-zinc-400 hover:bg-zinc-800 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateEvent}
+                  className="flex-1 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 rounded-xl text-xs font-semibold transition"
+                >
+                  Create Event
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </AppLayout>
   );
