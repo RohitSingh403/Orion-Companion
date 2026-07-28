@@ -51,15 +51,21 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Interactive time slots with hover states and "+ Add" indicators
 - Week view with day headers and active day highlighting
 - Tasks This Week section showing scheduled tasks with priority indicators
+- Drag-and-drop task scheduling to time slots
+- Automatic due date update on task drop
 
 **Notes**
 - Complete notesStore with full CRUD operations and persist middleware
 - Rich text editor with markdown support
+- Markdown preview rendering with proper styling
+- Preview/edit mode toggle with icons
 - Search functionality (title, content, tags) with real-time filtering
 - Edit/Save/Delete note functionality with confirmation dialogs
+- Auto-save in edit mode
 - Empty state handling with "Create your first note" call-to-action
 - Note list with timestamps and active state highlighting
 - Tags display with emerald accent styling
+- Custom prose styling for dark theme
 
 **Analytics**
 - Daily statistics from real store data (total focus time, sessions, tasks completed)
@@ -79,6 +85,10 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Achievement filtering (All, Unlocked, Locked)
 - Achievement grid with unlock status indicators
 - Persistent achievement state with local storage
+- Achievement unlock triggers integrated into focus timer
+- XP rewards (10 XP) for each completed focus session
+- Level-up notifications with toast animations
+- Error handling with reset button for corrupted data
 
 **Settings**
 - Comprehensive settingsStore with persist middleware
@@ -127,25 +137,16 @@ Focus Companion v2.0 is currently in active development with significant progres
 
 ## Roadmap
 
-### 🚧 In Progress
-
-**Achievement Integration**
-- Integrate achievement unlock triggers into focus timer completion
-- Add XP rewards for session completions
-- Level-up notifications with toast animations
-
-### 📋 Planned Features
+###  Planned Features
 
 **Calendar Enhancements**
-- Drag-and-drop task scheduling
 - Recurring events support
-- Calendar view filters (day/week/month views)
+- Calendar view filters (day/week/month views) - UI exists, needs functionality
 - Event creation modal with time picker
 - Calendar export functionality
 
 **Notes Enhancements**
-- Markdown preview rendering
-- Quick notes capture
+- Quick notes capture (keyboard shortcut)
 - Linked tasks integration
 - Attachments support
 - Advanced search with filters
@@ -250,6 +251,10 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Tag system for organization
 - Timestamp tracking (created/updated)
 - Empty state handling
+- Markdown preview rendering with proper styling
+- Preview/edit mode toggle
+- Auto-save in edit mode
+- Custom prose styling for dark theme
 
 **Calendar System**
 - Weekly calendar view with day headers
@@ -258,6 +263,8 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Task filtering by due date
 - Interactive time slots
 - Week date range display
+- Drag-and-drop task scheduling to time slots
+- Automatic due date update on task drop
 
 **Analytics System**
 - Real-time statistics from store data
@@ -354,6 +361,22 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Dynamic level titles
 - Achievement unlock logic
 - Real-time progress display
+- Achievement unlock triggers integrated into focus timer
+- XP rewards (10 XP) for each completed focus session
+- Error handling with reset button for corrupted data
+
+**Phase 8: Notes Module Enhancement** ✅
+- Markdown preview rendering with react-markdown
+- Tailwind typography plugin for prose styling
+- Preview/edit mode toggle with icons
+- Auto-save in edit mode
+- Custom dark theme prose styling
+
+**Phase 9: Calendar Module Enhancement** ✅
+- Drag-and-drop task scheduling to time slots
+- Native HTML5 drag-and-drop implementation
+- Automatic due date update on task drop
+- Visual feedback for draggable tasks
 
 ---
 
@@ -511,6 +534,6 @@ The project follows strict development rules to maintain code quality and archit
 
 **Last Updated:** July 28, 2026
 
-**Active Phase:** Phase 7 - Achievements Module Expansion (Complete)
+**Active Phase:** Phase 9 - Calendar Module Enhancement (Complete)
 
-**Next Priority:** Integrate achievement unlock triggers into focus timer completion
+**Next Priority:** Calendar recurring events support or Notes quick notes capture

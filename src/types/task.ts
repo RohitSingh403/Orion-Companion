@@ -7,6 +7,8 @@ export type TaskStatus =
   | "in-progress"
   | "completed";
 
+export type RecurrenceType = "none" | "daily" | "weekly" | "monthly" | "yearly";
+
 export interface Task {
   id: string;
 
@@ -37,4 +39,8 @@ export interface Task {
   createdAt: string;
 
   updatedAt: string;
+
+  recurrence?: RecurrenceType;
+
+  recurrenceEndDate?: string | null;
 }

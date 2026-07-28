@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import type { Task, TaskPriority } from "../types/task";
+import type { Task, TaskPriority, RecurrenceType } from "../types/task";
 
 export interface CreateTaskData {
   title: string;
@@ -13,6 +13,8 @@ export interface CreateTaskData {
   dueDate?: string | null;
   projectId?: string | null;
   tags?: string[];
+  recurrence?: RecurrenceType;
+  recurrenceEndDate?: string | null;
 }
 
 interface TaskStore {
@@ -26,6 +28,7 @@ interface TaskStore {
   setActiveTask: (id: string | null) => void;
   incrementTaskFocusSession: (id: string) => void;
   clearCompleted: () => void;
+  generateRecurringTasks: () => void;
 }
 
 export const useTaskStore = create<TaskStore>()(
@@ -56,6 +59,8 @@ export const useTaskStore = create<TaskStore>()(
           completedAt: null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          recurrence: input.recurrence || "none",
+          recurrenceEndDate: input.recurrenceEndDate || null,
         };
 
         set((state) => ({
@@ -127,6 +132,69 @@ export const useTaskStore = create<TaskStore>()(
         set((state) => ({
           tasks: state.tasks.filter((task) => !task.completed),
         })),
+
+      generateRecurringTasks: () =>
+        set((state) => {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          const newTasks: Task[] = [];
+          
+          state.tasks.forEach((task) => {
+            if (!task.dueDate || task.recurrence === "none") return;
+            
+            const dueDate = new Date(task.dueDate);
+            const recurrenceEndDate = task.recurrenceEndDate 
+              ? new Date(task.recurrenceEndDate) 
+              : null;
+            
+            // Only generate if the due date is in the past or today
+            if (dueDate > today) return;
+            
+            // Check if we've passed the recurrence end date
+            if (recurrenceEndDate && today > recurrenceEndDate) return;
+            
+            let nextDueDate = new Date(dueDate);
+            
+            // Calculate next due date based on recurrence type
+            switch (task.recurrence) {
+              case "daily":
+                nextDueDate.setDate(nextDueDate.getDate() + 1);
+                break;
+              case "weekly":
+                nextDueDate.setDate(nextDueDate.getDate() + 7);
+                break;
+              case "monthly":
+                nextDueDate.setMonth(nextDueDate.getMonth() + 1);
+                break;
+              case "yearly":
+                nextDueDate.setFullYear(nextDueDate.getFullYear() + 1);
+                break;
+            }
+            
+            // Check if next due date is within recurrence end date
+            if (recurrenceEndDate && nextDueDate > recurrenceEndDate) return;
+            
+            // Create new recurring task
+            const recurringTask: Task = {
+              ...task,
+              id: crypto.randomUUID(),
+              dueDate: nextDueDate.toISOString(),
+              completedFocusSessions: 0,
+              completed: false,
+              status: "todo",
+              completedAt: null,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+            
+            newTasks.push(recurringTask);
+          });
+          
+          return {
+            tasks: [...state.tasks, ...newTasks],
+          };
+        }),
     }),
     {
       name: "focus-companion-tasks",

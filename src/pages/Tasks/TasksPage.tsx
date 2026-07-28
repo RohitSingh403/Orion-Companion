@@ -4,7 +4,7 @@ import { useState } from "react";
 import AppLayout from "../../layouts/AppLayout";
 import Topbar from "../../components/topbar/Topbar";
 import { useTaskStore } from "../../store/taskStore";
-import type { TaskPriority } from "../../types/task";
+import type { TaskPriority, RecurrenceType } from "../../types/task";
 import {
   FiCalendar,
   FiStar,
@@ -14,6 +14,7 @@ import {
   FiFolder,
   FiTag,
   FiTarget,
+  FiRepeat,
 } from "react-icons/fi";
 
 export default function TasksPage() {
@@ -24,6 +25,8 @@ export default function TasksPage() {
   const [priority, setPriority] = useState<TaskPriority>("medium");
   const [estimatedSessions, setEstimatedSessions] = useState<number>(2);
   const [selectedTag, setSelectedTag] = useState<string>("Work");
+  const [recurrence, setRecurrence] = useState<RecurrenceType>("none");
+  const [recurrenceEndDate, setRecurrenceEndDate] = useState<string>("");
 
   const handleAddTask = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,9 +38,13 @@ export default function TasksPage() {
       estimatedFocusSessions: estimatedSessions,
       tags: [selectedTag],
       dueDate: "Today",
+      recurrence,
+      recurrenceEndDate: recurrenceEndDate || null,
     });
 
     setTitle("");
+    setRecurrence("none");
+    setRecurrenceEndDate("");
   };
 
   const filteredTasks = tasks.filter((t) => {
@@ -209,6 +216,22 @@ export default function TasksPage() {
                       <option value={4}>4 Sessions (100m)</option>
                     </select>
                   </div>
+
+                  {/* Recurrence Select */}
+                  <div className="flex items-center gap-1 text-xs">
+                    <FiRepeat className="w-3.5 h-3.5 text-zinc-500" />
+                    <select
+                      value={recurrence}
+                      onChange={(e) => setRecurrence(e.target.value as RecurrenceType)}
+                      className="bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-300 focus:outline-none"
+                    >
+                      <option value="none">No Repeat</option>
+                      <option value="daily">Daily</option>
+                      <option value="weekly">Weekly</option>
+                      <option value="monthly">Monthly</option>
+                      <option value="yearly">Yearly</option>
+                    </select>
+                  </div>
                 </div>
 
                 <button
@@ -219,6 +242,19 @@ export default function TasksPage() {
                   <span>Add Task</span>
                 </button>
               </div>
+
+              {/* Recurrence End Date */}
+              {recurrence !== "none" && (
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-zinc-500 text-[10px]">Repeat until:</span>
+                  <input
+                    type="date"
+                    value={recurrenceEndDate}
+                    onChange={(e) => setRecurrenceEndDate(e.target.value)}
+                    className="bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-300 focus:outline-none"
+                  />
+                </div>
+              )}
             </form>
 
             {/* Task Rows List */}
@@ -271,6 +307,14 @@ export default function TasksPage() {
                           {task.tags[0] && (
                             <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
                               {task.tags[0]}
+                            </span>
+                          )}
+
+                          {/* Recurrence Badge */}
+                          {task.recurrence && task.recurrence !== "none" && (
+                            <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20 flex items-center gap-1">
+                              <FiRepeat className="w-2.5 h-2.5" />
+                              {task.recurrence}
                             </span>
                           )}
 
