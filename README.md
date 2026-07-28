@@ -53,6 +53,10 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Tasks This Week section showing scheduled tasks with priority indicators
 - Drag-and-drop task scheduling to time slots
 - Automatic due date update on task drop
+- Calendar view filters (day/week/month) with full functionality
+- Month view with calendar grid and task previews
+- Day view with single-day hourly schedule
+- Dynamic task filtering based on current view
 
 **Notes**
 - Complete notesStore with full CRUD operations and persist middleware
@@ -66,6 +70,13 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Note list with timestamps and active state highlighting
 - Tags display with emerald accent styling
 - Custom prose styling for dark theme
+- Quick notes capture with keyboard shortcut (Cmd/Ctrl + N)
+- Quick note button with FiZap icon
+- Toast notification for quick note creation
+- Linked tasks integration with task picker modal
+- FiTarget button to link/unlink tasks
+- Visual indicator for linked tasks
+- Linked task display overlay with task title and progress
 
 **Analytics**
 - Daily statistics from real store data (total focus time, sessions, tasks completed)
@@ -140,14 +151,11 @@ Focus Companion v2.0 is currently in active development with significant progres
 ###  Planned Features
 
 **Calendar Enhancements**
-- Recurring events support
 - Calendar view filters (day/week/month views) - UI exists, needs functionality
 - Event creation modal with time picker
 - Calendar export functionality
 
 **Notes Enhancements**
-- Quick notes capture (keyboard shortcut)
-- Linked tasks integration
 - Attachments support
 - Advanced search with filters
 
@@ -377,6 +385,24 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Native HTML5 drag-and-drop implementation
 - Automatic due date update on task drop
 - Visual feedback for draggable tasks
+- Calendar view filters (day/week/month) with full functionality
+- Month view with calendar grid and task previews
+- Day view with single-day hourly schedule
+- Dynamic task filtering based on current view
+
+**Phase 10: Notes Module Enhancement** ✅
+- Markdown preview rendering with react-markdown
+- Tailwind typography plugin for prose styling
+- Preview/edit mode toggle with icons
+- Auto-save in edit mode
+- Custom dark theme prose styling
+- Quick notes capture with keyboard shortcut (Cmd/Ctrl + N)
+- Quick note button with FiZap icon
+- Toast notification for quick note creation
+- Linked tasks integration with task picker modal
+- FiTarget button to link/unlink tasks
+- Visual indicator for linked tasks
+- Linked task display overlay with task title and progress
 
 ---
 
@@ -534,6 +560,6 @@ The project follows strict development rules to maintain code quality and archit
 
 **Last Updated:** July 28, 2026
 
-**Active Phase:** Phase 9 - Calendar Module Enhancement (Complete)
+**Active Phase:** Phase 10 - Notes Module Enhancement (Complete)
 
-**Next Priority:** Calendar recurring events support or Notes quick notes capture
+**Next Priority:** Calendar event creation modal, Notes attachments support, or Analytics monthly reports

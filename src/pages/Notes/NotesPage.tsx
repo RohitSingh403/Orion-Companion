@@ -1,9 +1,10 @@
 // src/pages/Notes/NotesPage.tsx
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppLayout from "../../layouts/AppLayout";
 import Topbar from "../../components/topbar/Topbar";
 import { useNotesStore } from "../../store/notesStore";
+import { useTaskStore } from "../../store/taskStore";
 import ReactMarkdown from "react-markdown";
 import {
   FiSearch,
@@ -17,19 +18,57 @@ import {
   FiTrash2,
   FiEye,
   FiEdit3,
+  FiZap,
+  FiTarget,
 } from "react-icons/fi";
 
 export default function NotesPage() {
   const { notes, activeNoteId, addNote, updateNote, deleteNote, setActiveNote, searchNotes } = useNotesStore();
+  const { tasks } = useTaskStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
   const [viewMode, setViewMode] = useState<"edit" | "preview">("preview");
+  const [showQuickNoteToast, setShowQuickNoteToast] = useState(false);
+  const [showTaskPicker, setShowTaskPicker] = useState(false);
 
   const activeNote = notes.find((n) => n.id === activeNoteId);
 
   const filteredNotes = searchQuery ? searchNotes(searchQuery) : notes;
+
+  // Keyboard shortcut for quick note capture (Cmd/Ctrl + N)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "n") {
+        e.preventDefault();
+        handleQuickNote();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const handleQuickNote = () => {
+    addNote("Quick Note", "# Quick Note\n\nCapture your thoughts...");
+    setViewMode("edit");
+    setShowQuickNoteToast(true);
+    setTimeout(() => setShowQuickNoteToast(false), 2000);
+  };
+
+  const handleLinkTask = (taskId: string) => {
+    if (activeNoteId) {
+      updateNote(activeNoteId, { linkedTaskId: taskId });
+      setShowTaskPicker(false);
+    }
+  };
+
+  const handleUnlinkTask = () => {
+    if (activeNoteId) {
+      updateNote(activeNoteId, { linkedTaskId: null });
+    }
+  };
 
   const handleCreateNote = () => {
     addNote("New Note", "# New Note\n\nStart writing here...");
@@ -64,15 +103,32 @@ export default function NotesPage() {
   return (
     <AppLayout>
       <Topbar greeting="Notes & Thoughts 📝" subtitle="Capture ideas and link tasks to your focus sessions" />
-      <div className="flex-1 overflow-hidden p-8 flex gap-6">
+      <div className="flex-1 overflow-hidden p-8 flex gap-6 relative">
+        {/* Quick Note Toast */}
+        {showQuickNoteToast && (
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg z-50 animate-pulse">
+            <FiZap className="w-4 h-4" />
+            <span>Quick note created!</span>
+          </div>
+        )}
+
         {/* Left Note List Panel */}
         <div className="w-80 glass-card rounded-2xl p-4 flex flex-col gap-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold text-zinc-100">Notes</h3>
-            <button onClick={handleCreateNote} className="p-1.5 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 rounded-lg text-xs font-semibold flex items-center gap-1 shadow">
-              <FiPlus className="w-3.5 h-3.5" />
-              <span>New</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={handleQuickNote} 
+                className="p-1.5 bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-400 hover:text-emerald-400 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
+                title="Quick note (Cmd/Ctrl + N)"
+              >
+                <FiZap className="w-3.5 h-3.5" />
+              </button>
+              <button onClick={handleCreateNote} className="p-1.5 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 rounded-lg text-xs font-semibold flex items-center gap-1 shadow">
+                <FiPlus className="w-3.5 h-3.5" />
+                <span>New</span>
+              </button>
+            </div>
           </div>
 
           <div className="relative">
@@ -143,7 +199,27 @@ export default function NotesPage() {
                       >
                         <FiEdit3 className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={handleDeleteNote} className="p-1.5 hover:text-red-400 rounded hover:bg-zinc-800">
+                      <button 
+                        onClick={() => setShowTaskPicker(!showTaskPicker)}
+                        className={`p-1.5 rounded hover:bg-zinc-800 ${activeNote?.linkedTaskId ? "text-emerald-400 bg-zinc-800" : "hover:text-zinc-200"}`}
+                        title={activeNote?.linkedTaskId ? "Linked task" : "Link task"}
+                      >
+                        <FiTarget className="w-3.5 h-3.5" />
+                      </button>
+                      {activeNote?.linkedTaskId && (
+                        <button 
+                          onClick={handleUnlinkTask}
+                          className="p-1.5 hover:text-red-400 rounded hover:bg-zinc-800"
+                          title="Unlink task"
+                        >
+                          <FiTrash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      <button 
+                        onClick={handleDeleteNote} 
+                        className="p-1.5 hover:text-red-400 rounded hover:bg-zinc-800"
+                        title="Delete note"
+                      >
                         <FiTrash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -171,24 +247,76 @@ export default function NotesPage() {
                 </div>
               </div>
 
-              {/* Markdown Body */}
-              {viewMode === "edit" ? (
-                <textarea
-                  value={isEditing ? editContent : (activeNote?.content || "")}
-                  onChange={(e) => {
-                    setEditContent(e.target.value);
-                    if (!isEditing && activeNoteId) {
-                      updateNote(activeNoteId, { content: e.target.value });
-                    }
-                  }}
-                  className="w-full flex-1 bg-zinc-900/50 border border-zinc-800 rounded-xl p-3 text-sm text-zinc-200 leading-relaxed outline-none resize-none font-mono no-scrollbar focus:border-emerald-500/50"
-                  placeholder="Write your note here..."
-                />
-              ) : (
-                <div className="w-full flex-1 bg-zinc-900/30 border border-zinc-800 rounded-xl p-4 text-sm text-zinc-200 leading-relaxed overflow-y-auto no-scrollbar prose prose-invert prose-sm max-w-none prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-strong:text-zinc-100 prose-code:text-emerald-400 prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-zinc-800">
-                  <ReactMarkdown>{activeNote?.content || ""}</ReactMarkdown>
+              {/* Task Picker Modal */}
+              {showTaskPicker && (
+                <div className="absolute inset-0 bg-zinc-950/90 backdrop-blur-sm rounded-xl p-4 z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-sm font-bold text-zinc-100">Link a Task</h4>
+                    <button onClick={() => setShowTaskPicker(false)} className="text-zinc-400 hover:text-zinc-200">
+                      <FiTrash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="space-y-2 max-h-60 overflow-y-auto no-scrollbar">
+                    {tasks.length === 0 ? (
+                      <p className="text-xs text-zinc-500 text-center py-4">No tasks available</p>
+                    ) : (
+                      tasks.map((task) => (
+                        <button
+                          key={task.id}
+                          onClick={() => handleLinkTask(task.id)}
+                          className="w-full p-3 bg-zinc-900 border border-zinc-800 rounded-xl text-left hover:border-emerald-500/50 transition"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-medium text-zinc-200">{task.title}</span>
+                            <span className="text-[10px] text-zinc-500">
+                              {task.completedFocusSessions}/{task.estimatedFocusSessions}
+                            </span>
+                          </div>
+                        </button>
+                      ))
+                    )}
+                  </div>
                 </div>
               )}
+
+              {/* Markdown Body */}
+              <div className="relative flex-1">
+                {viewMode === "edit" ? (
+                  <textarea
+                    value={isEditing ? editContent : (activeNote?.content || "")}
+                    onChange={(e) => {
+                      setEditContent(e.target.value);
+                      if (!isEditing && activeNoteId) {
+                        updateNote(activeNoteId, { content: e.target.value });
+                      }
+                    }}
+                    className="w-full h-full bg-zinc-900/50 border border-zinc-800 rounded-xl p-3 text-sm text-zinc-200 leading-relaxed outline-none resize-none font-mono no-scrollbar focus:border-emerald-500/50"
+                    placeholder="Write your note here..."
+                  />
+                ) : (
+                  <div className="w-full h-full bg-zinc-900/30 border border-zinc-800 rounded-xl p-4 text-sm text-zinc-200 leading-relaxed overflow-y-auto no-scrollbar prose prose-invert prose-sm max-w-none prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-strong:text-zinc-100 prose-code:text-emerald-400 prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-zinc-800">
+                    <ReactMarkdown>{activeNote?.content || ""}</ReactMarkdown>
+                  </div>
+                )}
+
+                {/* Linked Task Display */}
+                {activeNote?.linkedTaskId && (
+                  <div className="absolute bottom-4 left-4 right-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FiTarget className="w-3.5 h-3.5 text-emerald-400" />
+                      <span className="text-xs text-emerald-300 font-medium">
+                        {tasks.find((t) => t.id === activeNote.linkedTaskId)?.title || "Linked Task"}
+                      </span>
+                    </div>
+                    <button 
+                      onClick={handleUnlinkTask}
+                      className="text-zinc-400 hover:text-red-400 transition"
+                    >
+                      <FiTrash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+              </div>
 
               {/* Tags Footer */}
               <div className="flex items-center gap-2 pt-2 border-t border-zinc-800/80">
