@@ -57,6 +57,12 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Month view with calendar grid and task previews
 - Day view with single-day hourly schedule
 - Dynamic task filtering based on current view
+- Event creation modal with time picker
+- Event types: meeting, focus session, break, reminder, other
+- Color-coded events by type
+- Event filtering by date range for all views
+- Events rendered in week, month, and day views
+- Event store with persist middleware
 
 **Notes**
 - Complete notesStore with full CRUD operations and persist middleware
@@ -151,8 +157,6 @@ Focus Companion v2.0 is currently in active development with significant progres
 ###  Planned Features
 
 **Calendar Enhancements**
-- Calendar view filters (day/week/month views) - UI exists, needs functionality
-- Event creation modal with time picker
 - Calendar export functionality
 
 **Notes Enhancements**
@@ -390,6 +394,19 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Day view with single-day hourly schedule
 - Dynamic task filtering based on current view
 
+**Phase 11: Calendar Event Management** ✅
+- Event creation modal with time picker
+- Event types: meeting, focus session, break, reminder, other
+- Color-coded events by type (purple, emerald, blue, amber, gray)
+- Event store with full CRUD operations and persist middleware
+- Event filtering by date range for all calendar views
+- Events rendered in week view time slots
+- Events rendered in month view grid cells
+- Events rendered in day view hourly schedule
+- Add Event buttons in week and day views
+- Modal with backdrop blur and glassmorphism styling
+- Form validation and reset on cancel/create
+
 **Phase 10: Notes Module Enhancement** ✅
 - Markdown preview rendering with react-markdown
 - Tailwind typography plugin for prose styling
@@ -560,6 +577,6 @@ The project follows strict development rules to maintain code quality and archit
 
 **Last Updated:** July 28, 2026
 
-**Active Phase:** Phase 10 - Notes Module Enhancement (Complete)
+**Active Phase:** Phase 11 - Calendar Event Management (Complete)
 
-**Next Priority:** Calendar event creation modal, Notes attachments support, or Analytics monthly reports
+**Next Priority:** Calendar export functionality, Notes attachments support, or Analytics monthly reports
