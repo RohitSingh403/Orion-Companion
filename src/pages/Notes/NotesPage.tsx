@@ -4,6 +4,7 @@ import { useState } from "react";
 import AppLayout from "../../layouts/AppLayout";
 import Topbar from "../../components/topbar/Topbar";
 import { useNotesStore } from "../../store/notesStore";
+import ReactMarkdown from "react-markdown";
 import {
   FiSearch,
   FiPlus,
@@ -14,6 +15,8 @@ import {
   FiLink,
   FiCheckSquare,
   FiTrash2,
+  FiEye,
+  FiEdit3,
 } from "react-icons/fi";
 
 export default function NotesPage() {
@@ -22,6 +25,7 @@ export default function NotesPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
+  const [viewMode, setViewMode] = useState<"edit" | "preview">("preview");
 
   const activeNote = notes.find((n) => n.id === activeNoteId);
 
@@ -29,7 +33,7 @@ export default function NotesPage() {
 
   const handleCreateNote = () => {
     addNote("New Note", "# New Note\n\nStart writing here...");
-    setIsEditing(true);
+    setViewMode("edit");
   };
 
   const handleSaveNote = () => {
@@ -40,18 +44,12 @@ export default function NotesPage() {
       });
     }
     setIsEditing(false);
-  };
-
-  const handleStartEdit = () => {
-    if (activeNote) {
-      setEditTitle(activeNote.title);
-      setEditContent(activeNote.content);
-      setIsEditing(true);
-    }
+    setViewMode("preview");
   };
 
   const handleCancelEdit = () => {
     setIsEditing(false);
+    setViewMode("preview");
     setEditTitle("");
     setEditContent("");
   };
@@ -133,8 +131,17 @@ export default function NotesPage() {
                     </div>
                   ) : (
                     <div className="flex items-center gap-1 bg-zinc-900/80 p-1 rounded-xl border border-zinc-800 text-zinc-400">
-                      <button onClick={handleStartEdit} className="p-1.5 hover:text-zinc-200 rounded hover:bg-zinc-800">
-                        Edit
+                      <button 
+                        onClick={() => setViewMode("preview")}
+                        className={`p-1.5 rounded hover:bg-zinc-800 ${viewMode === "preview" ? "text-emerald-400 bg-zinc-800" : "hover:text-zinc-200"}`}
+                      >
+                        <FiEye className="w-3.5 h-3.5" />
+                      </button>
+                      <button 
+                        onClick={() => setViewMode("edit")}
+                        className={`p-1.5 rounded hover:bg-zinc-800 ${viewMode === "edit" ? "text-emerald-400 bg-zinc-800" : "hover:text-zinc-200"}`}
+                      >
+                        <FiEdit3 className="w-3.5 h-3.5" />
                       </button>
                       <button onClick={handleDeleteNote} className="p-1.5 hover:text-red-400 rounded hover:bg-zinc-800">
                         <FiTrash2 className="w-3.5 h-3.5" />
@@ -164,20 +171,23 @@ export default function NotesPage() {
                 </div>
               </div>
 
-              {/* Markdown Body Text Area */}
-              {isEditing ? (
+              {/* Markdown Body */}
+              {viewMode === "edit" ? (
                 <textarea
-                  value={editContent}
-                  onChange={(e) => setEditContent(e.target.value)}
+                  value={isEditing ? editContent : (activeNote?.content || "")}
+                  onChange={(e) => {
+                    setEditContent(e.target.value);
+                    if (!isEditing && activeNoteId) {
+                      updateNote(activeNoteId, { content: e.target.value });
+                    }
+                  }}
                   className="w-full flex-1 bg-zinc-900/50 border border-zinc-800 rounded-xl p-3 text-sm text-zinc-200 leading-relaxed outline-none resize-none font-mono no-scrollbar focus:border-emerald-500/50"
                   placeholder="Write your note here..."
                 />
               ) : (
-                <textarea
-                  value={activeNote.content}
-                  readOnly
-                  className="w-full flex-1 bg-transparent text-sm text-zinc-200 leading-relaxed outline-none resize-none font-mono no-scrollbar"
-                />
+                <div className="w-full flex-1 bg-zinc-900/30 border border-zinc-800 rounded-xl p-4 text-sm text-zinc-200 leading-relaxed overflow-y-auto no-scrollbar prose prose-invert prose-sm max-w-none prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-strong:text-zinc-100 prose-code:text-emerald-400 prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-zinc-800">
+                  <ReactMarkdown>{activeNote?.content || ""}</ReactMarkdown>
+                </div>
               )}
 
               {/* Tags Footer */}
