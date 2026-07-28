@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import AppLayout from "../../layouts/AppLayout";
 import Topbar from "../../components/topbar/Topbar";
 import { useTaskStore } from "../../store/taskStore";
-import { FiChevronLeft, FiChevronRight, FiClock, FiPlus } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiClock, FiPlus, FiMoreVertical } from "react-icons/fi";
 
 export default function CalendarPage() {
   const [viewMode, setViewMode] = useState<"month" | "week" | "day">("week");
@@ -17,7 +17,7 @@ export default function CalendarPage() {
     return monday;
   });
 
-  const { tasks } = useTaskStore();
+  const { tasks, updateTask } = useTaskStore();
 
   // Generate week dates
   const weekDates = useMemo(() => {
@@ -71,6 +71,20 @@ export default function CalendarPage() {
     const monday = new Date(now.setDate(diff));
     monday.setHours(0, 0, 0, 0);
     setCurrentWeekStart(monday);
+  };
+
+  const handleDrop = (e: React.DragEvent, dayIndex: number, hour: number) => {
+    e.preventDefault();
+    const taskId = e.dataTransfer.getData("taskId");
+    if (!taskId) return;
+
+    // Calculate the target date based on the day index
+    const targetDate = new Date(currentWeekStart);
+    targetDate.setDate(targetDate.getDate() + dayIndex);
+    targetDate.setHours(hour, 0, 0, 0);
+
+    // Update the task's due date
+    updateTask(taskId, { dueDate: targetDate.toISOString() });
   };
 
   // Filter tasks for the current week
@@ -153,21 +167,29 @@ export default function CalendarPage() {
             </button>
           </div>
           <div className="space-y-3">
-            {timeSlots.map((time, idx) => (
+            {timeSlots.map((time, timeIdx) => (
               <div key={time} className="flex items-start gap-4 pt-2 border-t border-zinc-800/50">
                 <span className="w-16 text-xs text-zinc-500 font-medium">{time}</span>
                 <div className="flex-1 min-h-[48px] rounded-xl bg-zinc-900/40 border border-dashed border-zinc-800/80 p-2 relative hover:border-zinc-700/60 transition cursor-pointer group">
-                  {idx === 2 && (
+                  {weekDates.map((_, dayIdx) => (
+                    <div
+                      key={`${dayIdx}-${timeIdx}`}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => handleDrop(e, dayIdx, timeIdx + 6)}
+                      className="absolute inset-0"
+                    />
+                  ))}
+                  {timeIdx === 2 && (
                     <div className="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 p-2.5 rounded-lg text-xs font-medium shadow-sm">
                       🎯 Deep Focus Session — Build Workspace UI (9:00 AM - 11:00 AM)
                     </div>
                   )}
-                  {idx === 4 && (
+                  {timeIdx === 4 && (
                     <div className="bg-purple-500/20 border border-purple-500/40 text-purple-300 p-2.5 rounded-lg text-xs font-medium shadow-sm">
                       🎨 Design Review Meeting (11:00 AM - 12:00 PM)
                     </div>
                   )}
-                  {idx === 5 && (
+                  {timeIdx === 5 && (
                     <div className="bg-blue-500/20 border border-blue-500/40 text-blue-300 p-2 rounded-lg text-xs font-medium shadow-sm">
                       ☕ Scheduled Rest Break (1:00 PM - 1:15 PM)
                     </div>
@@ -191,8 +213,14 @@ export default function CalendarPage() {
           ) : (
             <div className="space-y-2">
               {weeklyTasks.map((task) => (
-                <div key={task.id} className="flex items-center justify-between p-3 bg-zinc-900/70 border border-zinc-800/80 rounded-xl hover:border-zinc-700 transition">
+                <div
+                  key={task.id}
+                  draggable
+                  onDragStart={(e) => e.dataTransfer.setData("taskId", task.id)}
+                  className="flex items-center justify-between p-3 bg-zinc-900/70 border border-zinc-800/80 rounded-xl hover:border-zinc-700 transition cursor-move"
+                >
                   <div className="flex items-center gap-3">
+                    <FiMoreVertical className="w-4 h-4 text-zinc-500" />
                     <div className={`w-2 h-2 rounded-full ${
                       task.priority === "high" ? "bg-red-500" : 
                       task.priority === "medium" ? "bg-amber-500" : "bg-emerald-500"
