@@ -95,7 +95,8 @@ export const useAchievementStore = create<AchievementState>()(
         }),
     }),
     {
-      name: "achievement-storage",
+      name: "focus-companion-achievements-v2",
+      version: 1,
     },
   ),
 );

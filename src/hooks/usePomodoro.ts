@@ -31,6 +31,7 @@ export default function usePomodoro() {
 
   const unlockAchievement = useAchievementStore((s) => s.unlockAchievement);
   const isUnlocked = useAchievementStore((s) => s.isUnlocked);
+  const addXP = useAchievementStore((s) => s.addXP);
 
   const showToast = useToastStore((s) => s.showToast);
 
@@ -48,6 +49,9 @@ export default function usePomodoro() {
       if (activeTaskId) {
         incrementTaskFocusSession(activeTaskId);
       }
+
+      // Add XP for completing a focus session
+      addXP(10);
 
       // Achievement checks
       if (completedSessions === 1 && !isUnlocked("first-session")) {
@@ -86,6 +90,7 @@ export default function usePomodoro() {
     incrementTaskFocusSession,
     unlockAchievement,
     isUnlocked,
+    addXP,
     showToast,
   ]);
 
