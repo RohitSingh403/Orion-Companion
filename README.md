@@ -63,6 +63,9 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Event filtering by date range for all views
 - Events rendered in week, month, and day views
 - Event store with persist middleware
+- Export calendar to ICS/iCal format
+- View-based export (week/day/month) with date range filtering
+- Automatic file download with proper ICS formatting
 
 **Notes**
 - Complete notesStore with full CRUD operations and persist middleware
@@ -83,6 +86,10 @@ Focus Companion v2.0 is currently in active development with significant progres
 - FiTarget button to link/unlink tasks
 - Visual indicator for linked tasks
 - Linked task display overlay with task title and progress
+- Attachments support with file upload
+- Base64 encoding for file storage
+- Attachment list with name, size, and delete option
+- File size formatting (B/KB/MB)
 
 **Analytics**
 - Daily statistics from real store data (total focus time, sessions, tasks completed)
@@ -92,6 +99,10 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Current streak display with day counter
 - Task completion rate calculation
 - Productivity score based on daily goal progress
+- Monthly and yearly reports with time range selector
+- Dynamic statistics calculation for week/month/year views
+- Adaptive trend chart and heatmap based on selected time range
+- Period-specific overview with dynamic labels
 
 **Achievements**
 - Expanded achievementStore with XP system and level progression
@@ -157,18 +168,13 @@ Focus Companion v2.0 is currently in active development with significant progres
 ###  Planned Features
 
 **Calendar Enhancements**
-- Calendar export functionality
+- (All planned features completed)
 
 **Notes Enhancements**
-- Attachments support
 - Advanced search with filters
 
 **Analytics Enhancements**
-- Monthly and yearly reports
-- Advanced productivity insights
-- Focus patterns analysis
-- Comparative statistics (week-over-week, month-over-month)
-- Export analytics data
+- (All planned features completed)
 
 **Reminder System**
 - Desktop notifications with custom sounds
@@ -367,6 +373,15 @@ Focus Companion v2.0 is currently in active development with significant progres
 - GitHub-style heatmap with real activity levels
 - Focus time trend charts
 
+**Phase 14: Analytics Monthly/Yearly Reports** ✅
+- Time range selector (week/month/year) in Analytics page
+- Dynamic statistics calculation based on selected time range
+- Updated stat cards with range-specific data
+- Period-specific overview with dynamic labels
+- Adaptive trend chart (7 days/4 weeks/12 months)
+- Scaled heatmap based on time range (1 week/4 weeks/52 weeks)
+- Multiplier-based calculations for longer periods
+
 **Phase 7: Achievements Module** ✅
 - XP system implementation
 - Level progression
@@ -407,6 +422,15 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Modal with backdrop blur and glassmorphism styling
 - Form validation and reset on cancel/create
 
+**Phase 12: Calendar Export** ✅
+- Export calendar to ICS/iCal format
+- ICS format generation with proper VCALENDAR structure
+- Date range filtering for export (week/day/month views)
+- Event title and description escaping for ICS compliance
+- Export button in calendar header with FiDownload icon
+- Automatic file download with view-specific naming
+- Blob-based file generation for browser compatibility
+
 **Phase 10: Notes Module Enhancement** ✅
 - Markdown preview rendering with react-markdown
 - Tailwind typography plugin for prose styling
@@ -420,6 +444,18 @@ Focus Companion v2.0 is currently in active development with significant progres
 - FiTarget button to link/unlink tasks
 - Visual indicator for linked tasks
 - Linked task display overlay with task title and progress
+
+**Phase 13: Notes Attachments** ✅
+- Attachments support with file upload
+- NoteAttachment type with id, name, type, size, data (base64), createdAt
+- Updated Note interface to include attachments array
+- addAttachment function with FileReader for base64 encoding
+- removeAttachment function to delete attachments
+- File upload handler with loading state
+- Attachments section in NotesPage with Add button
+- Attachment list display with name, size, and delete button
+- File size formatting helper (B/KB/MB)
+- Persist middleware stores attachments in localStorage
 
 ---
 
@@ -575,8 +611,8 @@ The project follows strict development rules to maintain code quality and archit
 
 **Version:** v2.0.0 (In Development)
 
-**Last Updated:** July 28, 2026
+**Last Updated:** July 29, 2026
 
-**Active Phase:** Phase 11 - Calendar Event Management (Complete)
+**Active Phase:** Phase 14 - Analytics Monthly/Yearly Reports (Complete)
 
-**Next Priority:** Calendar export functionality, Notes attachments support, or Analytics monthly reports
+**Next Priority:** Advanced search filters for Notes or Reminder System

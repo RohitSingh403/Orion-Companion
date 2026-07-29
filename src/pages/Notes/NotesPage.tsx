@@ -23,7 +23,7 @@ import {
 } from "react-icons/fi";
 
 export default function NotesPage() {
-  const { notes, activeNoteId, addNote, updateNote, deleteNote, setActiveNote, searchNotes } = useNotesStore();
+  const { notes, activeNoteId, addNote, updateNote, deleteNote, setActiveNote, searchNotes, addAttachment, removeAttachment } = useNotesStore();
   const { tasks } = useTaskStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -32,6 +32,7 @@ export default function NotesPage() {
   const [viewMode, setViewMode] = useState<"edit" | "preview">("preview");
   const [showQuickNoteToast, setShowQuickNoteToast] = useState(false);
   const [showTaskPicker, setShowTaskPicker] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const activeNote = notes.find((n) => n.id === activeNoteId);
 
@@ -68,6 +69,32 @@ export default function NotesPage() {
     if (activeNoteId) {
       updateNote(activeNoteId, { linkedTaskId: null });
     }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !activeNoteId) return;
+
+    setIsUploading(true);
+    try {
+      await addAttachment(activeNoteId, file);
+    } catch (error) {
+      console.error("Failed to upload file:", error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleRemoveAttachment = (attachmentId: string) => {
+    if (activeNoteId) {
+      removeAttachment(activeNoteId, attachmentId);
+    }
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
   };
 
   const handleCreateNote = () => {
@@ -167,7 +194,7 @@ export default function NotesPage() {
         </div>
 
         {/* Right Note Markdown Editor Panel */}
-        <div className="flex-1 glass-card rounded-2xl p-6 flex flex-col gap-4 overflow-hidden">
+        <div className="flex-1 glass-card rounded-2xl p-6 flex flex-col gap-4">
           {activeNote ? (
             <>
               {/* Editor Header Toolbar */}
@@ -280,7 +307,7 @@ export default function NotesPage() {
               )}
 
               {/* Markdown Body */}
-              <div className="relative flex-1">
+              <div className="relative flex-1 min-h-0">
                 {viewMode === "edit" ? (
                   <textarea
                     value={isEditing ? editContent : (activeNote?.content || "")}
@@ -328,6 +355,49 @@ export default function NotesPage() {
                       #{t}
                     </span>
                   ))
+                )}
+              </div>
+
+              {/* Attachments Section */}
+              <div className="flex flex-col gap-2 pt-2 border-t border-zinc-800/80">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-zinc-500">Attachments</span>
+                  <label className="flex items-center gap-1 text-[10px] text-emerald-400 hover:text-emerald-300 cursor-pointer">
+                    <FiPaperclip className="w-3 h-3" />
+                    <span>Add</span>
+                    <input
+                      type="file"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                      disabled={isUploading}
+                    />
+                  </label>
+                </div>
+                {activeNote.attachments?.length === 0 ? (
+                  <span className="text-[10px] text-zinc-600">No attachments</span>
+                ) : (
+                  <div className="space-y-1">
+                    {(activeNote.attachments || []).map((attachment) => (
+                      <div
+                        key={attachment.id}
+                        className="flex items-center justify-between p-2 bg-zinc-900/50 border border-zinc-800 rounded-lg"
+                      >
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <FiPaperclip className="w-3 h-3 text-zinc-400 flex-shrink-0" />
+                          <span className="text-[10px] text-zinc-300 truncate">{attachment.name}</span>
+                          <span className="text-[10px] text-zinc-500 flex-shrink-0">
+                            {formatFileSize(attachment.size)}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => handleRemoveAttachment(attachment.id)}
+                          className="text-zinc-400 hover:text-red-400 transition flex-shrink-0"
+                        >
+                          <FiTrash2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </>

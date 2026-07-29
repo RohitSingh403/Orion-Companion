@@ -18,6 +18,7 @@ interface EventState {
   deleteEvent: (id: string) => void;
   getEventsForDate: (date: Date) => CalendarEvent[];
   getEventsForRange: (startDate: Date, endDate: Date) => CalendarEvent[];
+  exportToICS: (startDate?: Date, endDate?: Date) => string;
 }
 
 const EVENT_COLORS: Record<EventType, string> = {
@@ -84,6 +85,44 @@ export const useEventStore = create<EventState>()(
           const eventDate = new Date(event.startDate);
           return eventDate >= startDate && eventDate <= endDate;
         });
+      },
+
+      exportToICS: (startDate, endDate) => {
+        const { events } = get();
+        let eventsToExport = events;
+
+        if (startDate && endDate) {
+          eventsToExport = events.filter((event) => {
+            const eventDate = new Date(event.startDate);
+            return eventDate >= startDate && eventDate <= endDate;
+          });
+        }
+
+        let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Focus Companion//Calendar//EN\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\n";
+
+        eventsToExport.forEach((event) => {
+          const startDate = new Date(event.startDate);
+          const endDate = new Date(event.endDate);
+          
+          const formatDate = (date: Date) => {
+            return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+          };
+
+          icsContent += "BEGIN:VEVENT\n";
+          icsContent += `UID:${event.id}@focuscompanion\n`;
+          icsContent += `DTSTAMP:${formatDate(new Date(event.createdAt))}\n`;
+          icsContent += `DTSTART:${formatDate(startDate)}\n`;
+          icsContent += `DTEND:${formatDate(endDate)}\n`;
+          icsContent += `SUMMARY:${event.title.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,")}\n`;
+          if (event.description) {
+            icsContent += `DESCRIPTION:${event.description.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n")}\n`;
+          }
+          icsContent += `STATUS:CONFIRMED\n`;
+          icsContent += "END:VEVENT\n";
+        });
+
+        icsContent += "END:VCALENDAR";
+        return icsContent;
       },
     }),
     {

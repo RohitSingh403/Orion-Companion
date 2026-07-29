@@ -1,15 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-export interface Note {
-  id: string;
-  title: string;
-  content: string;
-  tags: string[];
-  linkedTaskId: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
+import type { Note, NoteAttachment } from "../types/note";
 
 interface NotesState {
   notes: Note[];
@@ -19,6 +10,8 @@ interface NotesState {
   deleteNote: (id: string) => void;
   setActiveNote: (id: string | null) => void;
   searchNotes: (query: string) => Note[];
+  addAttachment: (noteId: string, file: File) => Promise<void>;
+  removeAttachment: (noteId: string, attachmentId: string) => void;
 }
 
 export const useNotesStore = create<NotesState>()(
@@ -34,6 +27,7 @@ export const useNotesStore = create<NotesState>()(
           content,
           tags: [],
           linkedTaskId: null,
+          attachments: [],
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
@@ -73,6 +67,53 @@ export const useNotesStore = create<NotesState>()(
             note.content.toLowerCase().includes(lowerQuery) ||
             note.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))
         );
+      },
+
+      addAttachment: async (noteId, file) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        
+        return new Promise<void>((resolve, reject) => {
+          reader.onload = () => {
+            const base64 = reader.result as string;
+            const attachment: NoteAttachment = {
+              id: crypto.randomUUID(),
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              data: base64,
+              createdAt: new Date().toISOString(),
+            };
+
+            set((state) => ({
+              notes: state.notes.map((note) =>
+                note.id === noteId
+                  ? { 
+                      ...note, 
+                      attachments: [...note.attachments, attachment],
+                      updatedAt: new Date().toISOString()
+                    }
+                  : note
+              ),
+            }));
+            resolve();
+          };
+          reader.onerror = () => reject(new Error("Failed to read file"));
+        });
+      },
+
+      removeAttachment: (noteId, attachmentId) => {
+        set((state) => ({
+          notes: state.notes.map((note) =>
+            note.id === noteId
+              ? { 
+                  ...note, 
+                  attachments: note.attachments.filter((a) => a.id !== attachmentId),
+                  updatedAt: new Date().toISOString()
+                }
+              : note
+          ),
+        }));
       },
     }),
     {

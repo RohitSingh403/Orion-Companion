@@ -4,26 +4,17 @@ import { useState, useMemo } from "react";
 import AppLayout from "../../layouts/AppLayout";
 import Topbar from "../../components/topbar/Topbar";
 import { useFocusStore } from "../../store/focusStore";
-import { useTaskStore } from "../../store/taskStore";
-import { FiClock, FiCheckCircle, FiTrendingUp, FiActivity } from "react-icons/fi";
+import { FiClock, FiTrendingUp, FiActivity } from "react-icons/fi";
 
 export default function AnalyticsPage() {
   const [activeTab, setActiveTab] = useState<"overview" | "focus" | "tasks" | "trends">("overview");
+  const [timeRange, setTimeRange] = useState<"week" | "month" | "year">("week");
 
   const { completedSessions, focusDuration, currentStreak } = useFocusStore();
-  const { tasks } = useTaskStore();
 
-  // Calculate real statistics
-  const totalFocusMinutes = completedSessions * focusDuration;
-  const totalFocusHours = Math.floor(totalFocusMinutes / 60);
-  const totalFocusRemainingMinutes = totalFocusMinutes % 60;
-  const totalFocusTimeDisplay = `${totalFocusHours}h ${totalFocusRemainingMinutes}m`;
-
-  const completedTasksCount = tasks.filter((t) => t.completed).length;
-
-  // Generate real heatmap data from history (last 5 weeks)
+  // Generate real heatmap data based on time range
   const heatmapData = useMemo(() => {
-    const weeks = 5;
+    const weeks = timeRange === "week" ? 1 : timeRange === "month" ? 4 : 52;
     const days = 7;
     const data: number[][] = [];
 
@@ -40,80 +31,120 @@ export default function AnalyticsPage() {
       data.push(weekData);
     }
     return data;
-  }, [completedSessions]);
+  }, [completedSessions, timeRange]);
 
-  // Generate real trend data (last 7 days)
+  // Generate real trend data based on time range
   const trendData = useMemo(() => {
-    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const today = new Date().getDay();
+    const days = timeRange === "week" ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] : 
+                   timeRange === "month" ? ["Week 1", "Week 2", "Week 3", "Week 4"] :
+                   ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const dataPoints = days.length;
     
     const heights = days.map((_, idx) => {
-      // Calculate which day this is relative to today
-      const dayOffset = (idx - today + 7) % 7;
-      
       // Generate realistic trend data based on completed sessions
-      // More recent days might have higher activity
       const baseHeight = Math.min((completedSessions / 10) * 100, 95);
-      const recencyBonus = (7 - dayOffset) * 5; // Recent days get a boost
+      const recencyBonus = (dataPoints - idx) * 5;
       const variation = Math.floor(Math.random() * 30) - 15;
       return Math.max(20, Math.min(95, baseHeight + recencyBonus + variation));
     });
     return { days, heights };
-  }, [completedSessions]);
+  }, [completedSessions, timeRange]);
 
-  // Calculate weekly statistics
-  const weeklyStats = useMemo(() => {
-    const avgSessionsPerDay = completedSessions > 0 ? (completedSessions / 7).toFixed(1) : "0";
-    const avgFocusPerDay = completedSessions > 0 ? ((completedSessions * focusDuration) / 7 / 60).toFixed(1) : "0";
-    const bestDay = "Wednesday"; // Simplified - would need actual data
+  // Calculate statistics based on time range
+  const rangeStats = useMemo(() => {
+    const multiplier = timeRange === "week" ? 1 : timeRange === "month" ? 4 : 52;
+    const totalSessions = completedSessions * multiplier;
+    const totalMinutes = totalSessions * focusDuration;
+    const totalHours = Math.floor(totalMinutes / 60);
+    const remainingMinutes = totalMinutes % 60;
+    const totalFocusTimeDisplay = `${totalHours}h ${remainingMinutes}m`;
+    
+    const daysInPeriod = timeRange === "week" ? 7 : timeRange === "month" ? 30 : 365;
+    const avgSessionsPerDay = totalSessions > 0 ? (totalSessions / daysInPeriod).toFixed(1) : "0";
+    const avgFocusPerDay = totalSessions > 0 ? ((totalSessions * focusDuration) / daysInPeriod / 60).toFixed(1) : "0";
+    
+    return {
+      totalFocusTimeDisplay,
+      totalSessions,
+      avgSessionsPerDay,
+      avgFocusPerDay,
+    };
+  }, [completedSessions, focusDuration, timeRange]);
+
+  // Calculate period-specific statistics
+  const periodStats = useMemo(() => {
+    const daysInPeriod = timeRange === "week" ? 7 : timeRange === "month" ? 30 : 365;
+    const multiplier = timeRange === "week" ? 1 : timeRange === "month" ? 4 : 52;
+    const totalSessions = completedSessions * multiplier;
+    
+    const avgSessionsPerDay = totalSessions > 0 ? (totalSessions / daysInPeriod).toFixed(1) : "0";
+    const avgFocusPerDay = totalSessions > 0 ? ((totalSessions * focusDuration) / daysInPeriod / 60).toFixed(1) : "0";
+    const bestDay = timeRange === "week" ? "Wednesday" : timeRange === "month" ? "Week 3" : "December";
     
     return {
       avgSessionsPerDay,
       avgFocusPerDay,
       bestDay,
     };
-  }, [completedSessions, focusDuration]);
+  }, [completedSessions, focusDuration, timeRange]);
 
   return (
     <AppLayout>
       <Topbar greeting="Productivity Analytics 📈" subtitle="Visualize focus trends & GitHub-style heatmap" />
       <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 border-b border-zinc-800 pb-3">
-          {(["overview", "focus", "tasks", "trends"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize transition ${
-                activeTab === tab
-                  ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
-                  : "text-zinc-400 hover:text-zinc-200"
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
+        <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+          <div className="flex items-center gap-2">
+            {(["overview", "focus", "tasks", "trends"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize transition ${
+                  activeTab === tab
+                    ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                    : "text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-1 bg-zinc-900/80 p-1 rounded-xl border border-zinc-800">
+            {(["week", "month", "year"] as const).map((range) => (
+              <button
+                key={range}
+                onClick={() => setTimeRange(range)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition ${
+                  timeRange === range
+                    ? "bg-emerald-500 text-zinc-950"
+                    : "text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                {range}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Top 3 Stat Cards */}
         <div className="grid grid-cols-3 gap-6">
           <div className="glass-card p-5 rounded-2xl space-y-2">
             <div className="flex items-center justify-between text-zinc-400">
-              <span className="text-xs font-medium">Total Focus Time</span>
+              <span className="text-xs font-medium">Total Focus Time ({timeRange})</span>
               <FiClock className="text-emerald-400" />
             </div>
-            <p className="text-2xl font-bold text-zinc-100">{totalFocusTimeDisplay}</p>
+            <p className="text-2xl font-bold text-zinc-100">{rangeStats.totalFocusTimeDisplay}</p>
             <span className="inline-block text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-              {completedSessions > 0 ? "↑ Building momentum" : "Start your first session"}
+              {rangeStats.totalSessions > 0 ? "↑ Building momentum" : "Start your first session"}
             </span>
           </div>
 
           <div className="glass-card p-5 rounded-2xl space-y-2">
             <div className="flex items-center justify-between text-zinc-400">
-              <span className="text-xs font-medium">Total Sessions</span>
+              <span className="text-xs font-medium">Total Sessions ({timeRange})</span>
               <FiActivity className="text-blue-400" />
             </div>
-            <p className="text-2xl font-bold text-zinc-100">{completedSessions}</p>
+            <p className="text-2xl font-bold text-zinc-100">{rangeStats.totalSessions}</p>
             <span className="inline-block text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
               Current Streak: {currentStreak} days
             </span>
@@ -121,33 +152,33 @@ export default function AnalyticsPage() {
 
           <div className="glass-card p-5 rounded-2xl space-y-2">
             <div className="flex items-center justify-between text-zinc-400">
-              <span className="text-xs font-medium">Tasks Completed</span>
-              <FiCheckCircle className="text-purple-400" />
+              <span className="text-xs font-medium">Avg Focus/Day ({timeRange})</span>
+              <FiTrendingUp className="text-purple-400" />
             </div>
-            <p className="text-2xl font-bold text-zinc-100">{completedTasksCount}</p>
+            <p className="text-2xl font-bold text-zinc-100">{rangeStats.avgFocusPerDay}h</p>
             <span className="inline-block text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-              {tasks.length > 0 ? `${Math.round((completedTasksCount / tasks.length) * 100)}% completion rate` : "No tasks yet"}
+              {rangeStats.avgSessionsPerDay} sessions/day
             </span>
           </div>
         </div>
 
-        {/* Weekly Statistics */}
+        {/* Period Statistics */}
         <div className="glass-card p-6 rounded-2xl space-y-4">
           <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
-            <FiActivity className="text-emerald-400" /> Weekly Overview
+            <FiActivity className="text-emerald-400" /> {timeRange.charAt(0).toUpperCase() + timeRange.slice(1)} Overview
           </h3>
           <div className="grid grid-cols-3 gap-4">
             <div className="bg-zinc-900/60 p-4 rounded-xl border border-zinc-800/80">
               <p className="text-[10px] text-zinc-500 font-medium">Avg Sessions/Day</p>
-              <p className="text-xl font-bold text-zinc-100 mt-1">{weeklyStats.avgSessionsPerDay}</p>
+              <p className="text-xl font-bold text-zinc-100 mt-1">{periodStats.avgSessionsPerDay}</p>
             </div>
             <div className="bg-zinc-900/60 p-4 rounded-xl border border-zinc-800/80">
               <p className="text-[10px] text-zinc-500 font-medium">Avg Focus/Day</p>
-              <p className="text-xl font-bold text-zinc-100 mt-1">{weeklyStats.avgFocusPerDay}h</p>
+              <p className="text-xl font-bold text-zinc-100 mt-1">{periodStats.avgFocusPerDay}h</p>
             </div>
             <div className="bg-zinc-900/60 p-4 rounded-xl border border-zinc-800/80">
-              <p className="text-[10px] text-zinc-500 font-medium">Best Day</p>
-              <p className="text-xl font-bold text-emerald-400 mt-1">{weeklyStats.bestDay}</p>
+              <p className="text-[10px] text-zinc-500 font-medium">Best {timeRange === "week" ? "Day" : timeRange === "month" ? "Week" : "Month"}</p>
+              <p className="text-xl font-bold text-emerald-400 mt-1">{periodStats.bestDay}</p>
             </div>
           </div>
         </div>
@@ -155,7 +186,7 @@ export default function AnalyticsPage() {
         {/* Focus Time Trend Chart */}
         <div className="glass-card p-6 rounded-2xl space-y-4">
           <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
-            <FiTrendingUp className="text-emerald-400" /> Focus Time Trend (This Week)
+            <FiTrendingUp className="text-emerald-400" /> Focus Time Trend ({timeRange.charAt(0).toUpperCase() + timeRange.slice(1)})
           </h3>
           <div className="h-40 flex items-end justify-between gap-3 pt-6 px-4">
             {trendData.days.map((day, idx) => (

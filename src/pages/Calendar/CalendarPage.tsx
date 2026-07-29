@@ -6,7 +6,7 @@ import Topbar from "../../components/topbar/Topbar";
 import { useTaskStore } from "../../store/taskStore";
 import { useEventStore } from "../../store/eventStore";
 import type { EventType } from "../../types/event";
-import { FiChevronLeft, FiChevronRight, FiClock, FiPlus, FiMoreVertical, FiX } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiClock, FiPlus, FiMoreVertical, FiX, FiDownload } from "react-icons/fi";
 
 export default function CalendarPage() {
   const [viewMode, setViewMode] = useState<"month" | "week" | "day">("week");
@@ -31,7 +31,7 @@ export default function CalendarPage() {
   });
 
   const { tasks, updateTask } = useTaskStore();
-  const { events, addEvent, getEventsForDate, getEventsForRange } = useEventStore();
+  const { events, addEvent, getEventsForDate, getEventsForRange, exportToICS } = useEventStore();
   const [showEventModal, setShowEventModal] = useState(false);
   const [eventTitle, setEventTitle] = useState("");
   const [eventDescription, setEventDescription] = useState("");
@@ -145,6 +145,36 @@ export default function CalendarPage() {
     setEventEndTime("10:00");
     setEventType("meeting");
     setShowEventModal(false);
+  };
+
+  const handleExportCalendar = () => {
+    let startDate: Date | undefined;
+    let endDate: Date | undefined;
+
+    if (viewMode === "week") {
+      startDate = new Date(currentWeekStart);
+      endDate = new Date(currentWeekStart);
+      endDate.setDate(endDate.getDate() + 7);
+    } else if (viewMode === "day") {
+      startDate = new Date(currentDay);
+      endDate = new Date(currentDay);
+      endDate.setDate(endDate.getDate() + 1);
+    } else if (viewMode === "month") {
+      startDate = new Date(currentMonth);
+      endDate = new Date(currentMonth);
+      endDate.setMonth(endDate.getMonth() + 1);
+    }
+
+    const icsContent = exportToICS(startDate, endDate);
+    const blob = new Blob([icsContent], { type: "text/calendar" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `focus-companion-calendar-${viewMode}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleDrop = (e: React.DragEvent, dayIndex: number, hour: number) => {
@@ -299,6 +329,13 @@ export default function CalendarPage() {
 
           <button onClick={goToToday} className="px-3.5 py-1.5 bg-zinc-900 border border-zinc-700/80 rounded-xl text-xs font-semibold text-zinc-200 hover:bg-zinc-800 transition">
             Today
+          </button>
+          <button 
+            onClick={handleExportCalendar}
+            className="px-3.5 py-1.5 bg-zinc-900 border border-zinc-700/80 rounded-xl text-xs font-semibold text-zinc-200 hover:bg-zinc-800 transition flex items-center gap-2"
+          >
+            <FiDownload className="w-3.5 h-3.5" />
+            <span>Export</span>
           </button>
         </div>
 
