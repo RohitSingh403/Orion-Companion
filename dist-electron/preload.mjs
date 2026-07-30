@@ -27,5 +27,26 @@ electron.contextBridge.exposeInMainWorld("focusAPI", {
   },
   showFocusNotification() {
     electron.ipcRenderer.send("show-focus-notification");
+  },
+  updateTrayStatus(status) {
+    electron.ipcRenderer.send("update-tray-status", status);
+  },
+  onTrayStartFocus(callback) {
+    electron.ipcRenderer.on("tray-start-focus", callback);
+  },
+  onTrayPauseFocus(callback) {
+    electron.ipcRenderer.on("tray-pause-focus", callback);
+  },
+  onTrayResumeFocus(callback) {
+    electron.ipcRenderer.on("tray-resume-focus", callback);
+  },
+  onTrayQuickAddTask(callback) {
+    electron.ipcRenderer.on("tray-quick-add-task", callback);
+  },
+  onTrayShowProgress(callback) {
+    electron.ipcRenderer.on("tray-show-progress", callback);
+  },
+  onGlobalShortcutQuickCapture(callback) {
+    electron.ipcRenderer.on("global-shortcut-quick-capture", callback);
   }
 });
