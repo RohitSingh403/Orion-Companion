@@ -39,6 +39,10 @@ contextBridge.exposeInMainWorld("focusAPI", {
     ipcRenderer.send("show-focus-notification");
   },
 
+  showReminderNotification(title: string, body: string) {
+    ipcRenderer.send("show-reminder-notification", title, body);
+  },
+
   updateTrayStatus(status: string) {
     ipcRenderer.send("update-tray-status", status);
   },

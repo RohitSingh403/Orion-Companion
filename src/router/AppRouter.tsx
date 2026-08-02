@@ -10,6 +10,8 @@ import NotesPage from "../pages/Notes/NotesPage";
 import AnalyticsPage from "../pages/Analytics/AnalyticsPage";
 import AchievementsPage from "../pages/Achievements/AchievementsPage";
 import SettingsPage from "../pages/Settings/SettingsPage";
+import MiniTimerPage from "../pages/MiniTimer/MiniTimerPage";
+import RemindersPage from "../pages/Reminders/RemindersPage";
 
 export default function AppRouter() {
   return (
@@ -23,6 +25,8 @@ export default function AppRouter() {
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/achievements" element={<AchievementsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/reminders" element={<RemindersPage />} />
+        <Route path="/mini-timer" element={<MiniTimerPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

@@ -27,6 +27,7 @@ interface Window {
   focusAPI: {
     showBreakNotification: () => void;
     showFocusNotification: () => void;
+    showReminderNotification: (title: string, body: string) => void;
     updateTrayStatus: (status: string) => void;
     onTrayStartFocus: (callback: () => void) => void;
     onTrayPauseFocus: (callback: () => void) => void;

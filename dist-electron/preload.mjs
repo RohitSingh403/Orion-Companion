@@ -28,6 +28,9 @@ electron.contextBridge.exposeInMainWorld("focusAPI", {
   showFocusNotification() {
     electron.ipcRenderer.send("show-focus-notification");
   },
+  showReminderNotification(title, body) {
+    electron.ipcRenderer.send("show-reminder-notification", title, body);
+  },
   updateTrayStatus(status) {
     electron.ipcRenderer.send("update-tray-status", status);
   },

@@ -9,7 +9,7 @@ import FocusTimer from "../timer/FocusTimer";
 import SessionHistory from "../history/SessionHistory";
 import BreakOverlay from "../overlay/BreakOverlay";
 import AchievementToast from "../ui/AchievementToast";
-import { FiTrendingUp, FiZap, FiPlus, FiCheckCircle } from "react-icons/fi";
+import { FiTrendingUp, FiZap, FiPlus, FiCheckCircle, FiBell } from "react-icons/fi";
 import { Link } from "react-router-dom";
 
 export default function DashboardContent() {

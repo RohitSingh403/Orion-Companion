@@ -76,4 +76,12 @@ app.whenReady().then(() => {
       body: "Your break is over. Ready for another deep focus session?",
     }).show();
   });
+
+  // Reminder notification
+  ipcMain.on("show-reminder-notification", (_event, title: string, body: string) => {
+    new Notification({
+      title: `🔔 ${title}`,
+      body,
+    }).show();
+  });
 });
