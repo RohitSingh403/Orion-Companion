@@ -38,4 +38,40 @@ contextBridge.exposeInMainWorld("focusAPI", {
   showFocusNotification() {
     ipcRenderer.send("show-focus-notification");
   },
+
+  updateTrayStatus(status: string) {
+    ipcRenderer.send("update-tray-status", status);
+  },
+
+  onTrayStartFocus(callback: () => void) {
+    ipcRenderer.on("tray-start-focus", callback);
+  },
+
+  onTrayPauseFocus(callback: () => void) {
+    ipcRenderer.on("tray-pause-focus", callback);
+  },
+
+  onTrayResumeFocus(callback: () => void) {
+    ipcRenderer.on("tray-resume-focus", callback);
+  },
+
+  onTrayQuickAddTask(callback: () => void) {
+    ipcRenderer.on("tray-quick-add-task", callback);
+  },
+
+  onTrayShowProgress(callback: () => void) {
+    ipcRenderer.on("tray-show-progress", callback);
+  },
+
+  onGlobalShortcutQuickCapture(callback: () => void) {
+    ipcRenderer.on("global-shortcut-quick-capture", callback);
+  },
+
+  getAutoLaunchStatus() {
+    return ipcRenderer.invoke("get-auto-launch-status");
+  },
+
+  toggleAutoLaunch(enabled: boolean) {
+    return ipcRenderer.invoke("toggle-auto-launch", enabled);
+  },
 });

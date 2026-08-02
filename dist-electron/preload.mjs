@@ -48,5 +48,11 @@ electron.contextBridge.exposeInMainWorld("focusAPI", {
   },
   onGlobalShortcutQuickCapture(callback) {
     electron.ipcRenderer.on("global-shortcut-quick-capture", callback);
+  },
+  getAutoLaunchStatus() {
+    return electron.ipcRenderer.invoke("get-auto-launch-status");
+  },
+  toggleAutoLaunch(enabled) {
+    return electron.ipcRenderer.invoke("toggle-auto-launch", enabled);
   }
 });

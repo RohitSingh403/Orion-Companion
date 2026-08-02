@@ -10,7 +10,13 @@ export default function AnalyticsPage() {
   const [activeTab, setActiveTab] = useState<"overview" | "focus" | "tasks" | "trends">("overview");
   const [timeRange, setTimeRange] = useState<"week" | "month" | "year">("week");
 
-  const { completedSessions, focusDuration, currentStreak } = useFocusStore();
+  const { completedSessions, focusDuration, bestStreak, getProductivityComparison, getFocusInsights } = useFocusStore();
+
+  // Get productivity comparison
+  const productivityComparison = useMemo(() => getProductivityComparison(), [getProductivityComparison]);
+
+  // Get focus insights
+  const focusInsights = useMemo(() => getFocusInsights(), [getFocusInsights]);
 
   // Generate real heatmap data based on time range
   const heatmapData = useMemo(() => {
@@ -146,18 +152,20 @@ export default function AnalyticsPage() {
             </div>
             <p className="text-2xl font-bold text-zinc-100">{rangeStats.totalSessions}</p>
             <span className="inline-block text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-              Current Streak: {currentStreak} days
+              Best Streak: {bestStreak} days
             </span>
           </div>
 
           <div className="glass-card p-5 rounded-2xl space-y-2">
             <div className="flex items-center justify-between text-zinc-400">
-              <span className="text-xs font-medium">Avg Focus/Day ({timeRange})</span>
+              <span className="text-xs font-medium">Productivity vs Yesterday</span>
               <FiTrendingUp className="text-purple-400" />
             </div>
-            <p className="text-2xl font-bold text-zinc-100">{rangeStats.avgFocusPerDay}h</p>
+            <p className="text-2xl font-bold text-zinc-100">
+              {productivityComparison.percentage > 0 ? "+" : ""}{productivityComparison.percentage}%
+            </p>
             <span className="inline-block text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-              {rangeStats.avgSessionsPerDay} sessions/day
+              {productivityComparison.label}
             </span>
           </div>
         </div>
@@ -180,6 +188,21 @@ export default function AnalyticsPage() {
               <p className="text-[10px] text-zinc-500 font-medium">Best {timeRange === "week" ? "Day" : timeRange === "month" ? "Week" : "Month"}</p>
               <p className="text-xl font-bold text-emerald-400 mt-1">{periodStats.bestDay}</p>
             </div>
+          </div>
+        </div>
+
+        {/* Focus Insights */}
+        <div className="glass-card p-6 rounded-2xl space-y-4">
+          <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
+            <FiTrendingUp className="text-emerald-400" /> Personalized Insights
+          </h3>
+          <div className="space-y-3">
+            {focusInsights.map((insight, idx) => (
+              <div key={idx} className="flex items-start gap-3 p-3 bg-zinc-900/50 border border-zinc-800 rounded-xl">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0" />
+                <p className="text-xs text-zinc-300 leading-relaxed">{insight}</p>
+              </div>
+            ))}
           </div>
         </div>
 

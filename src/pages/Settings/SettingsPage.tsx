@@ -1,6 +1,6 @@
 // src/pages/Settings/SettingsPage.tsx
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppLayout from "../../layouts/AppLayout";
 import Topbar from "../../components/topbar/Topbar";
 import { useSettingsStore } from "../../store/settingsStore";
@@ -15,7 +15,8 @@ import {
 } from "react-icons/fi";
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState("focus");
+  const [activeTab, setActiveTab] = useState("general");
+  const [autoLaunchEnabled, setAutoLaunchEnabled] = useState(false);
 
   const {
     focusMinutes,
@@ -41,6 +42,28 @@ export default function SettingsPage() {
     setBreakReminder,
     setTheme,
   } = useSettingsStore();
+
+  // Load auto-launch status on mount
+  useEffect(() => {
+    const loadAutoLaunchStatus = async () => {
+      try {
+        const status = await window.focusAPI?.getAutoLaunchStatus();
+        setAutoLaunchEnabled(status || false);
+      } catch (error) {
+        console.error("Failed to load auto-launch status:", error);
+      }
+    };
+    loadAutoLaunchStatus();
+  }, []);
+
+  const handleToggleAutoLaunch = async () => {
+    try {
+      const newStatus = await window.focusAPI?.toggleAutoLaunch(!autoLaunchEnabled);
+      setAutoLaunchEnabled(newStatus || false);
+    } catch (error) {
+      console.error("Failed to toggle auto-launch:", error);
+    }
+  };
 
   const navItems = [
     { id: "focus", label: "Focus Settings", icon: FiClock },
@@ -287,6 +310,36 @@ export default function SettingsPage() {
     </div>
   );
 
+  const renderGeneralSettings = () => (
+    <div className="space-y-6">
+      <h3 className="text-base font-bold text-zinc-100 pb-3 border-b border-zinc-800">
+        General Settings
+      </h3>
+
+      <div className="space-y-4">
+        {/* Auto Launch Toggle */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="text-xs font-bold text-zinc-200">Auto Launch on Startup</h4>
+            <p className="text-[10px] text-zinc-500">Start Focus Companion automatically when your computer starts</p>
+          </div>
+          <button
+            onClick={handleToggleAutoLaunch}
+            className={`w-11 h-6 rounded-full transition-colors relative p-0.5 ${
+              autoLaunchEnabled ? "bg-emerald-500" : "bg-zinc-800"
+            }`}
+          >
+            <div
+              className={`w-5 h-5 rounded-full bg-zinc-950 shadow transition-transform ${
+                autoLaunchEnabled ? "translate-x-5" : "translate-x-0"
+              }`}
+            />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderPlaceholder = (title: string) => (
     <div className="space-y-6">
       <h3 className="text-base font-bold text-zinc-100 pb-3 border-b border-zinc-800">
@@ -330,7 +383,7 @@ export default function SettingsPage() {
           {activeTab === "sounds" && renderSoundSettings()}
           {activeTab === "notifications" && renderNotificationSettings()}
           {activeTab === "appearance" && renderAppearanceSettings()}
-          {activeTab === "general" && renderPlaceholder("General Settings")}
+          {activeTab === "general" && renderGeneralSettings()}
           {activeTab === "data" && renderPlaceholder("Data & Backup")}
           {activeTab === "advanced" && renderPlaceholder("Advanced Settings")}
         </div>

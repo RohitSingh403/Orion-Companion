@@ -9,20 +9,12 @@ import { useTaskStore } from "../store/taskStore";
 
 import { playSound } from "../utils/audio";
 
-declare global {
-  interface Window {
-    focusAPI?: {
-      showBreakNotification: () => void;
-      showFocusNotification: () => void;
-    };
-  }
-}
-
 export default function usePomodoro() {
   const running = useFocusStore((s) => s.running);
   const tick = useFocusStore((s) => s.tick);
   const session = useFocusStore((s) => s.session);
   const completedSessions = useFocusStore((s) => s.completedSessions);
+  const updateDailyStats = useFocusStore((s) => s.updateDailyStats);
 
   const activeTaskId = useTaskStore((s) => s.activeTaskId);
   const incrementTaskFocusSession = useTaskStore(
@@ -44,6 +36,9 @@ export default function usePomodoro() {
       playSound("break.mp3");
 
       window.focusAPI?.showBreakNotification();
+
+      // Update daily statistics
+      updateDailyStats();
 
       // Automatically increment task focus session if active task is selected
       if (activeTaskId) {
@@ -92,6 +87,7 @@ export default function usePomodoro() {
     isUnlocked,
     addXP,
     showToast,
+    updateDailyStats,
   ]);
 
   // Timer tick interval

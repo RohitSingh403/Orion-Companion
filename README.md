@@ -103,6 +103,10 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Dynamic statistics calculation for week/month/year views
 - Adaptive trend chart and heatmap based on selected time range
 - Period-specific overview with dynamic labels
+- Daily statistics tracking with date-based data storage
+- Productivity comparison (e.g., "18% more productive than yesterday")
+- Streak tracking with best streak record comparison
+- Personalized insights based on focus patterns and history
 
 **Achievements**
 - Expanded achievementStore with XP system and level progression

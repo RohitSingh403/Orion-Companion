@@ -21,7 +21,20 @@ declare namespace NodeJS {
   }
 }
 
-// Used in Renderer process, expose in `preload.ts`
+//Used in Renderer process, expose in `preload.ts`
 interface Window {
   ipcRenderer: import('electron').IpcRenderer
+  focusAPI: {
+    showBreakNotification: () => void;
+    showFocusNotification: () => void;
+    updateTrayStatus: (status: string) => void;
+    onTrayStartFocus: (callback: () => void) => void;
+    onTrayPauseFocus: (callback: () => void) => void;
+    onTrayResumeFocus: (callback: () => void) => void;
+    onTrayQuickAddTask: (callback: () => void) => void;
+    onTrayShowProgress: (callback: () => void) => void;
+    onGlobalShortcutQuickCapture: (callback: () => void) => void;
+    getAutoLaunchStatus: () => Promise<boolean>;
+    toggleAutoLaunch: (enabled: boolean) => Promise<boolean>;
+  }
 }

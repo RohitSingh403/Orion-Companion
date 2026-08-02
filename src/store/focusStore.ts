@@ -8,6 +8,13 @@ export interface SessionHistoryItem {
   id: string;
   time: string;
   type: "Focus Session";
+  date: string; // YYYY-MM-DD format
+}
+
+export interface DailyStats {
+  date: string;
+  sessions: number;
+  focusMinutes: number;
 }
 
 // ----------------------
@@ -38,6 +45,10 @@ interface FocusState {
   // Streak
   currentStreak: number;
   lastCompletedDate: string | null;
+  bestStreak: number;
+
+  // Daily Statistics
+  dailyStats: DailyStats[];
 
   start: () => void;
   pause: () => void;
@@ -47,6 +58,10 @@ interface FocusState {
 
   addHistory: () => void;
   updateStreak: () => void;
+  updateDailyStats: () => void;
+  getYesterdayStats: () => DailyStats | undefined;
+  getProductivityComparison: () => { percentage: number; label: string };
+  getFocusInsights: () => string[];
 
   setFocusDuration: (minutes: number) => void;
   setBreakDuration: (minutes: number) => void;
@@ -83,6 +98,9 @@ export const useFocusStore = create<FocusState>()(
 
       currentStreak: 0,
       lastCompletedDate: null,
+      bestStreak: 0,
+
+      dailyStats: [],
 
       start: () =>
         set({
@@ -142,12 +160,15 @@ export const useFocusStore = create<FocusState>()(
           minute: "2-digit",
         });
 
+        const today = getTodayString();
+
         set({
           history: [
             {
               id: crypto.randomUUID(),
               time: currentTime,
               type: "Focus Session",
+              date: today,
             },
             ...state.history,
           ],
@@ -163,17 +184,137 @@ export const useFocusStore = create<FocusState>()(
         if (state.lastCompletedDate === today) return;
 
         if (state.lastCompletedDate === yesterday) {
+          const newStreak = state.currentStreak + 1;
           set({
-            currentStreak: state.currentStreak + 1,
+            currentStreak: newStreak,
+            bestStreak: Math.max(state.bestStreak, newStreak),
             lastCompletedDate: today,
           });
-          return;
+        } else {
+          set({
+            currentStreak: 1,
+            bestStreak: Math.max(state.bestStreak, 1),
+            lastCompletedDate: today,
+          });
+        }
+      },
+
+      updateDailyStats: () => {
+        const state = get();
+        const today = getTodayString();
+
+        const existingStats = state.dailyStats.find((s) => s.date === today);
+
+        if (existingStats) {
+          set({
+            dailyStats: state.dailyStats.map((s) =>
+              s.date === today
+                ? {
+                    ...s,
+                    sessions: s.sessions + 1,
+                    focusMinutes: s.focusMinutes + state.focusDuration / 60,
+                  }
+                : s
+            ),
+          });
+        } else {
+          set({
+            dailyStats: [
+              ...state.dailyStats,
+              {
+                date: today,
+                sessions: 1,
+                focusMinutes: state.focusDuration / 60,
+              },
+            ],
+          });
+        }
+      },
+
+      getYesterdayStats: () => {
+        const state = get();
+        const yesterday = getYesterdayString();
+        return state.dailyStats.find((s) => s.date === yesterday);
+      },
+
+      getProductivityComparison: () => {
+        const state = get();
+        const today = getTodayString();
+        const yesterday = getYesterdayString();
+
+        const todayStats = state.dailyStats.find((s) => s.date === today);
+        const yesterdayStats = state.dailyStats.find((s) => s.date === yesterday);
+
+        if (!todayStats || !yesterdayStats) {
+          return { percentage: 0, label: "No data" };
         }
 
-        set({
-          currentStreak: 1,
-          lastCompletedDate: today,
-        });
+        const percentage = ((todayStats.focusMinutes - yesterdayStats.focusMinutes) / yesterdayStats.focusMinutes) * 100;
+
+        if (percentage > 0) {
+          return { percentage: Math.round(percentage), label: "more productive" };
+        } else if (percentage < 0) {
+          return { percentage: Math.round(Math.abs(percentage)), label: "less productive" };
+        } else {
+          return { percentage: 0, label: "same productivity" };
+        }
+      },
+
+      getFocusInsights: () => {
+        const state = get();
+        const insights: string[] = [];
+
+        // Analyze daily stats for patterns
+        if (state.dailyStats.length >= 2) {
+          const avgSessions = state.dailyStats.reduce((sum, day) => sum + day.sessions, 0) / state.dailyStats.length;
+          const avgFocus = state.dailyStats.reduce((sum, day) => sum + day.focusMinutes, 0) / state.dailyStats.length;
+
+          // Insight about session completion rate
+          if (avgSessions > 4) {
+            insights.push(`You average ${avgSessions.toFixed(1)} sessions per day. Great consistency!`);
+          } else if (avgSessions > 0) {
+            insights.push(`Try to complete at least 4 sessions daily for better results.`);
+          }
+
+          // Insight about focus duration
+          if (avgFocus > 120) {
+            insights.push(`Your average daily focus time is ${Math.round(avgFocus)} minutes. Excellent dedication!`);
+          } else if (avgFocus > 0) {
+            insights.push(`Aim for 2+ hours of focus time daily for optimal productivity.`);
+          }
+
+          // Insight about streak
+          if (state.currentStreak >= 7) {
+            insights.push(`${state.currentStreak} day streak! You're building a strong habit.`);
+          } else if (state.currentStreak > 0) {
+            insights.push(`${state.currentStreak} day streak. Keep it going!`);
+          }
+
+          // Insight about best streak
+          if (state.bestStreak > state.currentStreak && state.currentStreak > 0) {
+            const daysToRecord = state.bestStreak - state.currentStreak;
+            insights.push(`${daysToRecord} days until you beat your best streak of ${state.bestStreak} days.`);
+          }
+        }
+
+        // Insight about today's progress
+        const today = getTodayString();
+        const todayStats = state.dailyStats.find((s) => s.date === today);
+        if (todayStats) {
+          if (todayStats.sessions >= state.dailyGoal) {
+            insights.push("Daily goal achieved! Great work today.");
+          } else {
+            const remaining = state.dailyGoal - todayStats.sessions;
+            insights.push(`${remaining} more session${remaining > 1 ? 's' : ''} to reach your daily goal.`);
+          }
+        }
+
+        // Default insight if no data
+        if (insights.length === 0) {
+          insights.push("Start your first focus session to see personalized insights.");
+        }
+
+        return insights;
       },
 
       setFocusDuration: (minutes) =>
