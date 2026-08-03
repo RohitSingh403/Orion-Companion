@@ -1,20 +1,34 @@
-# Focus Companion v2.0
+# Orion Companion v1.0.0
 
 A complete personal productivity operating system built around Focus Sessions (Pomodoro). Everything connects to the Focus Timer — tasks, reminders, analytics, achievements, projects, notes, and statistics.
 
-![version](https://img.shields.io/badge/version-2.0.0--in--development-blue)
+![version](https://img.shields.io/badge/version-1.0.0--production--ready-brightgreen)
 ![platform](https://img.shields.io/badge/platform-desktop-lightgrey)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
 ---
 
-## Current Progress
+## Overview
 
-Focus Companion v2.0 is currently in active development with significant progress across all core modules. The application features a complete productivity ecosystem with real-time data integration, persistent state management, and a polished dark glassmorphism UI.
+Orion Companion is a production-ready, single-user desktop application designed for deep work and productivity. Built with Electron, React, and TypeScript, it provides a complete productivity ecosystem with intelligent insights, local AI companion, and a premium glassmorphism UI.
 
-### ✅ Fully Implemented Modules
+**Key Features:**
+- 🎯 Focus Timer with Pomodoro sessions
+- 📋 Task Management with priority and session estimates
+- 📅 Calendar with event scheduling and export
+- 📝 Notes with markdown and attachments
+- 📊 Advanced Analytics with pattern detection
+- 🔔 Reminders with custom recurring schedules
+- 🤖 Local AI Companion for personalized suggestions
+- 🏆 Achievements and XP system
+- 🖥️ Desktop integration (system tray, global shortcuts, mini timer)
+- 🔄 Auto-updates via GitHub releases
 
-**Dashboard**
+---
+
+## Features
+
+### Dashboard
 - Daily productivity overview with personalized greeting
 - Today's Goal tracker with real-time progress bar
 - Focus Score sparkline widget with trend visualization
@@ -24,7 +38,7 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Session History logs with detailed session records
 - Responsive grid layout with mobile-first design
 
-**Focus (Deep Work Mode)**
+### Focus (Deep Work Mode)
 - Dedicated distraction-free focus environment
 - Focus Mode toggle for session type switching
 - Large animated Focus Timer ring with smooth transitions
@@ -33,7 +47,7 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Background Sound player with visualizer controls
 - "Select a task" link when no active task is present
 
-**Workspace (Tasks)**
+### Workspace (Tasks)
 - Workspace sub-sidebar with smart filters (Today, Upcoming, Important, Completed)
 - Project support with color-coded project badges
 - Tag filters (Work, Personal, Study, Health)
@@ -43,7 +57,7 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Task progress tracking (completed/estimated sessions) with visual progress
 - Due date support with calendar integration
 
-**Calendar**
+### Calendar
 - Hourly scheduling timeline view (6 AM - 10 PM)
 - Real date navigation with prev/next week controls
 - Today button for quick navigation to current week
@@ -67,7 +81,7 @@ Focus Companion v2.0 is currently in active development with significant progres
 - View-based export (week/day/month) with date range filtering
 - Automatic file download with proper ICS formatting
 
-**Notes**
+### Notes
 - Complete notesStore with full CRUD operations and persist middleware
 - Rich text editor with markdown support
 - Markdown preview rendering with proper styling
@@ -91,7 +105,7 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Attachment list with name, size, and delete option
 - File size formatting (B/KB/MB)
 
-**Analytics**
+### Analytics
 - Daily statistics from real store data (total focus time, sessions, tasks completed)
 - Weekly overview with avg sessions/day, avg focus/day, and best day metrics
 - GitHub-style contribution heatmap with real session-based activity levels
@@ -107,8 +121,30 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Productivity comparison (e.g., "18% more productive than yesterday")
 - Streak tracking with best streak record comparison
 - Personalized insights based on focus patterns and history
+- Advanced pattern detection (most productive day, focus drop-off trends)
+- Session duration analysis and recommendations
 
-**Achievements**
+### Reminders
+- Desktop notifications with custom sounds
+- Repeating tasks with intervals
+- Recurring reminders (daily, weekly, monthly, custom)
+- Custom days of week selection
+- Custom interval configuration
+- Snooze functionality
+- Time-based triggers
+- Reminder store with persist middleware
+- Complete/dismiss/delete actions
+
+### AI Companion
+- Morning suggestions based on task patterns and yesterday's performance
+- Evening summary with focus time, task completion, and streak insights
+- Weekly productivity analysis with most productive day detection
+- Pattern-based recommendations (no backend required)
+- Context-aware suggestions based on time of day
+- Local processing with no external API calls
+- AI Companion store with persist middleware
+
+### Achievements
 - Expanded achievementStore with XP system and level progression
 - Level progression system (1000 XP per level, 10 unique titles)
 - Dynamic level titles (Novice → Zen Master)
@@ -122,7 +158,7 @@ Focus Companion v2.0 is currently in active development with significant progres
 - Level-up notifications with toast animations
 - Error handling with reset button for corrupted data
 
-**Settings**
+### Settings
 - Comprehensive settingsStore with persist middleware
 - Focus Settings tab (focus duration, break duration, daily goal)
 - Sounds tab (sound enabled toggle, break/focus sound selection)
@@ -131,353 +167,21 @@ Focus Companion v2.0 is currently in active development with significant progres
 - All settings persist across app restarts
 - Real-time UI updates on setting changes
 
-### 🏗 Architecture & Design System
-
-**Global Design System**
-- Ultra-dark glassmorphism theme (#09090b base)
-- Custom glass-card components with backdrop blur (12px)
-- Ambient glow effects (glow-emerald, glow-blue)
-- GitHub-style heatmap color levels (0-4 intensity)
-- Custom scrollbars (8px width, rounded, active state)
-- Responsive grid layouts with mobile breakpoints
-- Smooth animations with cubic-bezier easing (0.3s duration)
-
-**Navigation & Layout**
-- Fixed left Sidebar with 8 module navigation and hover animations
-- Global Topbar with search, quick add, notifications
-- AppLayout wrapper with Framer Motion page transitions
-- Client-side routing with React Router v7
-- Sub-sidebar navigation for Settings and Workspace
-
-**State Management (Zustand)**
-- `focusStore` — Timer, sessions, settings, streaks, history, progress
-- `taskStore` — Task management with session estimates, priorities, tags, due dates
-- `achievementStore` — Achievement unlock status, XP, level progression
-- `toastStore` — Transient notifications and achievement popups
-- `settingsStore` — App settings configuration with persist middleware
-- `notesStore` — Notes CRUD operations with search and tags
-
-**Integration Engine**
-- `usePomodoro` hook — Central timer engine at App level
-- Automatic task progress increment on focus session completion
-- Real-time focus time calculations (hours/minutes display)
-- Productivity score calculation based on daily goal
-- Desktop notifications via Electron IPC
-- Audio cues on session transitions
-
----
-
-## Roadmap
-
-###  Planned Features
-
-**Calendar Enhancements**
-- (All planned features completed)
-
-**Notes Enhancements**
-- Advanced search with filters
-
-**Analytics Enhancements**
-- (All planned features completed)
-
-**Reminder System**
-- Desktop notifications with custom sounds
-- Repeating tasks with intervals
-- Recurring reminders (daily, weekly, monthly)
-- Snooze functionality
-- Time-based triggers
-
-**AI Companion**
-- Task suggestions based on productivity patterns
-- Daily summary generation
-- Motivation messages
-- Smart planning assistance
-- Focus advice and productivity coaching
-
-**Desktop Features**
-- Auto start on login
-- System tray icon with quick actions
-- Global keyboard shortcuts
-- Mini timer widget (always on top)
-- Quick add task shortcut
-- Floating focus widget
-- Window management and multi-monitor support
-
-### 🎯 Future Phases
-
-**Phase 8: AI Companion**
-- Task suggestions
-- Daily summary generation
-- Motivation messages
-- Smart planning assistance
-- Focus advice
-- Productivity coaching
-
-**Phase 9: Desktop Features**
-- Auto start on login
-- System tray icon
-- Global keyboard shortcuts
-- Mini timer widget
-- Quick add task shortcut
-- Floating focus widget
-- Window management
-
-**Phase 10: Polish & Launch**
-- Comprehensive testing
-- Performance optimization
-- Accessibility improvements
-- Documentation completion
-- Beta testing
-- v2.0 launch
-
----
-
-## Completed Work
-
-### Core Features Implemented
-
-**Timer System**
-- Complete Pomodoro timer with focus/break sessions
-- Visual progress ring with smooth animations
-- Session state management (idle, focus, break, complete)
-- Auto-start options for focus and break sessions
-- Sound notifications on session transitions
-- Desktop notification integration
-- Session history logging with timestamps
-
-**Task Management**
-- Full CRUD operations for tasks
-- Priority system (High/Medium/Low) with color coding
-- Estimated focus sessions per task
-- Automatic task progress tracking
-- Task completion on session completion
-- Due date support
-- Tag system for organization
-- Project support with grouping
-- Active task selection for timer integration
-
-**Achievement System**
-- Achievement definitions with XP rewards
-- Unlock status tracking
-- Level progression system (1000 XP per level)
-- 10 unique level titles (Novice → Zen Master)
-- Achievement filtering and display
-- Toast notifications on unlock
-- Persistent achievement state
-
-**Notes System**
-- Note creation with markdown support
-- Note editing with auto-save
-- Note deletion with confirmation
-- Search across titles, content, and tags
-- Tag system for organization
-- Timestamp tracking (created/updated)
-- Empty state handling
-- Markdown preview rendering with proper styling
-- Preview/edit mode toggle
-- Auto-save in edit mode
-- Custom prose styling for dark theme
-
-**Calendar System**
-- Weekly calendar view with day headers
-- Hourly time slot grid (6 AM - 10 PM)
-- Date navigation (prev/next week, today)
-- Task filtering by due date
-- Interactive time slots
-- Week date range display
-- Drag-and-drop task scheduling to time slots
-- Automatic due date update on task drop
-
-**Analytics System**
-- Real-time statistics from store data
-- Total focus time calculation
-- Session count tracking
-- Task completion rate
-- GitHub-style contribution heatmap
-- Weekly trend charts
-- Streak tracking
-- Productivity scoring
-
-**Settings System**
-- Focus duration configuration (15-60 minutes)
-- Break duration configuration (3-15 minutes)
-- Daily goal setting (4-12 sessions)
-- Auto-start toggles (focus/break)
-- Sound enabled toggle
-- Sound selection (break/focus sounds)
-- Desktop notification toggles
-- Theme selection
-- All settings persisted
-
-### Architecture Achievements
-
-**Modular Architecture**
-- Clear separation between UI and business logic
-- Zustand stores as single source of truth
-- Component-based design with reusable elements
-- Consistent layout patterns across pages
-
-**State Management**
-- 6 Zustand stores with persist middleware
-- Reactive state updates across components
-- Local storage persistence for all user data
-- Type-safe state management with TypeScript
-
-**Design System**
-- Ultra-dark glassmorphism theme
-- Custom CSS utilities for glass effects
-- Consistent color palette (emerald, amber, blue accents)
-- Custom scrollbar styling
-- Responsive grid layouts
-- Smooth animations and transitions
-
-**Integration Engine**
-- Central timer engine at App level
-- Automatic task progress updates
-- Real-time UI synchronization
-- Cross-module data flow
-- Event-driven architecture
-
-### Major Milestones
-
-**Sprint 1: Component Cleanup** ✅
-- Removed 8 unused dashboard components
-- Cleaned up redundant code
-- Streamlined component structure
-
-**Sprint 2: Integration & Deep Connections** ✅
-- Enhanced FocusPage active task integration
-- Expanded settingsStore with comprehensive settings
-- Connected Settings page to store
-- Wired up real daily stats to Analytics
-- Implemented real focus time calculations
-
-**Sprint 3: UI Polish Sprint** ✅
-- Dashboard spacing refinement with responsive breakpoints
-- Sidebar hover animations with smooth transitions
-- Framer Motion page transitions
-- Scrollbar behavior tuning
-- Animation timing adjustments
-
-**Phase 4: Calendar Module** ✅
-- Hourly scheduling timeline view
-- Real date navigation
-- Task calendar integration
-- Interactive time slots
-
-**Phase 5: Notes Module** ✅
-- Created notesStore with full CRUD
-- Rich text editor implementation
-- Search functionality
-- Edit/Save/Delete operations
-
-**Phase 6: Analytics Module** ✅
-- Daily statistics from real data
-- Weekly overview calculations
-- GitHub-style heatmap with real activity levels
-- Focus time trend charts
-
-**Phase 15: Desktop Excellence** ✅
+### Desktop Features
 - System Tray with right-click context menu (Start Focus, Pause, Resume, Quick Add Task, Today's Progress, Quit)
 - Window minimizes to tray instead of closing
 - Dynamic tray tooltip showing focus status and time
 - Floating Mini Timer (always on top, frameless, transparent)
 - Global Shortcut (Ctrl + Shift + Space for quick capture)
 - Auto Launch (start with OS with toggle in Settings)
-
-**Phase 17: Local AI Companion** ✅
-- Morning suggestions based on task patterns and yesterday's performance
-- Evening summary with focus time, task completion, and streak insights
-- Weekly productivity analysis with most productive day detection
-- Pattern-based recommendations (no backend required)
-- Context-aware suggestions based on time of day
-
-**Phase 5: Production Release** ✅
-- Performance optimization
-- Auto-updates configuration (electron-updater)
+- Auto-updates via GitHub releases
 - Code signing setup (macOS entitlements)
-- Build configuration for Windows (NSIS), macOS (DMG), Linux (AppImage/DEB)
-- GitHub releases as update provider
-- Platform-specific build scripts
-
-**Phase 7: Achievements Module** ✅
-- XP system implementation
-- Level progression
-- Dynamic level titles
-- Achievement unlock logic
-- Real-time progress display
-- Achievement unlock triggers integrated into focus timer
-- XP rewards (10 XP) for each completed focus session
-- Error handling with reset button for corrupted data
-
-**Phase 8: Notes Module Enhancement** ✅
-- Markdown preview rendering with react-markdown
-- Tailwind typography plugin for prose styling
-- Preview/edit mode toggle with icons
-- Auto-save in edit mode
-- Custom dark theme prose styling
-
-**Phase 9: Calendar Module Enhancement** ✅
-- Drag-and-drop task scheduling to time slots
-- Native HTML5 drag-and-drop implementation
-- Automatic due date update on task drop
-- Visual feedback for draggable tasks
-- Calendar view filters (day/week/month) with full functionality
-- Month view with calendar grid and task previews
-- Day view with single-day hourly schedule
-- Dynamic task filtering based on current view
-
-**Phase 11: Calendar Event Management** ✅
-- Event creation modal with time picker
-- Event types: meeting, focus session, break, reminder, other
-- Color-coded events by type (purple, emerald, blue, amber, gray)
-- Event store with full CRUD operations and persist middleware
-- Event filtering by date range for all calendar views
-- Events rendered in week view time slots
-- Events rendered in month view grid cells
-- Events rendered in day view hourly schedule
-- Add Event buttons in week and day views
-- Modal with backdrop blur and glassmorphism styling
-- Form validation and reset on cancel/create
-
-**Phase 12: Calendar Export** ✅
-- Export calendar to ICS/iCal format
-- ICS format generation with proper VCALENDAR structure
-- Date range filtering for export (week/day/month views)
-- Event title and description escaping for ICS compliance
-- Export button in calendar header with FiDownload icon
-- Automatic file download with view-specific naming
-- Blob-based file generation for browser compatibility
-
-**Phase 10: Notes Module Enhancement** ✅
-- Markdown preview rendering with react-markdown
-- Tailwind typography plugin for prose styling
-- Preview/edit mode toggle with icons
-- Auto-save in edit mode
-- Custom dark theme prose styling
-- Quick notes capture with keyboard shortcut (Cmd/Ctrl + N)
-- Quick note button with FiZap icon
-- Toast notification for quick note creation
-- Linked tasks integration with task picker modal
-- FiTarget button to link/unlink tasks
-- Visual indicator for linked tasks
-- Linked task display overlay with task title and progress
-
-**Phase 13: Notes Attachments** ✅
-- Attachments support with file upload
-- NoteAttachment type with id, name, type, size, data (base64), createdAt
-- Updated Note interface to include attachments array
-- addAttachment function with FileReader for base64 encoding
-- removeAttachment function to delete attachments
-- File upload handler with loading state
-- Attachments section in NotesPage with Add button
-- Attachment list display with name, size, and delete button
-- File size formatting helper (B/KB/MB)
-- Persist middleware stores attachments in localStorage
 
 ---
 
-## Tech Stack
+## Architecture
+
+### Tech Stack
 
 | Layer | Tech |
 |---|---|
@@ -490,26 +194,28 @@ Focus Companion v2.0 is currently in active development with significant progres
 | State management | Zustand v5 + Persist |
 | Routing | React Router DOM v7 |
 | Build tool | Vite 5 + vite-plugin-electron |
+| Auto-updates | electron-updater |
 
----
-
-## Architecture
+### Architecture Pattern
 
 The app follows a modular, component-based architecture with a clear split between logic and presentation:
 
 ```
 App.tsx
 ├── usePomodoro() (Global Timer Engine)
+├── useReminders() (Reminder Notifications)
+├── useTray() (System Tray Integration)
 └── AppRouter
     └── AppLayout
         ├── Sidebar (Navigation)
         ├── Topbar (Global Header)
-        └── Pages (8 Modules)
+        └── Pages (9 Modules)
             └── Components
                 └── Stores (Zustand)
 ```
 
-**Directory Structure:**
+### Directory Structure
+
 ```
 src/
 ├── components/
@@ -522,20 +228,156 @@ src/
 │   ├── topbar/         # Global header
 │   ├── sidebar/        # Navigation sidebar
 │   └── ui/             # Reusable components
-├── pages/              # 8 application pages
+├── pages/              # 9 application pages
+│   ├── Dashboard/
+│   ├── Focus/
+│   ├── Tasks/
+│   ├── Calendar/
+│   ├── Notes/
+│   ├── Analytics/
+│   ├── Achievements/
+│   ├── Settings/
+│   ├── Reminders/
+│   ├── AICompanion/
+│   └── MiniTimer/
 ├── layouts/            # Layout wrappers
 ├── store/              # Zustand state management
+│   ├── focusStore.ts
+│   ├── taskStore.ts
+│   ├── achievementStore.ts
+│   ├── toastStore.ts
+│   ├── settingsStore.ts
+│   ├── notesStore.ts
+│   ├── reminderStore.ts
+│   └── aiCompanionStore.ts
 ├── hooks/              # Custom React hooks
+│   ├── usePomodoro.ts
+│   ├── useReminders.ts
+│   └── useTray.ts
 ├── types/              # TypeScript definitions
 ├── utils/              # Utility functions
-└── data/               # Static data
+├── electron/           # Electron main process
+│   ├── main.ts
+│   ├── preload.ts
+│   └── electron-env.d.ts
+└── assets/             # Static assets
+    └── icons/          # Application icons and logos
 ```
 
-**Architecture Principles:**
+### Architecture Principles
+
 - **Stores own the logic.** All business logic lives in Zustand stores, not in components.
 - **Components stay presentational.** UI components render state and dispatch actions.
-- **Global services at App level.** `usePomodoro` runs at App.tsx, not in pages.
+- **Global services at App level.** `usePomodoro`, `useReminders`, `useTray` run at App.tsx, not in pages.
 - **One source of truth.** No duplicate logic or components.
+- **Local-first approach.** All data stored locally with no backend dependency.
+
+---
+
+## Design System
+
+The UI features an ultra-dark glassmorphism theme built for desktop-first experience:
+
+### Color Palette
+- Base: `#09090b` (zinc-950)
+- Cards: `rgba(18, 18, 21, 0.75)` with backdrop blur
+- Accent: Emerald-500 (primary), Amber-500 (warnings), Blue-500 (breaks)
+- Text: Zinc-100 (headings), Zinc-400 (body), Zinc-500 (muted)
+
+### Components
+- `.glass-card` - Standard card with backdrop blur
+- `.glass-card-hover` - Hover state with subtle lift and shadow
+- `.glow-emerald` / `.glow-blue` - Ambient glow effects
+- Custom scrollbars (8px width, zinc-900 track, rounded)
+- GitHub-style heatmap levels (0-4 intensity)
+
+### Design Principles
+- **Simplicity** — the next action should always be obvious
+- **Positive reinforcement** — achievements, stats, and animations encourage consistency
+- **Desktop-first** — built for focused desktop work, not a mobile port
+- **Modular by default** — every feature is isolated for easy extension
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- Git
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/RohitSingh403/Orion-Companion.git
+cd Orion-Companion
+
+# Install dependencies
+npm install
+
+# Run in development mode
+npm run dev
+
+# Build for production (Electron desktop app)
+npm run build
+
+# Build for web deployment
+npm run build:web
+
+# Platform-specific builds
+npm run build:win    # Windows installer
+npm run build:mac    # macOS DMG
+npm run build:linux  # Linux AppImage/DEB
+```
+
+### Development
+
+```bash
+# Start development server
+npm run dev
+
+# Run linter
+npm run lint
+
+# Type checking
+npx tsc --noEmit
+```
+
+### Production Build
+
+```bash
+# Build for current platform
+npm run build
+
+# Build for specific platform
+npm run build:win
+npm run build:mac
+npm run build:linux
+```
+
+Build artifacts are placed in the `release/` directory.
+
+---
+
+## Configuration
+
+### Environment Variables
+
+No environment variables required for local development. The app uses Electron's built-in environment detection.
+
+### Build Configuration
+
+Build configuration is defined in `package.json` under the `build` section:
+
+- **App ID**: `com.focuscompanion.app`
+- **Product Name**: `Focus Companion`
+- **Output Directory**: `release/`
+- **Update Provider**: GitHub Releases
+
+### Auto-Updates
+
+The app automatically checks for updates every 4 hours via GitHub Releases. Updates are downloaded in the background and users are notified when ready to install.
 
 ---
 
@@ -548,7 +390,7 @@ Launch → Dashboard → Start Focus → Timer Runs → Focus Completes
    → Break Ends → Next Focus Session
 ```
 
-**Timer-Task Integration:**
+### Timer-Task Integration
 1. User selects active task in Workspace
 2. User starts Focus Timer
 3. Focus session completes
@@ -560,47 +402,92 @@ Launch → Dashboard → Start Focus → Timer Runs → Focus Completes
 
 ---
 
-## Design System
+## State Management
 
-The UI features an ultra-dark glassmorphism theme built for desktop-first experience:
+The application uses Zustand for state management with persist middleware for local storage:
 
-**Color Palette:**
-- Base: `#09090b` (zinc-950)
-- Cards: `rgba(18, 18, 21, 0.75)` with backdrop blur
-- Accent: Emerald-500 (primary), Amber-500 (warnings), Blue-500 (breaks)
-- Text: Zinc-100 (headings), Zinc-400 (body), Zinc-500 (muted)
+### Stores
 
-**Components:**
-- `.glass-card` - Standard card with backdrop blur
-- `.glass-card-hover` - Hover state with subtle lift and shadow
-- `.glow-emerald` / `.glow-blue` - Ambient glow effects
-- Custom scrollbars (8px width, zinc-900 track, rounded)
-- GitHub-style heatmap levels (0-4 intensity)
+1. **focusStore** - Timer, sessions, settings, streaks, history, progress
+2. **taskStore** - Task management with session estimates, priorities, tags, due dates
+3. **achievementStore** - Achievement unlock status, XP, level progression
+4. **toastStore** - Transient notifications and achievement popups
+5. **settingsStore** - App settings configuration
+6. **notesStore** - Notes CRUD operations with search and tags
+7. **reminderStore** - Reminder management with recurring logic
+8. **aiCompanionStore** - AI suggestions and insights
 
-**Design Principles:**
-- **Simplicity** — the next action should always be obvious
-- **Positive reinforcement** — achievements, stats, and animations encourage consistency
-- **Desktop-first** — built for focused desktop work, not a mobile port
-- **Modular by default** — every feature is isolated for easy extension
+### Persistence
+
+All stores use `zustand/middleware/persist` to automatically save state to localStorage. Data persists across app restarts.
 
 ---
 
-## Getting Started
+## Desktop Integration
 
-```bash
-# clone the repo
-git clone https://github.com/RohitSingh403/focus-companion.git
-cd focus-companion
+### System Tray
+- Right-click menu with quick actions
+- Dynamic tooltip showing focus status
+- Minimize to tray instead of close
+- Start/Pause/Resume focus sessions
+- Quick add task
+- View today's progress
 
-# install dependencies
-npm install
+### Global Shortcuts
+- **Ctrl + Shift + Space** - Quick task capture
+- **Escape** - Close mini timer window
 
-# run in development
-npm run dev
+### Auto Launch
+- Toggle in Settings to start app with OS
+- Platform-specific implementation
 
-# build for production
-npm run build
-```
+### Mini Timer
+- Always-on-top floating window
+- Frameless and transparent
+- Start/Pause/Reset controls
+- Escape to close
+
+---
+
+## Deployment
+
+### Vercel (Web)
+
+The app can be deployed to Vercel as a web application:
+
+1. Connect GitHub repository to Vercel
+2. Build command: `npm run vercel-build`
+3. Output directory: `dist`
+4. The `vercel-build` script skips Electron-specific builds
+
+### GitHub Releases (Desktop)
+
+Desktop builds are published to GitHub Releases:
+
+1. Create a new release on GitHub
+2. Tag version (e.g., `v1.0.0`)
+3. Electron Builder automatically uploads installers
+4. Auto-updater checks GitHub releases for updates
+
+---
+
+## Troubleshooting
+
+### Build Issues
+
+**Issue**: Build fails on Vercel
+- **Solution**: Ensure `vercel-build` script is used instead of `build`
+
+**Issue**: Electron build fails
+- **Solution**: Check that Electron is installed and platform-specific dependencies are available
+
+### Runtime Issues
+
+**Issue**: Data not persisting
+- **Solution**: Check localStorage is enabled and not cleared by browser settings
+
+**Issue**: Notifications not showing
+- **Solution**: Enable desktop notifications in system settings and app settings
 
 ---
 
@@ -631,6 +518,36 @@ The project follows strict development rules to maintain code quality and archit
 
 **Last Updated:** August 3, 2026
 
-**Active Phase:** All Phases Complete ✅
-
 **Status:** Production-ready single-user desktop application with full feature set
+
+**All Phases Complete:**
+- ✅ Phase 1: Desktop Excellence
+- ✅ Phase 2: Data Intelligence
+- ✅ Phase 3: Reminder System
+- ✅ Phase 4: Local AI Companion
+- ✅ Phase 5: Production Release
+
+---
+
+## License
+
+MIT License - See LICENSE file for details
+
+---
+
+## Credits
+
+Built by Rohit Singh
+
+**Tech Stack:**
+- React + TypeScript + Vite
+- Tailwind CSS + Framer Motion
+- Zustand + React Router
+- Electron + electron-builder
+
+---
+
+## Support
+
+For issues, questions, or contributions, please visit the [GitHub repository](https://github.com/RohitSingh403/Orion-Companion).
+

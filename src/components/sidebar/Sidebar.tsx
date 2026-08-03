@@ -8,6 +8,9 @@ import {
   FaChartBar,
   FaTrophy,
   FaCog,
+  FaCalendarAlt,
+  FaBell,
+  FaRobot,
 } from "react-icons/fa";
 
 import SidebarItem from "./SidebarItem";
@@ -21,18 +24,24 @@ export default function Sidebar() {
         w-72
         flex-col
         border-r
-        border-zinc-800
-        bg-zinc-900
+        border-zinc-800/50
+        glass-card
         px-5
         py-6
       "
     >
       {/* Logo */}
       <div className="mb-10">
-        <h1 className="text-2xl font-bold">
-          🧠 Focus Companion
-        </h1>
-
+        <div className="flex items-center gap-3 mb-2">
+          <img 
+            src="/src/assets/icons/Orion Companion Logo.png" 
+            alt="Orion Companion Logo" 
+            className="w-10 h-10 rounded-lg object-contain"
+          />
+          <h1 className="text-2xl font-bold text-gradient-emerald">
+            Orion Companion
+          </h1>
+        </div>
         <p className="mt-1 text-sm text-zinc-400">
           Productivity Workspace
         </p>
@@ -59,6 +68,12 @@ export default function Sidebar() {
         />
 
         <SidebarItem
+          to="/calendar"
+          icon={<FaCalendarAlt />}
+          label="Calendar"
+        />
+
+        <SidebarItem
           to="/notes"
           icon={<FaStickyNote />}
           label="Notes"
@@ -77,6 +92,18 @@ export default function Sidebar() {
         />
 
         <SidebarItem
+          to="/reminders"
+          icon={<FaBell />}
+          label="Reminders"
+        />
+
+        <SidebarItem
+          to="/ai-companion"
+          icon={<FaRobot />}
+          label="AI Companion"
+        />
+
+        <SidebarItem
           to="/settings"
           icon={<FaCog />}
           label="Settings"
@@ -84,13 +111,13 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-zinc-800 pt-5">
+      <div className="border-t border-zinc-800/50 pt-5">
         <p className="text-xs text-zinc-500">
-          Focus Companion
+          Orion Companion
         </p>
 
         <p className="text-xs text-zinc-600">
-          Version 2.0 Development
+          Version 1.0.0 Production
         </p>
       </div>
     </aside>

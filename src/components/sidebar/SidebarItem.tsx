@@ -28,18 +28,20 @@ export default function SidebarItem({
           py-3
           text-left
           transition-all
-          duration-200
+          duration-300
+          relative
+          overflow-hidden
           ${
             isActive
-              ? "bg-emerald-500 text-white shadow-lg"
-              : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+              ? "bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 text-emerald-400 border border-emerald-500/30 glow-emerald"
+              : "text-zinc-400 hover:bg-zinc-800/50 hover:text-white hover:border hover:border-zinc-700/50"
           }
         `
       }
     >
-      <span className="text-xl">{icon}</span>
+      <span className="text-xl relative z-10">{icon}</span>
 
-      <span className="font-medium">{label}</span>
+      <span className="font-medium relative z-10">{label}</span>
     </NavLink>
   );
 }
