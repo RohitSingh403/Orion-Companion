@@ -9,12 +9,15 @@ export interface SessionHistoryItem {
   time: string;
   type: "Focus Session";
   date: string; // YYYY-MM-DD format
+  duration: number; // in seconds
+  completedAt: string; // ISO timestamp
 }
 
 export interface DailyStats {
   date: string;
   sessions: number;
   focusMinutes: number;
+  averageSessionDuration: number; // in seconds
 }
 
 // ----------------------
@@ -161,6 +164,8 @@ export const useFocusStore = create<FocusState>()(
         });
 
         const today = getTodayString();
+        const completedAt = new Date().toISOString();
+        const duration = state.focusDuration; // Duration in seconds
 
         set({
           history: [
@@ -169,6 +174,8 @@ export const useFocusStore = create<FocusState>()(
               time: currentTime,
               type: "Focus Session",
               date: today,
+              duration,
+              completedAt,
             },
             ...state.history,
           ],
@@ -206,13 +213,18 @@ export const useFocusStore = create<FocusState>()(
         const existingStats = state.dailyStats.find((s) => s.date === today);
 
         if (existingStats) {
+          const newSessions = existingStats.sessions + 1;
+          const newFocusMinutes = existingStats.focusMinutes + state.focusDuration / 60;
+          const averageSessionDuration = (newFocusMinutes * 60) / newSessions;
+
           set({
             dailyStats: state.dailyStats.map((s) =>
               s.date === today
                 ? {
                     ...s,
-                    sessions: s.sessions + 1,
-                    focusMinutes: s.focusMinutes + state.focusDuration / 60,
+                    sessions: newSessions,
+                    focusMinutes: newFocusMinutes,
+                    averageSessionDuration,
                   }
                 : s
             ),
@@ -225,6 +237,7 @@ export const useFocusStore = create<FocusState>()(
                 date: today,
                 sessions: 1,
                 focusMinutes: state.focusDuration / 60,
+                averageSessionDuration: state.focusDuration,
               },
             ],
           });
@@ -268,6 +281,7 @@ export const useFocusStore = create<FocusState>()(
         if (state.dailyStats.length >= 2) {
           const avgSessions = state.dailyStats.reduce((sum, day) => sum + day.sessions, 0) / state.dailyStats.length;
           const avgFocus = state.dailyStats.reduce((sum, day) => sum + day.focusMinutes, 0) / state.dailyStats.length;
+          const avgSessionDuration = state.dailyStats.reduce((sum, day) => sum + day.averageSessionDuration, 0) / state.dailyStats.length;
 
           // Insight about session completion rate
           if (avgSessions > 4) {
@@ -283,6 +297,18 @@ export const useFocusStore = create<FocusState>()(
             insights.push(`Aim for 2+ hours of focus time daily for optimal productivity.`);
           }
 
+          // Insight about average session duration (pattern detection)
+          if (avgSessionDuration > 0) {
+            const avgMinutes = Math.round(avgSessionDuration / 60);
+            if (avgMinutes > 35) {
+              insights.push(`Your average session is ${avgMinutes} minutes. Consider shorter breaks to maintain focus.`);
+            } else if (avgMinutes < 20) {
+              insights.push(`Your average session is ${avgMinutes} minutes. Try extending focus sessions for deeper work.`);
+            } else {
+              insights.push(`Your average session duration is ${avgMinutes} minutes - a sweet spot for productivity.`);
+            }
+          }
+
           // Insight about streak
           if (state.currentStreak >= 7) {
             insights.push(`${state.currentStreak} day streak! You're building a strong habit.`);
@@ -295,6 +321,48 @@ export const useFocusStore = create<FocusState>()(
             const daysToRecord = state.bestStreak - state.currentStreak;
             insights.push(`${daysToRecord} days until you beat your best streak of ${state.bestStreak} days.`);
           }
+
+          // Pattern detection: most productive day
+          const dayStats: { [key: number]: { sessions: number; focusMinutes: number } } = {};
+          state.dailyStats.forEach((stat) => {
+            const day = new Date(stat.date).getDay();
+            if (!dayStats[day]) {
+              dayStats[day] = { sessions: 0, focusMinutes: 0 };
+            }
+            dayStats[day].sessions += stat.sessions;
+            dayStats[day].focusMinutes += stat.focusMinutes;
+          });
+
+          const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+          let mostProductiveDay = "";
+          let maxFocus = 0;
+
+          Object.entries(dayStats).forEach(([day, stats]) => {
+            if (stats.focusMinutes > maxFocus) {
+              maxFocus = stats.focusMinutes;
+              mostProductiveDay = dayNames[Number(day)];
+            }
+          });
+
+          if (mostProductiveDay && maxFocus > 0) {
+            insights.push(`Your most productive day is ${mostProductiveDay} with ${Math.round(maxFocus)} minutes of focus.`);
+          }
+
+          // Pattern detection: focus drop-off
+          const recentStats = state.dailyStats.slice(-5);
+          if (recentStats.length >= 3) {
+            const firstHalf = recentStats.slice(0, Math.floor(recentStats.length / 2));
+            const secondHalf = recentStats.slice(Math.floor(recentStats.length / 2));
+            
+            const firstHalfAvg = firstHalf.reduce((sum, s) => sum + s.focusMinutes, 0) / firstHalf.length;
+            const secondHalfAvg = secondHalf.reduce((sum, s) => sum + s.focusMinutes, 0) / secondHalf.length;
+            
+            if (secondHalfAvg < firstHalfAvg * 0.7) {
+              insights.push("Your focus time has decreased recently. Consider reviewing your schedule or taking a rest day.");
+            } else if (secondHalfAvg > firstHalfAvg * 1.3) {
+              insights.push("Your focus time has improved recently. Keep up the momentum!");
+            }
+          }
         }
 
         // Insight about today's progress
@@ -306,6 +374,20 @@ export const useFocusStore = create<FocusState>()(
           } else {
             const remaining = state.dailyGoal - todayStats.sessions;
             insights.push(`${remaining} more session${remaining > 1 ? 's' : ''} to reach your daily goal.`);
+          }
+
+          // Session duration insight for today
+          if (todayStats.averageSessionDuration > 0) {
+            const todayAvg = Math.round(todayStats.averageSessionDuration / 60);
+            const overallAvg = state.dailyStats.length > 0 
+              ? Math.round(state.dailyStats.reduce((sum, s) => sum + s.averageSessionDuration, 0) / state.dailyStats.length / 60)
+              : 25;
+
+            if (todayAvg > overallAvg + 5) {
+              insights.push(`Today's sessions are longer than usual (${todayAvg} vs ${overallAvg} min avg). Great focus!`);
+            } else if (todayAvg < overallAvg - 5) {
+              insights.push(`Today's sessions are shorter than usual. Consider extending your next session.`);
+            }
           }
         }
 

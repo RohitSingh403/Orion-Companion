@@ -16,6 +16,8 @@ export default function RemindersPage() {
     dueDate: new Date().toISOString().split("T")[0],
     dueTime: "",
     frequency: "once" as ReminderFrequency,
+    customDays: [] as number[],
+    customInterval: 1,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -31,6 +33,8 @@ export default function RemindersPage() {
       dueDate: new Date().toISOString().split("T")[0],
       dueTime: "",
       frequency: "once",
+      customDays: [],
+      customInterval: 1,
     });
   };
 
@@ -238,8 +242,55 @@ export default function RemindersPage() {
                   <option value="daily">Daily</option>
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
+                  <option value="custom">Custom</option>
                 </select>
               </div>
+
+              {/* Custom Days of Week */}
+              {newReminder.frequency === "custom" && (
+                <div>
+                  <label className="text-xs font-semibold text-zinc-300 mb-2 block">Repeat on</label>
+                  <div className="flex gap-2 flex-wrap">
+                    {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, idx) => (
+                      <button
+                        key={day}
+                        type="button"
+                        onClick={() => {
+                          const newDays = newReminder.customDays.includes(idx)
+                            ? newReminder.customDays.filter((d) => d !== idx)
+                            : [...newReminder.customDays, idx];
+                          setNewReminder({ ...newReminder, customDays: newDays });
+                        }}
+                        className={`w-8 h-8 rounded-lg text-[10px] font-semibold transition ${
+                          newReminder.customDays.includes(idx)
+                            ? "bg-emerald-500 text-zinc-950"
+                            : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                        }`}
+                      >
+                        {day.charAt(0)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Custom Interval */}
+              {newReminder.frequency === "custom" && (
+                <div>
+                  <label className="text-xs font-semibold text-zinc-300 mb-1 block">Repeat every</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="1"
+                      max="365"
+                      value={newReminder.customInterval}
+                      onChange={(e) => setNewReminder({ ...newReminder, customInterval: Number(e.target.value) })}
+                      className="w-20 h-10 px-3 bg-zinc-800 border border-zinc-700 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-emerald-500"
+                    />
+                    <span className="text-xs text-zinc-400">days</span>
+                  </div>
+                </div>
+              )}
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"
