@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Notification } from "electron";
+import { app, BrowserWindow, ipcMain, Notification, autoUpdater } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 const __dirname$1 = path.dirname(fileURLToPath(import.meta.url));
@@ -64,6 +64,37 @@ app.whenReady().then(() => {
       body
     }).show();
   });
+  if (!VITE_DEV_SERVER_URL) {
+    const server = "https://github.com/RohitSingh403/Orion-Companion/releases";
+    const feed = `${server}/latest`;
+    autoUpdater.setFeedURL({
+      url: feed,
+      headers: { "Accept": "application/json" }
+    });
+    autoUpdater.on("checking-for-update", () => {
+      console.log("Checking for update...");
+    });
+    autoUpdater.on("update-available", (info) => {
+      console.log("Update available:", info);
+    });
+    autoUpdater.on("update-not-available", (info) => {
+      console.log("Update not available:", info);
+    });
+    autoUpdater.on("error", (err) => {
+      console.error("Auto-updater error:", err);
+    });
+    autoUpdater.on("update-downloaded", (info) => {
+      console.log("Update downloaded:", info);
+      new Notification({
+        title: "Update Available",
+        body: "A new version is ready to install. Restart to apply."
+      }).show();
+    });
+    setInterval(() => {
+      autoUpdater.checkForUpdates();
+    }, 4 * 60 * 60 * 1e3);
+    autoUpdater.checkForUpdates();
+  }
 });
 export {
   MAIN_DIST,
