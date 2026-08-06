@@ -284,15 +284,15 @@ export default function CalendarPage() {
       <Topbar greeting="Calendar Schedule 📅" subtitle="Plan your focus sessions & meetings" />
       <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
         {/* Header Controls */}
-        <div className="flex items-center justify-between glass-card p-4 rounded-2xl">
-          <div className="flex items-center gap-2 bg-zinc-900/90 p-1 rounded-xl border border-zinc-800">
+        <div className="flex items-center justify-between glass-card p-4 rounded-2xl border-gradient">
+          <div className="flex items-center gap-2 glass-card p-1 rounded-xl">
             {(["month", "week", "day"] as const).map((mode) => (
               <button
                 key={mode}
                 onClick={() => setViewMode(mode)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${
                   viewMode === mode
-                    ? "bg-emerald-500 text-zinc-950 shadow"
+                    ? "btn-premium text-zinc-950"
                     : "text-zinc-400 hover:text-zinc-200"
                 }`}
               >
@@ -308,11 +308,11 @@ export default function CalendarPage() {
                 else if (viewMode === "day") navigateDay("prev");
                 else if (viewMode === "month") navigateMonth("prev");
               }} 
-              className="p-2 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-400 hover:text-zinc-200 transition"
+              className="p-2 glass-card rounded-xl text-zinc-400 hover:text-zinc-200 hover:border-emerald-500/30 transition-all"
             >
               <FiChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-sm font-bold text-zinc-100">
+            <span className="text-sm font-bold text-gradient-emerald">
               {formatDateRange()}
             </span>
             <button 
@@ -321,18 +321,18 @@ export default function CalendarPage() {
                 else if (viewMode === "day") navigateDay("next");
                 else if (viewMode === "month") navigateMonth("next");
               }} 
-              className="p-2 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-400 hover:text-zinc-200 transition"
+              className="p-2 glass-card rounded-xl text-zinc-400 hover:text-zinc-200 hover:border-emerald-500/30 transition-all"
             >
               <FiChevronRight className="w-4 h-4" />
             </button>
           </div>
 
-          <button onClick={goToToday} className="px-3.5 py-1.5 bg-zinc-900 border border-zinc-700/80 rounded-xl text-xs font-semibold text-zinc-200 hover:bg-zinc-800 transition">
+          <button onClick={goToToday} className="px-3.5 py-1.5 glass-card rounded-xl text-xs font-semibold text-zinc-200 hover:border-emerald-500/30 transition-all">
             Today
           </button>
           <button 
             onClick={handleExportCalendar}
-            className="px-3.5 py-1.5 bg-zinc-900 border border-zinc-700/80 rounded-xl text-xs font-semibold text-zinc-200 hover:bg-zinc-800 transition flex items-center gap-2"
+            className="px-3.5 py-1.5 btn-premium text-zinc-950 rounded-xl text-xs font-semibold transition-all flex items-center gap-2"
           >
             <FiDownload className="w-3.5 h-3.5" />
             <span>Export</span>
@@ -360,14 +360,14 @@ export default function CalendarPage() {
             </div>
 
             {/* Interactive Timeline Grid */}
-            <div className="glass-card p-6 rounded-2xl space-y-4">
+            <div className="glass-card p-6 rounded-2xl space-y-4 border-gradient">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
                   <FiClock className="text-emerald-400" /> Hourly Schedule
                 </h3>
                 <button 
                   onClick={() => setShowEventModal(true)}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40 rounded-xl text-xs font-semibold transition"
+                  className="flex items-center gap-2 px-3 py-1.5 btn-premium text-zinc-950 rounded-xl text-xs font-semibold transition-all"
                 >
                   <FiPlus className="w-3.5 h-3.5" />
                   <span>Add Event</span>
@@ -377,7 +377,7 @@ export default function CalendarPage() {
                 {timeSlots.map((time, timeIdx) => (
                   <div key={time} className="flex items-start gap-4 pt-2 border-t border-zinc-800/50">
                     <span className="w-16 text-xs text-zinc-500 font-medium">{time}</span>
-                    <div className="flex-1 min-h-[48px] rounded-xl bg-zinc-900/40 border border-dashed border-zinc-800/80 p-2 relative hover:border-zinc-700/60 transition cursor-pointer group">
+                    <div className="flex-1 min-h-[48px] rounded-xl glass-card border border-dashed border-zinc-800/80 p-2 relative hover:border-emerald-500/30 transition-all cursor-pointer group">
                       {weekDates.map((_, dayIdx) => (
                         <div
                           key={`${dayIdx}-${timeIdx}`}
@@ -402,7 +402,7 @@ export default function CalendarPage() {
                         .map((event) => (
                           <div
                             key={event.id}
-                            className="mb-1 p-2 rounded-lg text-xs font-medium shadow-sm border"
+                            className="mb-1 p-2 rounded-lg text-xs font-medium shadow-sm border badge-premium"
                             style={{
                               backgroundColor: `${event.color}20`,
                               borderColor: event.color,
@@ -413,17 +413,17 @@ export default function CalendarPage() {
                           </div>
                         ))}
                       {timeIdx === 2 && (
-                        <div className="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 p-2.5 rounded-lg text-xs font-medium shadow-sm">
+                        <div className="mb-1 p-2.5 rounded-lg text-xs font-medium shadow-sm badge-premium bg-emerald-500/20 border-emerald-500/40 text-emerald-300">
                           🎯 Deep Focus Session — Build Workspace UI (9:00 AM - 11:00 AM)
                         </div>
                       )}
                       {timeIdx === 4 && (
-                        <div className="bg-purple-500/20 border border-purple-500/40 text-purple-300 p-2.5 rounded-lg text-xs font-medium shadow-sm">
+                        <div className="mb-1 p-2.5 rounded-lg text-xs font-medium shadow-sm badge-premium bg-purple-500/20 border-purple-500/40 text-purple-300">
                           🎨 Design Review Meeting (11:00 AM - 12:00 PM)
                         </div>
                       )}
                       {timeIdx === 5 && (
-                        <div className="bg-blue-500/20 border border-blue-500/40 text-blue-300 p-2 rounded-lg text-xs font-medium shadow-sm">
+                        <div className="mb-1 p-2 rounded-lg text-xs font-medium shadow-sm badge-premium bg-blue-500/20 border-blue-500/40 text-blue-300">
                           ☕ Scheduled Rest Break (1:00 PM - 1:15 PM)
                         </div>
                       )}
@@ -440,7 +440,7 @@ export default function CalendarPage() {
 
         {/* Month View */}
         {viewMode === "month" && (
-          <div className="glass-card p-6 rounded-2xl space-y-4">
+          <div className="glass-card p-6 rounded-2xl space-y-4 border-gradient">
             <div className="grid grid-cols-7 gap-2 text-center mb-4">
               {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
                 <div key={day} className="text-xs font-semibold text-zinc-500 uppercase">
@@ -458,7 +458,7 @@ export default function CalendarPage() {
                         day
                           ? day.isToday
                             ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400 glow-emerald"
-                            : "glass-card text-zinc-400 border-zinc-800/80 hover:border-zinc-700"
+                            : "glass-card text-zinc-400 border-zinc-800/80 hover:border-emerald-500/30"
                           : "border-transparent"
                       }`}
                     >
@@ -476,7 +476,7 @@ export default function CalendarPage() {
                               .map((task) => (
                                 <div
                                   key={task.id}
-                                  className="text-[9px] truncate bg-zinc-800/80 px-1 py-0.5 rounded text-zinc-300"
+                                  className="text-[9px] truncate glass-card px-1 py-0.5 rounded text-zinc-300"
                                 >
                                   {task.title}
                                 </div>
@@ -490,7 +490,7 @@ export default function CalendarPage() {
                               .map((event) => (
                                 <div
                                   key={event.id}
-                                  className="text-[9px] truncate px-1 py-0.5 rounded"
+                                  className="text-[9px] truncate px-1 py-0.5 rounded badge-premium"
                                   style={{
                                     backgroundColor: `${event.color}40`,
                                     color: event.color
@@ -512,14 +512,14 @@ export default function CalendarPage() {
 
         {/* Day View */}
         {viewMode === "day" && (
-          <div className="glass-card p-6 rounded-2xl space-y-4">
+          <div className="glass-card p-6 rounded-2xl space-y-4 border-gradient">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
                 <FiClock className="text-emerald-400" /> Daily Schedule
               </h3>
               <button 
                 onClick={() => setShowEventModal(true)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40 rounded-xl text-xs font-semibold transition"
+                className="flex items-center gap-2 px-3 py-1.5 btn-premium text-zinc-950 rounded-xl text-xs font-semibold transition-all"
               >
                 <FiPlus className="w-3.5 h-3.5" />
                 <span>Add Event</span>
@@ -529,7 +529,7 @@ export default function CalendarPage() {
               {timeSlots.map((time, timeIdx) => (
                 <div key={time} className="flex items-start gap-4 pt-2 border-t border-zinc-800/50">
                   <span className="w-16 text-xs text-zinc-500 font-medium">{time}</span>
-                  <div className="flex-1 min-h-[48px] rounded-xl bg-zinc-900/40 border border-dashed border-zinc-800/80 p-2 relative hover:border-zinc-700/60 transition cursor-pointer group">
+                  <div className="flex-1 min-h-[48px] rounded-xl glass-card border border-dashed border-zinc-800/80 p-2 relative hover:border-emerald-500/30 transition-all cursor-pointer group">
                     {/* Render events for this time slot */}
                     {filteredEvents
                       .filter((event) => {
@@ -543,7 +543,7 @@ export default function CalendarPage() {
                       .map((event) => (
                         <div
                           key={event.id}
-                          className="mb-1 p-2 rounded-lg text-xs font-medium shadow-sm border"
+                          className="mb-1 p-2 rounded-lg text-xs font-medium shadow-sm border badge-premium"
                           style={{
                             backgroundColor: `${event.color}20`,
                             borderColor: event.color,
@@ -565,7 +565,7 @@ export default function CalendarPage() {
                       .map((task) => (
                         <div
                           key={task.id}
-                          className="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 p-2.5 rounded-lg text-xs font-medium shadow-sm"
+                          className="mb-1 p-2.5 rounded-lg text-xs font-medium shadow-sm badge-premium bg-emerald-500/20 border-emerald-500/40 text-emerald-300"
                         >
                           {task.title}
                         </div>
@@ -581,7 +581,7 @@ export default function CalendarPage() {
         )}
 
         {/* Tasks for Current View */}
-        <div className="glass-card p-6 rounded-2xl space-y-4">
+        <div className="glass-card p-6 rounded-2xl space-y-4 border-gradient">
           <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
             <FiClock className="text-emerald-400" /> Tasks {viewMode === "week" ? "This Week" : viewMode === "day" ? "Today" : "This Month"}
           </h3>
@@ -594,12 +594,12 @@ export default function CalendarPage() {
                   key={task.id}
                   draggable
                   onDragStart={(e) => e.dataTransfer.setData("taskId", task.id)}
-                  className="flex items-center justify-between p-3 bg-zinc-900/70 border border-zinc-800/80 rounded-xl hover:border-zinc-700 transition cursor-move"
+                  className="flex items-center justify-between p-3 glass-card rounded-xl hover:border-emerald-500/30 transition-all cursor-move"
                 >
                   <div className="flex items-center gap-3">
                     <FiMoreVertical className="w-4 h-4 text-zinc-500" />
                     <div className={`w-2 h-2 rounded-full ${
-                      task.priority === "high" ? "bg-red-500" : 
+                      task.priority === "high" ? "bg-red-500 glow-amber" : 
                       task.priority === "medium" ? "bg-amber-500" : "bg-emerald-500"
                     }`} />
                     <span className="text-xs font-medium text-zinc-200">{task.title}</span>
@@ -610,7 +610,7 @@ export default function CalendarPage() {
                         {new Date(task.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                       </span>
                     )}
-                    <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700/60">
+                    <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded badge-premium text-zinc-400">
                       {task.completedFocusSessions}/{task.estimatedFocusSessions}
                     </span>
                   </div>
@@ -623,12 +623,12 @@ export default function CalendarPage() {
         {/* Event Creation Modal */}
         {showEventModal && (
           <div className="fixed inset-0 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="glass-card p-6 rounded-2xl w-full max-w-md space-y-4">
+            <div className="glass-card p-6 rounded-2xl w-full max-w-md space-y-4 border-gradient">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-zinc-100">Create Event</h3>
+                <h3 className="text-sm font-bold text-gradient-emerald">Create Event</h3>
                 <button 
                   onClick={handleCancelEvent}
-                  className="text-zinc-400 hover:text-zinc-200 transition"
+                  className="text-zinc-400 hover:text-zinc-200 transition-colors"
                 >
                   <FiX className="w-4 h-4" />
                 </button>
@@ -642,7 +642,7 @@ export default function CalendarPage() {
                     value={eventTitle}
                     onChange={(e) => setEventTitle(e.target.value)}
                     placeholder="Event title"
-                    className="w-full h-9 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-emerald-500/50"
+                    className="w-full h-9 px-3 input-premium rounded-xl text-xs text-zinc-200 placeholder-zinc-500 transition-all"
                   />
                 </div>
 
@@ -653,7 +653,7 @@ export default function CalendarPage() {
                     onChange={(e) => setEventDescription(e.target.value)}
                     placeholder="Event description (optional)"
                     rows={3}
-                    className="w-full px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-emerald-500/50 resize-none"
+                    className="w-full px-3 input-premium rounded-xl text-xs text-zinc-200 placeholder-zinc-500 transition-all resize-none"
                   />
                 </div>
 
@@ -663,7 +663,7 @@ export default function CalendarPage() {
                     type="date"
                     value={eventDate}
                     onChange={(e) => setEventDate(e.target.value)}
-                    className="w-full h-9 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-emerald-500/50"
+                    className="w-full h-9 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
                   />
                 </div>
 
@@ -674,7 +674,7 @@ export default function CalendarPage() {
                       type="time"
                       value={eventStartTime}
                       onChange={(e) => setEventStartTime(e.target.value)}
-                      className="w-full h-9 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-emerald-500/50"
+                      className="w-full h-9 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
                     />
                   </div>
                   <div>
@@ -683,7 +683,7 @@ export default function CalendarPage() {
                       type="time"
                       value={eventEndTime}
                       onChange={(e) => setEventEndTime(e.target.value)}
-                      className="w-full h-9 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-emerald-500/50"
+                      className="w-full h-9 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
                     />
                   </div>
                 </div>
@@ -693,7 +693,7 @@ export default function CalendarPage() {
                   <select
                     value={eventType}
                     onChange={(e) => setEventType(e.target.value as EventType)}
-                    className="w-full h-9 px-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-emerald-500/50"
+                    className="w-full h-9 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
                   >
                     <option value="meeting">Meeting</option>
                     <option value="focus">Focus Session</option>
@@ -707,13 +707,13 @@ export default function CalendarPage() {
               <div className="flex items-center gap-2 pt-2">
                 <button
                   onClick={handleCancelEvent}
-                  className="flex-1 px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs font-semibold text-zinc-400 hover:bg-zinc-800 transition"
+                  className="flex-1 px-4 py-2 glass-card rounded-xl text-xs font-semibold text-zinc-400 hover:border-emerald-500/30 transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCreateEvent}
-                  className="flex-1 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 rounded-xl text-xs font-semibold transition"
+                  className="flex-1 px-4 py-2 btn-premium text-zinc-950 rounded-xl text-xs font-semibold transition-all"
                 >
                   Create Event
                 </button>

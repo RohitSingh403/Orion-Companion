@@ -59,7 +59,7 @@ export default function TasksPage() {
       <Topbar greeting="Workspace Tasks 💼" subtitle="Manage tasks & focus session estimates" />
       <div className="flex-1 overflow-hidden p-6 md:p-8 flex flex-col md:flex-row gap-6">
         {/* Left Sub-Sidebar (Workspace Categories, Projects, Tags) */}
-        <div className="w-full md:w-64 glass-card rounded-2xl p-4 flex flex-col justify-between flex-shrink-0 space-y-6">
+        <div className="w-full md:w-64 glass-card rounded-2xl p-4 flex flex-col justify-between flex-shrink-0 space-y-6 border-gradient">
           <div className="space-y-4">
             <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider px-2">
               Workspace
@@ -68,27 +68,27 @@ export default function TasksPage() {
             <nav className="space-y-1">
               <button
                 onClick={() => setActiveCategory("today")}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition ${
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                   activeCategory === "today"
-                    ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold"
-                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40"
+                    ? "bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-semibold glow-emerald"
+                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 hover:border hover:border-zinc-700/50"
                 }`}
               >
                 <div className="flex items-center gap-2.5">
                   <FiCalendar className="w-4 h-4" />
                   <span>Today</span>
                 </div>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300">
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded badge-premium text-zinc-300">
                   {tasks.filter((t) => !t.completed).length}
                 </span>
               </button>
 
               <button
                 onClick={() => setActiveCategory("upcoming")}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition ${
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                   activeCategory === "upcoming"
-                    ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold"
-                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40"
+                    ? "bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-semibold glow-emerald"
+                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 hover:border hover:border-zinc-700/50"
                 }`}
               >
                 <div className="flex items-center gap-2.5">
@@ -99,10 +99,10 @@ export default function TasksPage() {
 
               <button
                 onClick={() => setActiveCategory("important")}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition ${
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                   activeCategory === "important"
-                    ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold"
-                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40"
+                    ? "bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-semibold glow-emerald"
+                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 hover:border hover:border-zinc-700/50"
                 }`}
               >
                 <div className="flex items-center gap-2.5">
@@ -113,28 +113,28 @@ export default function TasksPage() {
 
               <button
                 onClick={() => setActiveCategory("completed")}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition ${
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                   activeCategory === "completed"
-                    ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold"
-                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40"
+                    ? "bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-semibold glow-emerald"
+                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 hover:border hover:border-zinc-700/50"
                 }`}
               >
                 <div className="flex items-center gap-2.5">
                   <FiCheckCircle className="w-4 h-4 text-purple-400" />
                   <span>Completed</span>
                 </div>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300">
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded badge-premium text-zinc-300">
                   {tasks.filter((t) => t.completed).length}
                 </span>
               </button>
             </nav>
 
             {/* Projects & Tags List */}
-            <div className="pt-4 border-t border-zinc-800 space-y-3">
+            <div className="pt-4 border-t border-zinc-800/50 space-y-3">
               <h4 className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider px-2 flex items-center gap-1.5">
                 <FiFolder className="w-3.5 h-3.5" /> Projects
               </h4>
-              <div className="px-2 py-1.5 rounded-lg bg-zinc-900/60 border border-zinc-800 text-xs text-zinc-300 flex justify-between items-center">
+              <div className="px-2 py-1.5 rounded-lg glass-card text-xs text-zinc-300 flex justify-between items-center">
                 <span>Project Apollo</span>
                 <span className="text-[10px] text-zinc-500">4 tasks</span>
               </div>
@@ -147,10 +147,10 @@ export default function TasksPage() {
                   <span
                     key={t}
                     onClick={() => setSelectedTag(t)}
-                    className={`px-2 py-0.5 rounded text-[10px] font-semibold cursor-pointer border transition ${
+                    className={`px-2 py-0.5 rounded text-[10px] font-semibold cursor-pointer border transition-all ${
                       selectedTag === t
-                        ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
-                        : "bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-zinc-700"
+                        ? "badge-premium text-emerald-400"
+                        : "glass-card text-zinc-400 hover:border-zinc-700/50"
                     }`}
                   >
                     {t}
@@ -162,12 +162,12 @@ export default function TasksPage() {
         </div>
 
         {/* Main Task List & Creation Panel */}
-        <div className="flex-1 glass-card rounded-2xl p-6 flex flex-col justify-between overflow-hidden">
+        <div className="flex-1 glass-card rounded-2xl p-6 flex flex-col justify-between overflow-hidden border-gradient">
           {/* Header & Quick Add Form */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+            <div className="flex items-center justify-between border-b border-zinc-800/50 pb-3">
               <div>
-                <h2 className="text-base font-bold text-zinc-100 capitalize">
+                <h2 className="text-base font-bold text-gradient-emerald capitalize">
                   {activeCategory} Tasks
                 </h2>
                 <p className="text-xs text-zinc-400 mt-0.5">
@@ -177,13 +177,13 @@ export default function TasksPage() {
             </div>
 
             {/* Comprehensive Task Creation Form */}
-            <form onSubmit={handleAddTask} className="p-3 bg-zinc-900/80 border border-zinc-800 rounded-xl space-y-3">
+            <form onSubmit={handleAddTask} className="p-3 glass-card rounded-xl space-y-3">
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="What do you want to focus on today?"
-                className="w-full h-9 px-3 bg-zinc-950 border border-zinc-800 rounded-lg text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-emerald-500/50"
+                className="w-full h-9 px-3 input-premium rounded-lg text-xs text-zinc-200 placeholder-zinc-500 transition-all"
               />
 
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -194,7 +194,7 @@ export default function TasksPage() {
                     <select
                       value={priority}
                       onChange={(e) => setPriority(e.target.value as TaskPriority)}
-                      className="bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-300 focus:outline-none"
+                      className="input-premium rounded px-2 py-1 text-xs text-zinc-300 transition-all"
                     >
                       <option value="high">High (Red)</option>
                       <option value="medium">Medium (Amber)</option>
@@ -208,7 +208,7 @@ export default function TasksPage() {
                     <select
                       value={estimatedSessions}
                       onChange={(e) => setEstimatedSessions(Number(e.target.value))}
-                      className="bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-300 focus:outline-none"
+                      className="input-premium rounded px-2 py-1 text-xs text-zinc-300 transition-all"
                     >
                       <option value={1}>1 Session (25m)</option>
                       <option value={2}>2 Sessions (50m)</option>
@@ -223,7 +223,7 @@ export default function TasksPage() {
                     <select
                       value={recurrence}
                       onChange={(e) => setRecurrence(e.target.value as RecurrenceType)}
-                      className="bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-300 focus:outline-none"
+                      className="input-premium rounded px-2 py-1 text-xs text-zinc-300 transition-all"
                     >
                       <option value="none">No Repeat</option>
                       <option value="daily">Daily</option>
@@ -236,7 +236,7 @@ export default function TasksPage() {
 
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 text-xs font-semibold rounded-lg flex items-center gap-1 shadow glow-emerald"
+                  className="px-4 py-1.5 btn-premium text-zinc-950 text-xs font-semibold rounded-lg flex items-center gap-1 transition-all"
                 >
                   <FiPlus className="w-3.5 h-3.5 stroke-[2.5]" />
                   <span>Add Task</span>
@@ -251,7 +251,7 @@ export default function TasksPage() {
                     type="date"
                     value={recurrenceEndDate}
                     onChange={(e) => setRecurrenceEndDate(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-300 focus:outline-none"
+                    className="input-premium rounded px-2 py-1 text-xs text-zinc-300 transition-all"
                   />
                 </div>
               )}
@@ -260,17 +260,17 @@ export default function TasksPage() {
             {/* Task Rows List */}
             <div className="space-y-2.5 overflow-y-auto max-h-[380px] no-scrollbar pr-1">
               {filteredTasks.length === 0 ? (
-                <div className="text-center py-12 border border-dashed border-zinc-800 rounded-xl">
+                <div className="text-center py-12 border border-dashed border-zinc-800/50 rounded-xl glass-card">
                   <p className="text-xs text-zinc-500">No tasks found in this section.</p>
                 </div>
               ) : (
                 filteredTasks.map((task) => (
                   <div
                     key={task.id}
-                    className={`flex items-center justify-between p-3.5 rounded-xl border transition ${
+                    className={`flex items-center justify-between p-3.5 rounded-xl border transition-all ${
                       activeTaskId === task.id
-                        ? "bg-emerald-500/10 border-emerald-500/40 text-zinc-100 shadow-sm"
-                        : "bg-zinc-900/60 border-zinc-800/80 hover:border-zinc-700"
+                        ? "bg-emerald-500/10 border-emerald-500/40 text-zinc-100 glow-emerald"
+                        : "glass-card hover:border-emerald-500/30"
                     }`}
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -292,7 +292,7 @@ export default function TasksPage() {
                         <div className="flex items-center gap-2 mt-1">
                           {/* Priority Badge */}
                           <span
-                            className={`text-[9px] font-semibold px-1.5 py-0.2 rounded border uppercase ${
+                            className={`text-[9px] font-semibold px-1.5 py-0.2 rounded border uppercase badge-premium ${
                               task.priority === "high"
                                 ? "bg-red-500/10 text-red-400 border-red-500/30"
                                 : task.priority === "medium"
@@ -305,14 +305,14 @@ export default function TasksPage() {
 
                           {/* Tag Badge */}
                           {task.tags[0] && (
-                            <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                            <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded badge-premium text-purple-300">
                               {task.tags[0]}
                             </span>
                           )}
 
                           {/* Recurrence Badge */}
                           {task.recurrence && task.recurrence !== "none" && (
-                            <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20 flex items-center gap-1">
+                            <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded badge-premium text-blue-300 flex items-center gap-1">
                               <FiRepeat className="w-2.5 h-2.5" />
                               {task.recurrence}
                             </span>
@@ -325,7 +325,7 @@ export default function TasksPage() {
 
                     <div className="flex items-center gap-3">
                       {/* Focus Session Counter */}
-                      <span className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-lg bg-zinc-800 text-zinc-300 border border-zinc-700/60">
+                      <span className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-lg badge-premium text-zinc-300">
                         {task.completedFocusSessions}/{task.estimatedFocusSessions}
                       </span>
 
@@ -333,10 +333,10 @@ export default function TasksPage() {
                       <button
                         onClick={() => setActiveTask(task.id)}
                         title="Set active for focus timer"
-                        className={`p-1.5 rounded-lg border transition ${
+                        className={`p-1.5 rounded-lg border transition-all ${
                           activeTaskId === task.id
-                            ? "bg-emerald-500 text-zinc-950 border-emerald-400"
-                            : "bg-zinc-800 text-zinc-400 border-zinc-700 hover:text-zinc-200"
+                            ? "btn-premium text-zinc-950 border-emerald-400"
+                            : "glass-card text-zinc-400 hover:text-zinc-200 hover:border-zinc-700/50"
                         }`}
                       >
                         <FiTarget className="w-3.5 h-3.5" />
@@ -345,7 +345,7 @@ export default function TasksPage() {
                       {/* Delete Task */}
                       <button
                         onClick={() => deleteTask(task.id)}
-                        className="p-1.5 text-zinc-500 hover:text-red-400 transition"
+                        className="p-1.5 text-zinc-500 hover:text-red-400 transition-colors"
                       >
                         <FiTrash2 className="w-3.5 h-3.5" />
                       </button>

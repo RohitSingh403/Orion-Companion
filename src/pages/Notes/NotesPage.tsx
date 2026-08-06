@@ -133,25 +133,25 @@ export default function NotesPage() {
       <div className="flex-1 overflow-hidden p-8 flex gap-6 relative">
         {/* Quick Note Toast */}
         {showQuickNoteToast && (
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg z-50 animate-pulse">
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 glass-card border border-emerald-500/40 text-emerald-400 px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg z-50 glow-emerald animate-pulse">
             <FiZap className="w-4 h-4" />
             <span>Quick note created!</span>
           </div>
         )}
 
         {/* Left Note List Panel */}
-        <div className="w-80 glass-card rounded-2xl p-4 flex flex-col gap-4 flex-shrink-0">
+        <div className="w-80 glass-card rounded-2xl p-4 flex flex-col gap-4 flex-shrink-0 border-gradient">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-zinc-100">Notes</h3>
+            <h3 className="text-sm font-bold text-gradient-emerald">Notes</h3>
             <div className="flex items-center gap-2">
               <button 
                 onClick={handleQuickNote} 
-                className="p-1.5 bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-400 hover:text-emerald-400 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
+                className="p-1.5 glass-card hover:border-emerald-500/50 text-zinc-400 hover:text-emerald-400 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all"
                 title="Quick note (Cmd/Ctrl + N)"
               >
                 <FiZap className="w-3.5 h-3.5" />
               </button>
-              <button onClick={handleCreateNote} className="p-1.5 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 rounded-lg text-xs font-semibold flex items-center gap-1 shadow">
+              <button onClick={handleCreateNote} className="p-1.5 btn-premium text-zinc-950 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all">
                 <FiPlus className="w-3.5 h-3.5" />
                 <span>New</span>
               </button>
@@ -165,7 +165,7 @@ export default function NotesPage() {
               placeholder="Search notes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-8 pl-8 pr-3 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-emerald-500"
+              className="w-full h-8 pl-8 pr-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
             />
           </div>
 
@@ -177,10 +177,10 @@ export default function NotesPage() {
                 <div
                   key={note.id}
                   onClick={() => setActiveNote(note.id)}
-                  className={`p-3 rounded-xl cursor-pointer transition ${
+                  className={`p-3 rounded-xl cursor-pointer transition-all ${
                     activeNoteId === note.id
-                      ? "bg-emerald-500/15 border border-emerald-500/40 text-zinc-100 shadow-sm"
-                      : "hover:bg-zinc-800/50 text-zinc-400"
+                      ? "bg-emerald-500/15 border border-emerald-500/40 text-zinc-100 glow-emerald"
+                      : "glass-card hover:border-emerald-500/30 text-zinc-400"
                   }`}
                 >
                   <h4 className="text-xs font-bold text-zinc-200">{note.title}</h4>
@@ -194,41 +194,41 @@ export default function NotesPage() {
         </div>
 
         {/* Right Note Markdown Editor Panel */}
-        <div className="flex-1 glass-card rounded-2xl p-6 flex flex-col gap-4">
+        <div className="flex-1 glass-card rounded-2xl p-6 flex flex-col gap-4 border-gradient">
           {activeNote ? (
             <>
               {/* Editor Header Toolbar */}
-              <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+              <div className="flex items-center justify-between border-b border-zinc-800/50 pb-3">
                 <span className="text-xs font-semibold text-zinc-400">
                   {new Date(activeNote.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                 </span>
                 <div className="flex items-center gap-2">
                   {isEditing ? (
                     <div className="flex items-center gap-1">
-                      <button onClick={handleCancelEdit} className="px-2 py-1 text-xs text-zinc-400 hover:text-zinc-200">
+                      <button onClick={handleCancelEdit} className="px-2 py-1 text-xs text-zinc-400 hover:text-zinc-200 transition-colors">
                         Cancel
                       </button>
-                      <button onClick={handleSaveNote} className="px-2 py-1 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 text-xs font-semibold rounded">
+                      <button onClick={handleSaveNote} className="px-2 py-1 btn-premium text-zinc-950 text-xs font-semibold rounded transition-all">
                         Save
                       </button>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-1 bg-zinc-900/80 p-1 rounded-xl border border-zinc-800 text-zinc-400">
+                    <div className="flex items-center gap-1 glass-card p-1 rounded-xl text-zinc-400">
                       <button 
                         onClick={() => setViewMode("preview")}
-                        className={`p-1.5 rounded hover:bg-zinc-800 ${viewMode === "preview" ? "text-emerald-400 bg-zinc-800" : "hover:text-zinc-200"}`}
+                        className={`p-1.5 rounded hover:bg-zinc-800/50 transition-all ${viewMode === "preview" ? "text-emerald-400 bg-zinc-800/50" : "hover:text-zinc-200"}`}
                       >
                         <FiEye className="w-3.5 h-3.5" />
                       </button>
                       <button 
                         onClick={() => setViewMode("edit")}
-                        className={`p-1.5 rounded hover:bg-zinc-800 ${viewMode === "edit" ? "text-emerald-400 bg-zinc-800" : "hover:text-zinc-200"}`}
+                        className={`p-1.5 rounded hover:bg-zinc-800/50 transition-all ${viewMode === "edit" ? "text-emerald-400 bg-zinc-800/50" : "hover:text-zinc-200"}`}
                       >
                         <FiEdit3 className="w-3.5 h-3.5" />
                       </button>
                       <button 
                         onClick={() => setShowTaskPicker(!showTaskPicker)}
-                        className={`p-1.5 rounded hover:bg-zinc-800 ${activeNote?.linkedTaskId ? "text-emerald-400 bg-zinc-800" : "hover:text-zinc-200"}`}
+                        className={`p-1.5 rounded hover:bg-zinc-800/50 transition-all ${activeNote?.linkedTaskId ? "text-emerald-400 bg-zinc-800/50" : "hover:text-zinc-200"}`}
                         title={activeNote?.linkedTaskId ? "Linked task" : "Link task"}
                       >
                         <FiTarget className="w-3.5 h-3.5" />
@@ -236,7 +236,7 @@ export default function NotesPage() {
                       {activeNote?.linkedTaskId && (
                         <button 
                           onClick={handleUnlinkTask}
-                          className="p-1.5 hover:text-red-400 rounded hover:bg-zinc-800"
+                          className="p-1.5 hover:text-red-400 rounded hover:bg-zinc-800/50 transition-all"
                           title="Unlink task"
                         >
                           <FiTrash2 className="w-3.5 h-3.5" />
@@ -244,30 +244,30 @@ export default function NotesPage() {
                       )}
                       <button 
                         onClick={handleDeleteNote} 
-                        className="p-1.5 hover:text-red-400 rounded hover:bg-zinc-800"
+                        className="p-1.5 hover:text-red-400 rounded hover:bg-zinc-800/50 transition-all"
                         title="Delete note"
                       >
                         <FiTrash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   )}
-                  <div className="flex items-center gap-1 bg-zinc-900/80 p-1 rounded-xl border border-zinc-800 text-zinc-400">
-                    <button className="p-1.5 hover:text-zinc-200 rounded hover:bg-zinc-800">
+                  <div className="flex items-center gap-1 glass-card p-1 rounded-xl text-zinc-400">
+                    <button className="p-1.5 hover:text-zinc-200 rounded hover:bg-zinc-800/50 transition-all">
                       <FiBold className="w-3.5 h-3.5" />
                     </button>
-                    <button className="p-1.5 hover:text-zinc-200 rounded hover:bg-zinc-800">
+                    <button className="p-1.5 hover:text-zinc-200 rounded hover:bg-zinc-800/50 transition-all">
                       <FiItalic className="w-3.5 h-3.5" />
                     </button>
-                    <button className="p-1.5 hover:text-zinc-200 rounded hover:bg-zinc-800">
+                    <button className="p-1.5 hover:text-zinc-200 rounded hover:bg-zinc-800/50 transition-all">
                       <FiList className="w-3.5 h-3.5" />
                     </button>
-                    <button className="p-1.5 hover:text-zinc-200 rounded hover:bg-zinc-800">
+                    <button className="p-1.5 hover:text-zinc-200 rounded hover:bg-zinc-800/50 transition-all">
                       <FiCheckSquare className="w-3.5 h-3.5" />
                     </button>
-                    <button className="p-1.5 hover:text-zinc-200 rounded hover:bg-zinc-800">
+                    <button className="p-1.5 hover:text-zinc-200 rounded hover:bg-zinc-800/50 transition-all">
                       <FiPaperclip className="w-3.5 h-3.5" />
                     </button>
-                    <button className="p-1.5 hover:text-zinc-200 rounded hover:bg-zinc-800">
+                    <button className="p-1.5 hover:text-zinc-200 rounded hover:bg-zinc-800/50 transition-all">
                       <FiLink className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -276,10 +276,10 @@ export default function NotesPage() {
 
               {/* Task Picker Modal */}
               {showTaskPicker && (
-                <div className="absolute inset-0 bg-zinc-950/90 backdrop-blur-sm rounded-xl p-4 z-10">
+                <div className="absolute inset-0 bg-zinc-950/90 backdrop-blur-sm rounded-xl p-4 z-10 glass-card">
                   <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-sm font-bold text-zinc-100">Link a Task</h4>
-                    <button onClick={() => setShowTaskPicker(false)} className="text-zinc-400 hover:text-zinc-200">
+                    <h4 className="text-sm font-bold text-gradient-emerald">Link a Task</h4>
+                    <button onClick={() => setShowTaskPicker(false)} className="text-zinc-400 hover:text-zinc-200 transition-colors">
                       <FiTrash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -291,7 +291,7 @@ export default function NotesPage() {
                         <button
                           key={task.id}
                           onClick={() => handleLinkTask(task.id)}
-                          className="w-full p-3 bg-zinc-900 border border-zinc-800 rounded-xl text-left hover:border-emerald-500/50 transition"
+                          className="w-full p-3 glass-card rounded-xl text-left hover:border-emerald-500/50 transition-all"
                         >
                           <div className="flex items-center justify-between">
                             <span className="text-xs font-medium text-zinc-200">{task.title}</span>
@@ -317,18 +317,18 @@ export default function NotesPage() {
                         updateNote(activeNoteId, { content: e.target.value });
                       }
                     }}
-                    className="w-full h-full bg-zinc-900/50 border border-zinc-800 rounded-xl p-3 text-sm text-zinc-200 leading-relaxed outline-none resize-none font-mono no-scrollbar focus:border-emerald-500/50"
+                    className="w-full h-full glass-card border border-zinc-800/50 rounded-xl p-3 text-sm text-zinc-200 leading-relaxed outline-none resize-none font-mono no-scrollbar hover:border-emerald-500/30 transition-all"
                     placeholder="Write your note here..."
                   />
                 ) : (
-                  <div className="w-full h-full bg-zinc-900/30 border border-zinc-800 rounded-xl p-4 text-sm text-zinc-200 leading-relaxed overflow-y-auto no-scrollbar prose prose-invert prose-sm max-w-none prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-strong:text-zinc-100 prose-code:text-emerald-400 prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-zinc-800">
+                  <div className="w-full h-full glass-card border border-zinc-800/50 rounded-xl p-4 text-sm text-zinc-200 leading-relaxed overflow-y-auto no-scrollbar prose prose-invert prose-sm max-w-none prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-strong:text-zinc-100 prose-code:text-emerald-400 prose-pre:bg-zinc-900 prose-pre:border prose-pre:border-zinc-800 hover:border-emerald-500/30 transition-all">
                     <ReactMarkdown>{activeNote?.content || ""}</ReactMarkdown>
                   </div>
                 )}
 
                 {/* Linked Task Display */}
                 {activeNote?.linkedTaskId && (
-                  <div className="absolute bottom-4 left-4 right-4 bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2 flex items-center justify-between">
+                  <div className="absolute bottom-4 left-4 right-4 glass-card border border-emerald-500/30 rounded-lg p-2 flex items-center justify-between glow-emerald">
                     <div className="flex items-center gap-2">
                       <FiTarget className="w-3.5 h-3.5 text-emerald-400" />
                       <span className="text-xs text-emerald-300 font-medium">
@@ -337,7 +337,7 @@ export default function NotesPage() {
                     </div>
                     <button 
                       onClick={handleUnlinkTask}
-                      className="text-zinc-400 hover:text-red-400 transition"
+                      className="text-zinc-400 hover:text-red-400 transition-colors"
                     >
                       <FiTrash2 className="w-3 h-3" />
                     </button>
@@ -346,12 +346,12 @@ export default function NotesPage() {
               </div>
 
               {/* Tags Footer */}
-              <div className="flex items-center gap-2 pt-2 border-t border-zinc-800/80">
+              <div className="flex items-center gap-2 pt-2 border-t border-zinc-800/50">
                 {activeNote.tags.length === 0 ? (
                   <span className="text-[10px] text-zinc-500">No tags</span>
                 ) : (
                   activeNote.tags.map((t) => (
-                    <span key={t} className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-semibold border border-emerald-500/20">
+                    <span key={t} className="px-2 py-0.5 rounded badge-premium text-emerald-400 text-[10px] font-semibold">
                       #{t}
                     </span>
                   ))
@@ -359,7 +359,7 @@ export default function NotesPage() {
               </div>
 
               {/* Attachments Section */}
-              <div className="flex flex-col gap-2 pt-2 border-t border-zinc-800/80">
+              <div className="flex flex-col gap-2 pt-2 border-t border-zinc-800/50">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-zinc-500">Attachments</span>
                   <label className="flex items-center gap-1 text-[10px] text-emerald-400 hover:text-emerald-300 cursor-pointer">
@@ -380,7 +380,7 @@ export default function NotesPage() {
                     {(activeNote.attachments || []).map((attachment) => (
                       <div
                         key={attachment.id}
-                        className="flex items-center justify-between p-2 bg-zinc-900/50 border border-zinc-800 rounded-lg"
+                        className="flex items-center justify-between p-2 glass-card border border-zinc-800/50 rounded-lg hover:border-emerald-500/30 transition-all"
                       >
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <FiPaperclip className="w-3 h-3 text-zinc-400 flex-shrink-0" />
@@ -405,7 +405,7 @@ export default function NotesPage() {
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <p className="text-sm text-zinc-400 mb-4">No note selected</p>
-                <button onClick={handleCreateNote} className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 text-xs font-semibold rounded-xl shadow">
+                <button onClick={handleCreateNote} className="px-4 py-2 btn-premium text-zinc-950 text-xs font-semibold rounded-xl transition-all">
                   Create your first note
                 </button>
               </div>
