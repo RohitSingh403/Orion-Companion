@@ -59,11 +59,11 @@ export default function AchievementsPage() {
       <AppLayout>
         <Topbar greeting="Gamified Achievements 🏆" subtitle="Unlock badges and level up your focus habit" />
         <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
-          <div className="glass-card p-8 rounded-2xl text-center">
+          <div className="glass-card p-8 rounded-2xl text-center border-gradient">
             <p className="text-sm text-zinc-400 mb-4">Achievements data is corrupted or missing.</p>
             <button
               onClick={handleReset}
-              className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 text-xs font-semibold rounded-xl shadow"
+              className="px-4 py-2 btn-premium text-zinc-950 text-xs font-semibold rounded-xl transition-all"
             >
               Reset Achievements
             </button>

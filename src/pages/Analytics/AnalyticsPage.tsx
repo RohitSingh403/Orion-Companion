@@ -99,30 +99,30 @@ export default function AnalyticsPage() {
       <Topbar greeting="Productivity Analytics 📈" subtitle="Visualize focus trends & GitHub-style heatmap" />
       <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
         {/* Navigation Tabs */}
-        <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <div className="flex items-center justify-between border-b border-zinc-800/50 pb-3">
           <div className="flex items-center gap-2">
             {(["overview", "focus", "tasks", "trends"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize transition ${
+                className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize transition-all ${
                   activeTab === tab
-                    ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
-                    : "text-zinc-400 hover:text-zinc-200"
+                    ? "bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 text-emerald-400 border border-emerald-500/30 glow-emerald"
+                    : "text-zinc-400 hover:text-zinc-200 hover:border hover:border-zinc-700/50"
                 }`}
               >
                 {tab}
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-1 bg-zinc-900/80 p-1 rounded-xl border border-zinc-800">
+          <div className="flex items-center gap-1 glass-card p-1 rounded-xl">
             {(["week", "month", "year"] as const).map((range) => (
               <button
                 key={range}
                 onClick={() => setTimeRange(range)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${
                   timeRange === range
-                    ? "bg-emerald-500 text-zinc-950"
+                    ? "btn-premium text-zinc-950"
                     : "text-zinc-400 hover:text-zinc-200"
                 }`}
               >
@@ -134,29 +134,29 @@ export default function AnalyticsPage() {
 
         {/* Top 3 Stat Cards */}
         <div className="grid grid-cols-3 gap-6">
-          <div className="glass-card p-5 rounded-2xl space-y-2">
+          <div className="glass-card p-5 rounded-2xl space-y-2 border-gradient">
             <div className="flex items-center justify-between text-zinc-400">
               <span className="text-xs font-medium">Total Focus Time ({timeRange})</span>
               <FiClock className="text-emerald-400" />
             </div>
-            <p className="text-2xl font-bold text-zinc-100">{rangeStats.totalFocusTimeDisplay}</p>
-            <span className="inline-block text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+            <p className="text-2xl font-bold text-gradient-emerald">{rangeStats.totalFocusTimeDisplay}</p>
+            <span className="inline-block text-[10px] font-semibold text-emerald-400 badge-premium">
               {rangeStats.totalSessions > 0 ? "↑ Building momentum" : "Start your first session"}
             </span>
           </div>
 
-          <div className="glass-card p-5 rounded-2xl space-y-2">
+          <div className="glass-card p-5 rounded-2xl space-y-2 border-gradient">
             <div className="flex items-center justify-between text-zinc-400">
               <span className="text-xs font-medium">Total Sessions ({timeRange})</span>
               <FiActivity className="text-blue-400" />
             </div>
-            <p className="text-2xl font-bold text-zinc-100">{rangeStats.totalSessions}</p>
-            <span className="inline-block text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+            <p className="text-2xl font-bold text-gradient-blue">{rangeStats.totalSessions}</p>
+            <span className="inline-block text-[10px] font-semibold text-emerald-400 badge-premium">
               Best Streak: {bestStreak} days
             </span>
           </div>
 
-          <div className="glass-card p-5 rounded-2xl space-y-2">
+          <div className="glass-card p-5 rounded-2xl space-y-2 border-gradient">
             <div className="flex items-center justify-between text-zinc-400">
               <span className="text-xs font-medium">Productivity vs Yesterday</span>
               <FiTrendingUp className="text-purple-400" />
@@ -164,27 +164,27 @@ export default function AnalyticsPage() {
             <p className="text-2xl font-bold text-zinc-100">
               {productivityComparison.percentage > 0 ? "+" : ""}{productivityComparison.percentage}%
             </p>
-            <span className="inline-block text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+            <span className="inline-block text-[10px] font-semibold text-emerald-400 badge-premium">
               {productivityComparison.label}
             </span>
           </div>
         </div>
 
         {/* Period Statistics */}
-        <div className="glass-card p-6 rounded-2xl space-y-4">
+        <div className="glass-card p-6 rounded-2xl space-y-4 border-gradient">
           <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
             <FiActivity className="text-emerald-400" /> {timeRange.charAt(0).toUpperCase() + timeRange.slice(1)} Overview
           </h3>
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-zinc-900/60 p-4 rounded-xl border border-zinc-800/80">
+            <div className="glass-card p-4 rounded-xl border border-zinc-800/50">
               <p className="text-[10px] text-zinc-500 font-medium">Avg Sessions/Day</p>
               <p className="text-xl font-bold text-zinc-100 mt-1">{periodStats.avgSessionsPerDay}</p>
             </div>
-            <div className="bg-zinc-900/60 p-4 rounded-xl border border-zinc-800/80">
+            <div className="glass-card p-4 rounded-xl border border-zinc-800/50">
               <p className="text-[10px] text-zinc-500 font-medium">Avg Focus/Day</p>
               <p className="text-xl font-bold text-zinc-100 mt-1">{periodStats.avgFocusPerDay}h</p>
             </div>
-            <div className="bg-zinc-900/60 p-4 rounded-xl border border-zinc-800/80">
+            <div className="glass-card p-4 rounded-xl border border-zinc-800/50">
               <p className="text-[10px] text-zinc-500 font-medium">Best {timeRange === "week" ? "Day" : timeRange === "month" ? "Week" : "Month"}</p>
               <p className="text-xl font-bold text-emerald-400 mt-1">{periodStats.bestDay}</p>
             </div>
@@ -192,14 +192,14 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Focus Insights */}
-        <div className="glass-card p-6 rounded-2xl space-y-4">
+        <div className="glass-card p-6 rounded-2xl space-y-4 border-gradient">
           <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
             <FiTrendingUp className="text-emerald-400" /> Personalized Insights
           </h3>
           <div className="space-y-3">
             {focusInsights.map((insight, idx) => (
-              <div key={idx} className="flex items-start gap-3 p-3 bg-zinc-900/50 border border-zinc-800 rounded-xl">
-                <div className="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0" />
+              <div key={idx} className="flex items-start gap-3 p-3 glass-card border border-zinc-800/50 rounded-xl hover:border-emerald-500/30 transition-all">
+                <div className="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0 glow-emerald" />
                 <p className="text-xs text-zinc-300 leading-relaxed">{insight}</p>
               </div>
             ))}
@@ -207,7 +207,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Focus Time Trend Chart */}
-        <div className="glass-card p-6 rounded-2xl space-y-4">
+        <div className="glass-card p-6 rounded-2xl space-y-4 border-gradient">
           <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
             <FiTrendingUp className="text-emerald-400" /> Focus Time Trend ({timeRange.charAt(0).toUpperCase() + timeRange.slice(1)})
           </h3>
@@ -216,7 +216,7 @@ export default function AnalyticsPage() {
               <div key={day} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
                 <div
                   style={{ height: `${trendData.heights[idx]}%` }}
-                  className="w-full bg-gradient-to-t from-emerald-500/20 to-emerald-400 border-t-2 border-emerald-400 rounded-t-md transition-all hover:brightness-125"
+                  className="w-full bg-gradient-to-t from-emerald-500/20 to-emerald-400 border-t-2 border-emerald-400 rounded-t-md transition-all hover:brightness-125 glow-emerald"
                 />
                 <span className="text-[10px] text-zinc-500 font-medium">{day}</span>
               </div>
@@ -225,7 +225,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* GitHub-style Productivity Heatmap */}
-        <div className="glass-card p-6 rounded-2xl space-y-4">
+        <div className="glass-card p-6 rounded-2xl space-y-4 border-gradient">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-zinc-200">Productivity Heatmap</h3>
             <div className="flex items-center gap-1.5 text-[10px] text-zinc-500 font-medium">
