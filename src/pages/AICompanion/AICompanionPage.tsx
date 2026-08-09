@@ -96,11 +96,11 @@ export default function AICompanionPage() {
           <div className="flex-1 overflow-y-auto">
             {loading ? (
               <div className="flex flex-col items-center justify-center h-full py-12">
-                <FiRefreshCw className="w-8 h-8 text-emerald-400 animate-spin mb-3" />
+                <FiRefreshCw className="w-8 h-8 text-emerald-400 animate-spin mb-3 glow-emerald" />
                 <p className="text-sm text-zinc-400">Analyzing your patterns...</p>
               </div>
             ) : suggestions.length === 0 ? (
-              <div className="text-center py-12 border border-dashed border-zinc-800 rounded-xl">
+              <div className="text-center py-12 border border-dashed border-zinc-800/50 rounded-xl glass-card">
                 <FiZap className="w-12 h-12 text-zinc-700 mx-auto mb-3" />
                 <p className="text-sm text-zinc-500">No suggestions yet</p>
                 <p className="text-xs text-zinc-600 mt-1">
@@ -110,7 +110,7 @@ export default function AICompanionPage() {
                 </p>
                 <button
                   onClick={() => handleGenerate(timeOfDay === "morning" ? "morning" : "evening")}
-                  className="mt-4 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 rounded-xl text-xs font-semibold transition"
+                  className="mt-4 px-4 py-2 btn-premium text-zinc-950 rounded-xl text-xs font-semibold transition-all"
                 >
                   Generate {timeOfDay === "morning" ? "Morning Plan" : "Evening Summary"}
                 </button>
@@ -120,9 +120,9 @@ export default function AICompanionPage() {
                 {suggestions.map((suggestion, idx) => (
                   <div
                     key={idx}
-                    className="flex items-start gap-3 p-4 bg-zinc-900/50 border border-zinc-800 rounded-xl hover:border-zinc-700 transition"
+                    className="flex items-start gap-3 p-4 glass-card border border-zinc-800/50 rounded-xl hover:border-emerald-500/30 transition-all"
                   >
-                    <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-full glass-card border border-emerald-500/40 flex items-center justify-center flex-shrink-0 mt-0.5 glow-emerald">
                       <FiTarget className="w-4 h-4 text-emerald-400" />
                     </div>
                     <p className="text-sm text-zinc-300 leading-relaxed">{suggestion}</p>
@@ -133,7 +133,7 @@ export default function AICompanionPage() {
           </div>
 
           {/* Footer */}
-          <div className="mt-6 pt-4 border-t border-zinc-800">
+          <div className="mt-6 pt-4 border-t border-zinc-800/50">
             <p className="text-[10px] text-zinc-600 text-center">
               Suggestions are based on your local focus patterns, task completion, and productivity data. No data is sent to external servers.
             </p>
