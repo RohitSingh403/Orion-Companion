@@ -49,16 +49,16 @@ export default function AICompanionPage() {
     <AppLayout>
       <Topbar greeting="AI Companion 🤖" subtitle="Personalized productivity insights based on your patterns" />
       <div className="flex-1 overflow-hidden p-8">
-        <div className="glass-card rounded-2xl p-6 h-full flex flex-col">
+        <div className="glass-card rounded-2xl p-6 h-full flex flex-col border-gradient">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-lg font-bold text-zinc-100">Your Personal Assistant</h2>
+              <h2 className="text-lg font-bold text-gradient-emerald">Your Personal Assistant</h2>
               <p className="text-xs text-zinc-500 mt-1">Get context-aware suggestions based on your work patterns</p>
             </div>
             <button
               onClick={() => clearSuggestions()}
-              className="text-xs text-zinc-400 hover:text-zinc-200 transition"
+              className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
             >
               Clear
             </button>
@@ -69,7 +69,7 @@ export default function AICompanionPage() {
             <button
               onClick={() => handleGenerate("morning")}
               disabled={loading}
-              className="flex flex-col items-center gap-2 p-4 bg-zinc-900/60 border border-zinc-800 rounded-xl hover:border-emerald-500/50 hover:bg-zinc-900/80 transition group"
+              className="flex flex-col items-center gap-2 p-4 glass-card border border-zinc-800/50 rounded-xl hover:border-amber-500/30 hover:bg-zinc-900/80 transition-all group"
             >
               <FiSun className="w-6 h-6 text-amber-400 group-hover:text-amber-300" />
               <span className="text-xs font-semibold text-zinc-300">Morning Plan</span>
@@ -77,7 +77,7 @@ export default function AICompanionPage() {
             <button
               onClick={() => handleGenerate("evening")}
               disabled={loading}
-              className="flex flex-col items-center gap-2 p-4 bg-zinc-900/60 border border-zinc-800 rounded-xl hover:border-purple-500/50 hover:bg-zinc-900/80 transition group"
+              className="flex flex-col items-center gap-2 p-4 glass-card border border-zinc-800/50 rounded-xl hover:border-purple-500/30 hover:bg-zinc-900/80 transition-all group"
             >
               <FiMoon className="w-6 h-6 text-purple-400 group-hover:text-purple-300" />
               <span className="text-xs font-semibold text-zinc-300">Evening Summary</span>
@@ -85,7 +85,7 @@ export default function AICompanionPage() {
             <button
               onClick={() => handleGenerate("weekly")}
               disabled={loading}
-              className="flex flex-col items-center gap-2 p-4 bg-zinc-900/60 border border-zinc-800 rounded-xl hover:border-blue-500/50 hover:bg-zinc-900/80 transition group"
+              className="flex flex-col items-center gap-2 p-4 glass-card border border-zinc-800/50 rounded-xl hover:border-blue-500/30 hover:bg-zinc-900/80 transition-all group"
             >
               <FiCalendar className="w-6 h-6 text-blue-400 group-hover:text-blue-300" />
               <span className="text-xs font-semibold text-zinc-300">Weekly Review</span>

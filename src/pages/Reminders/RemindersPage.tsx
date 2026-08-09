@@ -77,13 +77,13 @@ export default function RemindersPage() {
     <AppLayout>
       <Topbar greeting="Reminders 🔔" subtitle="Never forget important tasks and events" />
       <div className="flex-1 overflow-hidden p-8">
-        <div className="glass-card rounded-2xl p-6 h-full flex flex-col">
+        <div className="glass-card rounded-2xl p-6 h-full flex flex-col border-gradient">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-zinc-100">Your Reminders</h2>
+            <h2 className="text-lg font-bold text-gradient-emerald">Your Reminders</h2>
             <button
               onClick={() => setShowModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 rounded-xl text-xs font-semibold transition"
+              className="flex items-center gap-2 px-4 py-2 btn-premium text-zinc-950 rounded-xl text-xs font-semibold transition-all"
             >
               <FiPlus className="w-4 h-4" />
               Add Reminder
@@ -93,7 +93,7 @@ export default function RemindersPage() {
           {/* Reminders List */}
           <div className="flex-1 overflow-y-auto space-y-3 no-scrollbar">
             {pendingReminders.length === 0 && completedReminders.length === 0 ? (
-              <div className="text-center py-12 border border-dashed border-zinc-800 rounded-xl">
+              <div className="text-center py-12 border border-dashed border-zinc-800/50 rounded-xl glass-card">
                 <FiBell className="w-12 h-12 text-zinc-700 mx-auto mb-3" />
                 <p className="text-sm text-zinc-500">No reminders yet</p>
                 <p className="text-xs text-zinc-600 mt-1">Create your first reminder to stay organized</p>
@@ -107,14 +107,14 @@ export default function RemindersPage() {
                     {pendingReminders.map((reminder) => (
                       <div
                         key={reminder.id}
-                        className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-4 hover:border-zinc-700 transition"
+                        className="glass-card border border-zinc-800/50 rounded-xl p-4 hover:border-emerald-500/30 transition-all"
                       >
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               <h4 className="text-sm font-semibold text-zinc-100">{reminder.title}</h4>
                               {reminder.frequency !== "once" && (
-                                <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                                <span className="text-[10px] text-emerald-400 badge-premium">
                                   <FiRepeat className="w-3 h-3 inline mr-1" />
                                   {getFrequencyLabel(reminder.frequency)}
                                 </span>
@@ -131,14 +131,14 @@ export default function RemindersPage() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => completeReminder(reminder.id)}
-                              className="w-8 h-8 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 flex items-center justify-center transition"
+                              className="w-8 h-8 rounded-lg glass-card hover:border-emerald-500/50 text-emerald-400 flex items-center justify-center transition-all"
                               title="Complete"
                             >
                               <FiCheck className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => dismissReminder(reminder.id)}
-                              className="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 flex items-center justify-center transition"
+                              className="w-8 h-8 rounded-lg glass-card hover:border-red-500/50 text-zinc-400 hover:text-red-400 flex items-center justify-center transition-all"
                               title="Dismiss"
                             >
                               <FiX className="w-4 h-4" />
@@ -157,7 +157,7 @@ export default function RemindersPage() {
                     {completedReminders.map((reminder) => (
                       <div
                         key={reminder.id}
-                        className="bg-zinc-900/30 border border-zinc-800/50 rounded-xl p-4 opacity-60"
+                        className="glass-card border border-zinc-800/30 rounded-xl p-4 opacity-60"
                       >
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1">
@@ -168,7 +168,7 @@ export default function RemindersPage() {
                           </div>
                           <button
                             onClick={() => deleteReminder(reminder.id)}
-                            className="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-red-500/20 text-zinc-400 hover:text-red-400 flex items-center justify-center transition"
+                            className="w-8 h-8 rounded-lg glass-card hover:border-red-500/50 text-zinc-400 hover:text-red-400 flex items-center justify-center transition-all"
                             title="Delete"
                           >
                             <FiX className="w-4 h-4" />
@@ -187,8 +187,8 @@ export default function RemindersPage() {
       {/* Add Reminder Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-bold text-zinc-100 mb-4">New Reminder</h3>
+          <div className="glass-card border border-zinc-800 rounded-2xl p-6 w-full max-w-md border-gradient">
+            <h3 className="text-lg font-bold text-gradient-emerald mb-4">New Reminder</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="text-xs font-semibold text-zinc-300 mb-1 block">Title</label>
@@ -196,7 +196,7 @@ export default function RemindersPage() {
                   type="text"
                   value={newReminder.title}
                   onChange={(e) => setNewReminder({ ...newReminder, title: e.target.value })}
-                  className="w-full h-10 px-3 bg-zinc-800 border border-zinc-700 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-emerald-500"
+                  className="w-full h-10 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
                   placeholder="What do you need to remember?"
                   required
                 />
@@ -206,7 +206,7 @@ export default function RemindersPage() {
                 <textarea
                   value={newReminder.description}
                   onChange={(e) => setNewReminder({ ...newReminder, description: e.target.value })}
-                  className="w-full h-20 px-3 bg-zinc-800 border border-zinc-700 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-emerald-500 resize-none"
+                  className="w-full h-20 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all resize-none"
                   placeholder="Add more details..."
                 />
               </div>
@@ -217,7 +217,7 @@ export default function RemindersPage() {
                     type="date"
                     value={newReminder.dueDate}
                     onChange={(e) => setNewReminder({ ...newReminder, dueDate: e.target.value })}
-                    className="w-full h-10 px-3 bg-zinc-800 border border-zinc-700 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-emerald-500"
+                    className="w-full h-10 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
                     required
                   />
                 </div>
@@ -227,7 +227,7 @@ export default function RemindersPage() {
                     type="time"
                     value={newReminder.dueTime}
                     onChange={(e) => setNewReminder({ ...newReminder, dueTime: e.target.value })}
-                    className="w-full h-10 px-3 bg-zinc-800 border border-zinc-700 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-emerald-500"
+                    className="w-full h-10 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
                   />
                 </div>
               </div>
@@ -236,7 +236,7 @@ export default function RemindersPage() {
                 <select
                   value={newReminder.frequency}
                   onChange={(e) => setNewReminder({ ...newReminder, frequency: e.target.value as ReminderFrequency })}
-                  className="w-full h-10 px-3 bg-zinc-800 border border-zinc-700 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-emerald-500"
+                  className="w-full h-10 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
                 >
                   <option value="once">Once</option>
                   <option value="daily">Daily</option>
@@ -261,10 +261,10 @@ export default function RemindersPage() {
                             : [...newReminder.customDays, idx];
                           setNewReminder({ ...newReminder, customDays: newDays });
                         }}
-                        className={`w-8 h-8 rounded-lg text-[10px] font-semibold transition ${
+                        className={`w-8 h-8 rounded-lg text-[10px] font-semibold transition-all ${
                           newReminder.customDays.includes(idx)
-                            ? "bg-emerald-500 text-zinc-950"
-                            : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                            ? "btn-premium text-zinc-950"
+                            : "glass-card text-zinc-400 hover:border-zinc-700/50"
                         }`}
                       >
                         {day.charAt(0)}
@@ -285,7 +285,7 @@ export default function RemindersPage() {
                       max="365"
                       value={newReminder.customInterval}
                       onChange={(e) => setNewReminder({ ...newReminder, customInterval: Number(e.target.value) })}
-                      className="w-20 h-10 px-3 bg-zinc-800 border border-zinc-700 rounded-xl text-xs text-zinc-200 focus:outline-none focus:border-emerald-500"
+                      className="w-20 h-10 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
                     />
                     <span className="text-xs text-zinc-400">days</span>
                   </div>
@@ -295,13 +295,13 @@ export default function RemindersPage() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 h-10 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl text-xs font-semibold transition"
+                  className="flex-1 h-10 glass-card hover:border-emerald-500/30 text-zinc-300 rounded-xl text-xs font-semibold transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 h-10 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 rounded-xl text-xs font-semibold transition"
+                  className="flex-1 h-10 btn-premium text-zinc-950 rounded-xl text-xs font-semibold transition-all"
                 >
                   Create Reminder
                 </button>

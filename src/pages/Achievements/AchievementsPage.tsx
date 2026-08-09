@@ -78,15 +78,15 @@ export default function AchievementsPage() {
       <Topbar greeting="Gamified Achievements 🏆" subtitle="Unlock badges and level up your focus habit" />
       <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
         {/* Level Banner Card */}
-        <div className="glass-card p-6 rounded-2xl flex items-center justify-between relative overflow-hidden glow-emerald">
+        <div className="glass-card p-6 rounded-2xl flex items-center justify-between relative overflow-hidden border-gradient glow-emerald">
           <div className="flex items-center gap-4 relative z-10">
-            <div className="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-2xl shadow">
+            <div className="w-14 h-14 rounded-2xl glass-card border border-amber-500/40 flex items-center justify-center text-amber-400 text-2xl shadow">
               🏆
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold text-zinc-100">Level {safeLevel} {levelTitle}</h2>
-                <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-semibold border border-emerald-500/20">
+                <h2 className="text-xl font-bold text-gradient-emerald">Level {safeLevel} {levelTitle}</h2>
+                <span className="px-2 py-0.5 rounded badge-premium text-emerald-400 text-[10px] font-semibold">
                   {totalXP} XP
                 </span>
               </div>
@@ -101,22 +101,22 @@ export default function AchievementsPage() {
               <span>{progressPercentage}%</span>
             </div>
             <div className="w-full h-2.5 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800">
-              <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all" style={{ width: `${progressPercentage}%` }} />
+              <div className="h-full progress-premium-bar rounded-full transition-all" style={{ width: `${progressPercentage}%` }} />
             </div>
           </div>
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+        <div className="flex items-center justify-between border-b border-zinc-800/50 pb-3">
           <div className="flex items-center gap-2">
             {(["all", "unlocked", "locked"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setFilter(tab)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize transition ${
+                className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize transition-all ${
                   filter === tab
-                    ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
-                    : "text-zinc-400 hover:text-zinc-200"
+                    ? "bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 text-emerald-400 border border-emerald-500/30 glow-emerald"
+                    : "text-zinc-400 hover:text-zinc-200 hover:border hover:border-zinc-700/50"
                 }`}
               >
                 {tab}
@@ -125,7 +125,7 @@ export default function AchievementsPage() {
           </div>
           <button
             onClick={handleReset}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs text-zinc-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition"
+            className="flex items-center gap-2 px-3 py-1.5 text-xs text-zinc-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
           >
             <FiRefreshCw className="w-3.5 h-3.5" />
             <span>Reset</span>
@@ -134,7 +134,7 @@ export default function AchievementsPage() {
 
         {/* Achievements Grid */}
         {filteredAchievements.length === 0 ? (
-          <div className="glass-card p-8 rounded-2xl text-center">
+          <div className="glass-card p-8 rounded-2xl text-center border-gradient">
             <p className="text-sm text-zinc-400">No achievements found for this filter.</p>
           </div>
         ) : (
@@ -142,22 +142,22 @@ export default function AchievementsPage() {
             {filteredAchievements.map((item) => (
               <div
                 key={item.id}
-                className={`p-5 rounded-2xl border transition relative ${
+                className={`p-5 rounded-2xl border transition-all relative ${
                   item.unlocked
                     ? "glass-card border-emerald-500/30 glow-emerald"
-                    : "bg-zinc-900/40 border-zinc-800/60 opacity-60"
+                    : "glass-card border-zinc-800/60 opacity-60"
                 }`}
               >
                 <div className="flex items-start justify-between">
-                  <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-2xl">
+                  <div className="w-12 h-12 rounded-xl glass-card border border-zinc-800 flex items-center justify-center text-2xl">
                     {item.icon || "🏆"}
                   </div>
                   {item.unlocked ? (
-                    <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/40">
+                    <span className="w-6 h-6 rounded-full glass-card border border-emerald-500/40 text-emerald-400 flex items-center justify-center">
                       <FiCheck className="w-3.5 h-3.5" />
                     </span>
                   ) : (
-                    <span className="w-6 h-6 rounded-full bg-zinc-800 text-zinc-500 flex items-center justify-center">
+                    <span className="w-6 h-6 rounded-full glass-card border border-zinc-800 text-zinc-500 flex items-center justify-center">
                       <FiLock className="w-3.5 h-3.5" />
                     </span>
                   )}
@@ -166,7 +166,7 @@ export default function AchievementsPage() {
                 <div className="mt-4 space-y-1">
                   <h4 className="text-sm font-bold text-zinc-100 flex items-center justify-between">
                     <span>{item.title}</span>
-                    <span className="text-[10px] text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20 font-semibold">
+                    <span className="text-[10px] text-amber-400 badge-premium font-semibold">
                       +{item.xp || 100} XP
                     </span>
                   </h4>
