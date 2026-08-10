@@ -24,8 +24,8 @@ export default function Sidebar() {
         w-72
         flex-col
         border-r
-        border-zinc-800/50
-        glass-card
+        border-white/6
+        bg-white/[0.02]
         px-5
         py-6
       "
@@ -38,17 +38,17 @@ export default function Sidebar() {
             alt="Orion Companion Logo" 
             className="w-10 h-10 rounded-lg object-contain"
           />
-          <h1 className="text-2xl font-bold text-gradient-emerald">
+          <h1 className="text-2xl font-bold text-accent">
             Orion Companion
           </h1>
         </div>
-        <p className="mt-1 text-sm text-zinc-400">
+        <p className="mt-1 text-sm text-secondary">
           Productivity Workspace
         </p>
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-1 flex-col gap-2">
+      <nav className="flex flex-1 flex-col gap-1">
         <SidebarItem
           to="/"
           icon={<FaHome />}
@@ -111,12 +111,12 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-zinc-800/50 pt-5">
-        <p className="text-xs text-zinc-500">
+      <div className="border-t border-white/6 pt-5">
+        <p className="text-xs text-muted">
           Orion Companion
         </p>
 
-        <p className="text-xs text-zinc-600">
+        <p className="text-xs text-muted">
           Version 1.0.0 Production
         </p>
       </div>

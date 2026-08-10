@@ -284,16 +284,16 @@ export default function CalendarPage() {
       <Topbar greeting="Calendar Schedule 📅" subtitle="Plan your focus sessions & meetings" />
       <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
         {/* Header Controls */}
-        <div className="flex items-center justify-between glass-card p-4 rounded-2xl border-gradient">
-          <div className="flex items-center gap-2 glass-card p-1 rounded-xl">
+        <div className="flex items-center justify-between card-elevated p-4">
+          <div className="flex items-center gap-2 card p-1 rounded-lg">
             {(["month", "week", "day"] as const).map((mode) => (
               <button
                 key={mode}
                 onClick={() => setViewMode(mode)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize transition-all ${
                   viewMode === mode
-                    ? "btn-premium text-zinc-950"
-                    : "text-zinc-400 hover:text-zinc-200"
+                    ? "btn-primary"
+                    : "text-secondary hover:text-white"
                 }`}
               >
                 {mode}
@@ -308,11 +308,11 @@ export default function CalendarPage() {
                 else if (viewMode === "day") navigateDay("prev");
                 else if (viewMode === "month") navigateMonth("prev");
               }} 
-              className="p-2 glass-card rounded-xl text-zinc-400 hover:text-zinc-200 hover:border-emerald-500/30 transition-all"
+              className="icon-btn"
             >
               <FiChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-sm font-bold text-gradient-emerald">
+            <span className="text-sm font-semibold text-accent">
               {formatDateRange()}
             </span>
             <button 
@@ -321,18 +321,18 @@ export default function CalendarPage() {
                 else if (viewMode === "day") navigateDay("next");
                 else if (viewMode === "month") navigateMonth("next");
               }} 
-              className="p-2 glass-card rounded-xl text-zinc-400 hover:text-zinc-200 hover:border-emerald-500/30 transition-all"
+              className="icon-btn"
             >
               <FiChevronRight className="w-4 h-4" />
             </button>
           </div>
 
-          <button onClick={goToToday} className="px-3.5 py-1.5 glass-card rounded-xl text-xs font-semibold text-zinc-200 hover:border-emerald-500/30 transition-all">
+          <button onClick={goToToday} className="px-3.5 py-1.5 btn-secondary rounded-lg text-sm font-medium">
             Today
           </button>
           <button 
             onClick={handleExportCalendar}
-            className="px-3.5 py-1.5 btn-premium text-zinc-950 rounded-xl text-xs font-semibold transition-all flex items-center gap-2"
+            className="px-3.5 py-1.5 btn-primary rounded-lg text-sm font-medium flex items-center gap-2"
           >
             <FiDownload className="w-3.5 h-3.5" />
             <span>Export</span>
@@ -347,27 +347,27 @@ export default function CalendarPage() {
               {weekDates.map((d) => (
                 <div
                   key={d.date}
-                  className={`p-3 rounded-2xl border transition cursor-pointer ${
+                  className={`p-3 rounded-lg border transition cursor-pointer ${
                     d.active
-                      ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400 glow-emerald"
-                      : "glass-card text-zinc-400 border-zinc-800/80 hover:border-zinc-700"
+                      ? "bg-accent/15 border-accent/40 text-accent"
+                      : "card text-secondary border-white/6 hover:border-white/10"
                   }`}
                 >
-                  <p className="text-xs font-medium">{d.day}</p>
-                  <p className="text-lg font-bold text-zinc-100 mt-0.5">{d.date}</p>
+                  <p className="text-sm font-medium">{d.day}</p>
+                  <p className="text-lg font-semibold text-primary mt-0.5">{d.date}</p>
                 </div>
               ))}
             </div>
 
             {/* Interactive Timeline Grid */}
-            <div className="glass-card p-6 rounded-2xl space-y-4 border-gradient">
+            <div className="card-elevated p-6 space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
-                  <FiClock className="text-emerald-400" /> Hourly Schedule
+                <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
+                  <FiClock className="text-accent" /> Hourly Schedule
                 </h3>
                 <button 
                   onClick={() => setShowEventModal(true)}
-                  className="flex items-center gap-2 px-3 py-1.5 btn-premium text-zinc-950 rounded-xl text-xs font-semibold transition-all"
+                  className="flex items-center gap-2 px-3 py-1.5 btn-primary rounded-lg text-sm font-medium"
                 >
                   <FiPlus className="w-3.5 h-3.5" />
                   <span>Add Event</span>
@@ -375,9 +375,9 @@ export default function CalendarPage() {
               </div>
               <div className="space-y-3">
                 {timeSlots.map((time, timeIdx) => (
-                  <div key={time} className="flex items-start gap-4 pt-2 border-t border-zinc-800/50">
-                    <span className="w-16 text-xs text-zinc-500 font-medium">{time}</span>
-                    <div className="flex-1 min-h-[48px] rounded-xl glass-card border border-dashed border-zinc-800/80 p-2 relative hover:border-emerald-500/30 transition-all cursor-pointer group">
+                  <div key={time} className="flex items-start gap-4 pt-2 border-t border-white/6">
+                    <span className="w-16 text-sm text-muted font-medium">{time}</span>
+                    <div className="flex-1 min-h-[48px] rounded-lg card border border-dashed border-white/10 p-2 relative hover:border-white/20 transition-all cursor-pointer group">
                       {weekDates.map((_, dayIdx) => (
                         <div
                           key={`${dayIdx}-${timeIdx}`}
@@ -402,7 +402,7 @@ export default function CalendarPage() {
                         .map((event) => (
                           <div
                             key={event.id}
-                            className="mb-1 p-2 rounded-lg text-xs font-medium shadow-sm border badge-premium"
+                            className="mb-1 p-2 rounded-lg text-sm font-medium shadow-sm border badge"
                             style={{
                               backgroundColor: `${event.color}20`,
                               borderColor: event.color,
@@ -413,22 +413,22 @@ export default function CalendarPage() {
                           </div>
                         ))}
                       {timeIdx === 2 && (
-                        <div className="mb-1 p-2.5 rounded-lg text-xs font-medium shadow-sm badge-premium bg-emerald-500/20 border-emerald-500/40 text-emerald-300">
+                        <div className="mb-1 p-2.5 rounded-lg text-sm font-medium shadow-sm badge bg-accent/20 border-accent/40 text-accent">
                           🎯 Deep Focus Session — Build Workspace UI (9:00 AM - 11:00 AM)
                         </div>
                       )}
                       {timeIdx === 4 && (
-                        <div className="mb-1 p-2.5 rounded-lg text-xs font-medium shadow-sm badge-premium bg-purple-500/20 border-purple-500/40 text-purple-300">
+                        <div className="mb-1 p-2.5 rounded-lg text-sm font-medium shadow-sm badge bg-purple-500/20 border-purple-500/40 text-purple-300">
                           🎨 Design Review Meeting (11:00 AM - 12:00 PM)
                         </div>
                       )}
                       {timeIdx === 5 && (
-                        <div className="mb-1 p-2 rounded-lg text-xs font-medium shadow-sm badge-premium bg-blue-500/20 border-blue-500/40 text-blue-300">
+                        <div className="mb-1 p-2 rounded-lg text-sm font-medium shadow-sm badge bg-blue-500/20 border-blue-500/40 text-blue-300">
                           ☕ Scheduled Rest Break (1:00 PM - 1:15 PM)
                         </div>
                       )}
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                        <span className="text-[10px] text-zinc-500">+ Add</span>
+                        <span className="text-[10px] text-muted">+ Add</span>
                       </div>
                     </div>
                   </div>
@@ -440,10 +440,10 @@ export default function CalendarPage() {
 
         {/* Month View */}
         {viewMode === "month" && (
-          <div className="glass-card p-6 rounded-2xl space-y-4 border-gradient">
+          <div className="card-elevated p-6 space-y-4">
             <div className="grid grid-cols-7 gap-2 text-center mb-4">
               {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-                <div key={day} className="text-xs font-semibold text-zinc-500 uppercase">
+                <div key={day} className="text-sm font-semibold text-muted uppercase">
                   {day}
                 </div>
               ))}
@@ -454,17 +454,17 @@ export default function CalendarPage() {
                   {week.map((day, dayIdx) => (
                     <div
                       key={dayIdx}
-                      className={`p-2 rounded-xl border transition cursor-pointer min-h-[60px] ${
+                      className={`p-2 rounded-lg border transition cursor-pointer min-h-[60px] ${
                         day
                           ? day.isToday
-                            ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400 glow-emerald"
-                            : "glass-card text-zinc-400 border-zinc-800/80 hover:border-emerald-500/30"
+                            ? "bg-accent/15 border-accent/40 text-accent"
+                            : "card text-secondary border-white/6 hover:border-white/10"
                           : "border-transparent"
                       }`}
                     >
                       {day && (
                         <>
-                          <p className="text-xs font-bold text-zinc-100">{day.day}</p>
+                          <p className="text-sm font-semibold text-primary">{day.day}</p>
                           <div className="mt-1 space-y-1">
                             {filteredTasks
                               .filter((task) => {
@@ -476,7 +476,7 @@ export default function CalendarPage() {
                               .map((task) => (
                                 <div
                                   key={task.id}
-                                  className="text-[9px] truncate glass-card px-1 py-0.5 rounded text-zinc-300"
+                                  className="text-[9px] truncate card px-1 py-0.5 rounded text-secondary"
                                 >
                                   {task.title}
                                 </div>
@@ -490,7 +490,7 @@ export default function CalendarPage() {
                               .map((event) => (
                                 <div
                                   key={event.id}
-                                  className="text-[9px] truncate px-1 py-0.5 rounded badge-premium"
+                                  className="text-[9px] truncate px-1 py-0.5 rounded badge"
                                   style={{
                                     backgroundColor: `${event.color}40`,
                                     color: event.color
@@ -512,14 +512,14 @@ export default function CalendarPage() {
 
         {/* Day View */}
         {viewMode === "day" && (
-          <div className="glass-card p-6 rounded-2xl space-y-4 border-gradient">
+          <div className="card-elevated p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
-                <FiClock className="text-emerald-400" /> Daily Schedule
+              <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
+                <FiClock className="text-accent" /> Daily Schedule
               </h3>
               <button 
                 onClick={() => setShowEventModal(true)}
-                className="flex items-center gap-2 px-3 py-1.5 btn-premium text-zinc-950 rounded-xl text-xs font-semibold transition-all"
+                className="flex items-center gap-2 px-3 py-1.5 btn-primary rounded-lg text-sm font-medium"
               >
                 <FiPlus className="w-3.5 h-3.5" />
                 <span>Add Event</span>
@@ -527,9 +527,9 @@ export default function CalendarPage() {
             </div>
             <div className="space-y-3">
               {timeSlots.map((time, timeIdx) => (
-                <div key={time} className="flex items-start gap-4 pt-2 border-t border-zinc-800/50">
-                  <span className="w-16 text-xs text-zinc-500 font-medium">{time}</span>
-                  <div className="flex-1 min-h-[48px] rounded-xl glass-card border border-dashed border-zinc-800/80 p-2 relative hover:border-emerald-500/30 transition-all cursor-pointer group">
+                <div key={time} className="flex items-start gap-4 pt-2 border-t border-white/6">
+                  <span className="w-16 text-sm text-muted font-medium">{time}</span>
+                  <div className="flex-1 min-h-[48px] rounded-lg card border border-dashed border-white/10 p-2 relative hover:border-white/20 transition-all cursor-pointer group">
                     {/* Render events for this time slot */}
                     {filteredEvents
                       .filter((event) => {
@@ -543,7 +543,7 @@ export default function CalendarPage() {
                       .map((event) => (
                         <div
                           key={event.id}
-                          className="mb-1 p-2 rounded-lg text-xs font-medium shadow-sm border badge-premium"
+                          className="mb-1 p-2 rounded-lg text-sm font-medium shadow-sm border badge"
                           style={{
                             backgroundColor: `${event.color}20`,
                             borderColor: event.color,
@@ -565,13 +565,13 @@ export default function CalendarPage() {
                       .map((task) => (
                         <div
                           key={task.id}
-                          className="mb-1 p-2.5 rounded-lg text-xs font-medium shadow-sm badge-premium bg-emerald-500/20 border-emerald-500/40 text-emerald-300"
+                          className="mb-1 p-2.5 rounded-lg text-sm font-medium shadow-sm badge bg-accent/20 border-accent/40 text-accent"
                         >
                           {task.title}
                         </div>
                       ))}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                      <span className="text-[10px] text-zinc-500">+ Add</span>
+                      <span className="text-[10px] text-muted">+ Add</span>
                     </div>
                   </div>
                 </div>
@@ -581,12 +581,12 @@ export default function CalendarPage() {
         )}
 
         {/* Tasks for Current View */}
-        <div className="glass-card p-6 rounded-2xl space-y-4 border-gradient">
-          <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
-            <FiClock className="text-emerald-400" /> Tasks {viewMode === "week" ? "This Week" : viewMode === "day" ? "Today" : "This Month"}
+        <div className="card-elevated p-6 space-y-4">
+          <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
+            <FiClock className="text-accent" /> Tasks {viewMode === "week" ? "This Week" : viewMode === "day" ? "Today" : "This Month"}
           </h3>
           {filteredTasks.length === 0 ? (
-            <p className="text-xs text-zinc-500 text-center py-6">No tasks scheduled for this period.</p>
+            <p className="text-sm text-muted text-center py-6">No tasks scheduled for this period.</p>
           ) : (
             <div className="space-y-2">
               {filteredTasks.map((task) => (
@@ -594,23 +594,23 @@ export default function CalendarPage() {
                   key={task.id}
                   draggable
                   onDragStart={(e) => e.dataTransfer.setData("taskId", task.id)}
-                  className="flex items-center justify-between p-3 glass-card rounded-xl hover:border-emerald-500/30 transition-all cursor-move"
+                  className="flex items-center justify-between p-3 card hover:bg-white/5 transition-all cursor-move"
                 >
                   <div className="flex items-center gap-3">
-                    <FiMoreVertical className="w-4 h-4 text-zinc-500" />
+                    <FiMoreVertical className="w-4 h-4 text-muted" />
                     <div className={`w-2 h-2 rounded-full ${
-                      task.priority === "high" ? "bg-red-500 glow-amber" : 
+                      task.priority === "high" ? "bg-red-500" : 
                       task.priority === "medium" ? "bg-amber-500" : "bg-emerald-500"
                     }`} />
-                    <span className="text-xs font-medium text-zinc-200">{task.title}</span>
+                    <span className="text-sm font-medium text-primary">{task.title}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {task.dueDate && (
-                      <span className="text-[10px] text-zinc-500">
+                      <span className="text-[10px] text-muted">
                         {new Date(task.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                       </span>
                     )}
-                    <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded badge-premium text-zinc-400">
+                    <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded badge text-secondary">
                       {task.completedFocusSessions}/{task.estimatedFocusSessions}
                     </span>
                   </div>
@@ -622,13 +622,13 @@ export default function CalendarPage() {
 
         {/* Event Creation Modal */}
         {showEventModal && (
-          <div className="fixed inset-0 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="glass-card p-6 rounded-2xl w-full max-w-md space-y-4 border-gradient">
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="card-elevated p-6 w-full max-w-md space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-gradient-emerald">Create Event</h3>
+                <h3 className="text-sm font-semibold text-accent">Create Event</h3>
                 <button 
                   onClick={handleCancelEvent}
-                  className="text-zinc-400 hover:text-zinc-200 transition-colors"
+                  className="text-secondary hover:text-primary transition-colors"
                 >
                   <FiX className="w-4 h-4" />
                 </button>
@@ -636,64 +636,64 @@ export default function CalendarPage() {
 
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs font-medium text-zinc-400 mb-1 block">Title</label>
+                  <label className="text-sm font-medium text-secondary mb-1 block">Title</label>
                   <input
                     type="text"
                     value={eventTitle}
                     onChange={(e) => setEventTitle(e.target.value)}
                     placeholder="Event title"
-                    className="w-full h-9 px-3 input-premium rounded-xl text-xs text-zinc-200 placeholder-zinc-500 transition-all"
+                    className="w-full h-9 px-3 input rounded-lg text-sm text-primary placeholder-muted"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-zinc-400 mb-1 block">Description</label>
+                  <label className="text-sm font-medium text-secondary mb-1 block">Description</label>
                   <textarea
                     value={eventDescription}
                     onChange={(e) => setEventDescription(e.target.value)}
                     placeholder="Event description (optional)"
                     rows={3}
-                    className="w-full px-3 input-premium rounded-xl text-xs text-zinc-200 placeholder-zinc-500 transition-all resize-none"
+                    className="w-full px-3 input rounded-lg text-sm text-primary placeholder-muted resize-none"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-zinc-400 mb-1 block">Date</label>
+                  <label className="text-sm font-medium text-secondary mb-1 block">Date</label>
                   <input
                     type="date"
                     value={eventDate}
                     onChange={(e) => setEventDate(e.target.value)}
-                    className="w-full h-9 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
+                    className="w-full h-9 px-3 input rounded-lg text-sm text-primary"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-medium text-zinc-400 mb-1 block">Start Time</label>
+                    <label className="text-sm font-medium text-secondary mb-1 block">Start Time</label>
                     <input
                       type="time"
                       value={eventStartTime}
                       onChange={(e) => setEventStartTime(e.target.value)}
-                      className="w-full h-9 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
+                      className="w-full h-9 px-3 input rounded-lg text-sm text-primary"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-zinc-400 mb-1 block">End Time</label>
+                    <label className="text-sm font-medium text-secondary mb-1 block">End Time</label>
                     <input
                       type="time"
                       value={eventEndTime}
                       onChange={(e) => setEventEndTime(e.target.value)}
-                      className="w-full h-9 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
+                      className="w-full h-9 px-3 input rounded-lg text-sm text-primary"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-zinc-400 mb-1 block">Event Type</label>
+                  <label className="text-sm font-medium text-secondary mb-1 block">Event Type</label>
                   <select
                     value={eventType}
                     onChange={(e) => setEventType(e.target.value as EventType)}
-                    className="w-full h-9 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
+                    className="w-full h-9 px-3 input rounded-lg text-sm text-primary"
                   >
                     <option value="meeting">Meeting</option>
                     <option value="focus">Focus Session</option>
@@ -707,13 +707,13 @@ export default function CalendarPage() {
               <div className="flex items-center gap-2 pt-2">
                 <button
                   onClick={handleCancelEvent}
-                  className="flex-1 px-4 py-2 glass-card rounded-xl text-xs font-semibold text-zinc-400 hover:border-emerald-500/30 transition-all"
+                  className="flex-1 px-4 py-2 btn-secondary rounded-lg text-sm font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCreateEvent}
-                  className="flex-1 px-4 py-2 btn-premium text-zinc-950 rounded-xl text-xs font-semibold transition-all"
+                  className="flex-1 px-4 py-2 btn-primary rounded-lg text-sm font-medium"
                 >
                   Create Event
                 </button>

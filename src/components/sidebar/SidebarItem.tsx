@@ -23,25 +23,23 @@ export default function SidebarItem({
           w-full
           items-center
           gap-3
-          rounded-xl
-          px-4
-          py-3
+          rounded-lg
+          px-3
+          py-2
           text-left
           transition-all
-          duration-300
-          relative
-          overflow-hidden
+          duration-200
           ${
             isActive
-              ? "bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 text-emerald-400 border border-emerald-500/30 glow-emerald"
-              : "text-zinc-400 hover:bg-zinc-800/50 hover:text-white hover:border hover:border-zinc-700/50"
+              ? "bg-white/10 text-white"
+              : "text-secondary hover:bg-white/5 hover:text-white"
           }
         `
       }
     >
-      <span className="text-xl relative z-10">{icon}</span>
+      <span className="text-lg">{icon}</span>
 
-      <span className="font-medium relative z-10">{label}</span>
+      <span className="font-medium text-sm">{label}</span>
     </NavLink>
   );
 }

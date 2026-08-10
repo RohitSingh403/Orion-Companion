@@ -99,31 +99,31 @@ export default function AnalyticsPage() {
       <Topbar greeting="Productivity Analytics 📈" subtitle="Visualize focus trends & GitHub-style heatmap" />
       <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
         {/* Navigation Tabs */}
-        <div className="flex items-center justify-between border-b border-zinc-800/50 pb-3">
+        <div className="flex items-center justify-between border-b border-white/6 pb-3">
           <div className="flex items-center gap-2">
             {(["overview", "focus", "tasks", "trends"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize transition-all ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition-all ${
                   activeTab === tab
-                    ? "bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 text-emerald-400 border border-emerald-500/30 glow-emerald"
-                    : "text-zinc-400 hover:text-zinc-200 hover:border hover:border-zinc-700/50"
+                    ? "bg-white/10 text-white"
+                    : "text-secondary hover:text-white hover:bg-white/5"
                 }`}
               >
                 {tab}
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-1 glass-card p-1 rounded-xl">
+          <div className="flex items-center gap-1 card p-1 rounded-lg">
             {(["week", "month", "year"] as const).map((range) => (
               <button
                 key={range}
                 onClick={() => setTimeRange(range)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize transition-all ${
                   timeRange === range
-                    ? "btn-premium text-zinc-950"
-                    : "text-zinc-400 hover:text-zinc-200"
+                    ? "btn-primary"
+                    : "text-secondary hover:text-white"
                 }`}
               >
                 {range}
@@ -134,103 +134,103 @@ export default function AnalyticsPage() {
 
         {/* Top 3 Stat Cards */}
         <div className="grid grid-cols-3 gap-6">
-          <div className="glass-card p-5 rounded-2xl space-y-2 border-gradient">
-            <div className="flex items-center justify-between text-zinc-400">
-              <span className="text-xs font-medium">Total Focus Time ({timeRange})</span>
-              <FiClock className="text-emerald-400" />
+          <div className="card-elevated p-5 space-y-2">
+            <div className="flex items-center justify-between text-secondary">
+              <span className="text-sm font-medium">Total Focus Time ({timeRange})</span>
+              <FiClock className="text-accent" />
             </div>
-            <p className="text-2xl font-bold text-gradient-emerald">{rangeStats.totalFocusTimeDisplay}</p>
-            <span className="inline-block text-[10px] font-semibold text-emerald-400 badge-premium">
+            <p className="text-2xl font-semibold text-accent">{rangeStats.totalFocusTimeDisplay}</p>
+            <span className="inline-block text-xs font-medium text-accent badge">
               {rangeStats.totalSessions > 0 ? "↑ Building momentum" : "Start your first session"}
             </span>
           </div>
 
-          <div className="glass-card p-5 rounded-2xl space-y-2 border-gradient">
-            <div className="flex items-center justify-between text-zinc-400">
-              <span className="text-xs font-medium">Total Sessions ({timeRange})</span>
+          <div className="card-elevated p-5 space-y-2">
+            <div className="flex items-center justify-between text-secondary">
+              <span className="text-sm font-medium">Total Sessions ({timeRange})</span>
               <FiActivity className="text-blue-400" />
             </div>
-            <p className="text-2xl font-bold text-gradient-blue">{rangeStats.totalSessions}</p>
-            <span className="inline-block text-[10px] font-semibold text-emerald-400 badge-premium">
+            <p className="text-2xl font-semibold text-blue-400">{rangeStats.totalSessions}</p>
+            <span className="inline-block text-xs font-medium text-accent badge">
               Best Streak: {bestStreak} days
             </span>
           </div>
 
-          <div className="glass-card p-5 rounded-2xl space-y-2 border-gradient">
-            <div className="flex items-center justify-between text-zinc-400">
-              <span className="text-xs font-medium">Productivity vs Yesterday</span>
+          <div className="card-elevated p-5 space-y-2">
+            <div className="flex items-center justify-between text-secondary">
+              <span className="text-sm font-medium">Productivity vs Yesterday</span>
               <FiTrendingUp className="text-purple-400" />
             </div>
-            <p className="text-2xl font-bold text-zinc-100">
+            <p className="text-2xl font-semibold text-primary">
               {productivityComparison.percentage > 0 ? "+" : ""}{productivityComparison.percentage}%
             </p>
-            <span className="inline-block text-[10px] font-semibold text-emerald-400 badge-premium">
+            <span className="inline-block text-xs font-medium text-accent badge">
               {productivityComparison.label}
             </span>
           </div>
         </div>
 
         {/* Period Statistics */}
-        <div className="glass-card p-6 rounded-2xl space-y-4 border-gradient">
-          <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
-            <FiActivity className="text-emerald-400" /> {timeRange.charAt(0).toUpperCase() + timeRange.slice(1)} Overview
+        <div className="card-elevated p-6 space-y-4">
+          <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
+            <FiActivity className="text-accent" /> {timeRange.charAt(0).toUpperCase() + timeRange.slice(1)} Overview
           </h3>
           <div className="grid grid-cols-3 gap-4">
-            <div className="glass-card p-4 rounded-xl border border-zinc-800/50">
-              <p className="text-[10px] text-zinc-500 font-medium">Avg Sessions/Day</p>
-              <p className="text-xl font-bold text-zinc-100 mt-1">{periodStats.avgSessionsPerDay}</p>
+            <div className="card p-4 border border-white/10">
+              <p className="text-xs text-muted font-medium">Avg Sessions/Day</p>
+              <p className="text-xl font-semibold text-primary mt-1">{periodStats.avgSessionsPerDay}</p>
             </div>
-            <div className="glass-card p-4 rounded-xl border border-zinc-800/50">
-              <p className="text-[10px] text-zinc-500 font-medium">Avg Focus/Day</p>
-              <p className="text-xl font-bold text-zinc-100 mt-1">{periodStats.avgFocusPerDay}h</p>
+            <div className="card p-4 border border-white/10">
+              <p className="text-xs text-muted font-medium">Avg Focus/Day</p>
+              <p className="text-xl font-semibold text-primary mt-1">{periodStats.avgFocusPerDay}h</p>
             </div>
-            <div className="glass-card p-4 rounded-xl border border-zinc-800/50">
-              <p className="text-[10px] text-zinc-500 font-medium">Best {timeRange === "week" ? "Day" : timeRange === "month" ? "Week" : "Month"}</p>
-              <p className="text-xl font-bold text-emerald-400 mt-1">{periodStats.bestDay}</p>
+            <div className="card p-4 border border-white/10">
+              <p className="text-xs text-muted font-medium">Best {timeRange === "week" ? "Day" : timeRange === "month" ? "Week" : "Month"}</p>
+              <p className="text-xl font-semibold text-accent mt-1">{periodStats.bestDay}</p>
             </div>
           </div>
         </div>
 
         {/* Focus Insights */}
-        <div className="glass-card p-6 rounded-2xl space-y-4 border-gradient">
-          <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
-            <FiTrendingUp className="text-emerald-400" /> Personalized Insights
+        <div className="card-elevated p-6 space-y-4">
+          <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
+            <FiTrendingUp className="text-accent" /> Personalized Insights
           </h3>
           <div className="space-y-3">
             {focusInsights.map((insight, idx) => (
-              <div key={idx} className="flex items-start gap-3 p-3 glass-card border border-zinc-800/50 rounded-xl hover:border-emerald-500/30 transition-all">
-                <div className="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0 glow-emerald" />
-                <p className="text-xs text-zinc-300 leading-relaxed">{insight}</p>
+              <div key={idx} className="flex items-start gap-3 p-3 card border border-white/10 rounded-lg hover:bg-white/5 transition-all">
+                <div className="w-2 h-2 rounded-full bg-accent mt-1.5 flex-shrink-0" />
+                <p className="text-sm text-secondary leading-relaxed">{insight}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Focus Time Trend Chart */}
-        <div className="glass-card p-6 rounded-2xl space-y-4 border-gradient">
-          <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
-            <FiTrendingUp className="text-emerald-400" /> Focus Time Trend ({timeRange.charAt(0).toUpperCase() + timeRange.slice(1)})
+        <div className="card-elevated p-6 space-y-4">
+          <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
+            <FiTrendingUp className="text-accent" /> Focus Time Trend ({timeRange.charAt(0).toUpperCase() + timeRange.slice(1)})
           </h3>
           <div className="h-40 flex items-end justify-between gap-3 pt-6 px-4">
             {trendData.days.map((day, idx) => (
               <div key={day} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
                 <div
                   style={{ height: `${trendData.heights[idx]}%` }}
-                  className="w-full bg-gradient-to-t from-emerald-500/20 to-emerald-400 border-t-2 border-emerald-400 rounded-t-md transition-all hover:brightness-125 glow-emerald"
+                  className="w-full bg-gradient-to-t from-accent/20 to-accent border-t-2 border-accent rounded-t-md transition-all hover:brightness-125"
                 />
-                <span className="text-[10px] text-zinc-500 font-medium">{day}</span>
+                <span className="text-xs text-muted font-medium">{day}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* GitHub-style Productivity Heatmap */}
-        <div className="glass-card p-6 rounded-2xl space-y-4 border-gradient">
+        <div className="card-elevated p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-zinc-200">Productivity Heatmap</h3>
-            <div className="flex items-center gap-1.5 text-[10px] text-zinc-500 font-medium">
+            <h3 className="text-sm font-semibold text-primary">Productivity Heatmap</h3>
+            <div className="flex items-center gap-1.5 text-xs text-muted font-medium">
               <span>Less</span>
-              <span className="w-2.5 h-2.5 rounded-sm heatmap-level-0 border border-zinc-800"></span>
+              <span className="w-2.5 h-2.5 rounded-sm heatmap-level-0 border border-white/10"></span>
               <span className="w-2.5 h-2.5 rounded-sm heatmap-level-1"></span>
               <span className="w-2.5 h-2.5 rounded-sm heatmap-level-2"></span>
               <span className="w-2.5 h-2.5 rounded-sm heatmap-level-3"></span>
@@ -240,7 +240,7 @@ export default function AnalyticsPage() {
           </div>
 
           <div className="flex gap-2 items-center">
-            <div className="grid grid-rows-7 text-[10px] text-zinc-500 font-medium h-28 justify-between pr-2">
+            <div className="grid grid-rows-7 text-xs text-muted font-medium h-28 justify-between pr-2">
               <span>Mon</span>
               <span>Wed</span>
               <span>Fri</span>

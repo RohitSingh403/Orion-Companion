@@ -59,11 +59,11 @@ export default function AchievementsPage() {
       <AppLayout>
         <Topbar greeting="Gamified Achievements 🏆" subtitle="Unlock badges and level up your focus habit" />
         <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
-          <div className="glass-card p-8 rounded-2xl text-center border-gradient">
-            <p className="text-sm text-zinc-400 mb-4">Achievements data is corrupted or missing.</p>
+          <div className="card-elevated p-8 text-center">
+            <p className="text-sm text-secondary mb-4">Achievements data is corrupted or missing.</p>
             <button
               onClick={handleReset}
-              className="px-4 py-2 btn-premium text-zinc-950 text-xs font-semibold rounded-xl transition-all"
+              className="px-4 py-2 btn-primary text-sm font-medium rounded-lg"
             >
               Reset Achievements
             </button>
@@ -78,45 +78,45 @@ export default function AchievementsPage() {
       <Topbar greeting="Gamified Achievements 🏆" subtitle="Unlock badges and level up your focus habit" />
       <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
         {/* Level Banner Card */}
-        <div className="glass-card p-6 rounded-2xl flex items-center justify-between relative overflow-hidden border-gradient glow-emerald">
+        <div className="card-elevated p-6 flex items-center justify-between relative overflow-hidden">
           <div className="flex items-center gap-4 relative z-10">
-            <div className="w-14 h-14 rounded-2xl glass-card border border-amber-500/40 flex items-center justify-center text-amber-400 text-2xl shadow">
+            <div className="w-14 h-14 rounded-lg card border border-amber-500/40 flex items-center justify-center text-amber-400 text-2xl shadow">
               🏆
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold text-gradient-emerald">Level {safeLevel} {levelTitle}</h2>
-                <span className="px-2 py-0.5 rounded badge-premium text-emerald-400 text-[10px] font-semibold">
+                <h2 className="text-xl font-semibold text-accent">Level {safeLevel} {levelTitle}</h2>
+                <span className="px-2 py-0.5 rounded badge-success text-accent text-xs font-medium">
                   {totalXP} XP
                 </span>
               </div>
-              <p className="text-xs text-zinc-400 mt-0.5">{xpToNextLevel} XP to Level {safeLevel + 1}</p>
+              <p className="text-sm text-secondary mt-0.5">{xpToNextLevel} XP to Level {safeLevel + 1}</p>
             </div>
           </div>
 
           {/* XP Progress Bar */}
           <div className="w-64 space-y-1.5 relative z-10">
-            <div className="flex justify-between text-[10px] font-semibold text-zinc-400">
+            <div className="flex justify-between text-xs font-medium text-secondary">
               <span>Progress</span>
               <span>{progressPercentage}%</span>
             </div>
-            <div className="w-full h-2.5 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800">
-              <div className="h-full progress-premium-bar rounded-full transition-all" style={{ width: `${progressPercentage}%` }} />
+            <div className="w-full h-2.5 bg-white/5 rounded-full overflow-hidden border border-white/10">
+              <div className="h-full progress-bar rounded-full transition-all" style={{ width: `${progressPercentage}%` }} />
             </div>
           </div>
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex items-center justify-between border-b border-zinc-800/50 pb-3">
+        <div className="flex items-center justify-between border-b border-white/6 pb-3">
           <div className="flex items-center gap-2">
             {(["all", "unlocked", "locked"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setFilter(tab)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize transition-all ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition-all ${
                   filter === tab
-                    ? "bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 text-emerald-400 border border-emerald-500/30 glow-emerald"
-                    : "text-zinc-400 hover:text-zinc-200 hover:border hover:border-zinc-700/50"
+                    ? "bg-white/10 text-white"
+                    : "text-secondary hover:text-white hover:bg-white/5"
                 }`}
               >
                 {tab}
@@ -125,7 +125,7 @@ export default function AchievementsPage() {
           </div>
           <button
             onClick={handleReset}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs text-zinc-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
+            className="flex items-center gap-2 px-3 py-1.5 text-sm text-secondary hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
           >
             <FiRefreshCw className="w-3.5 h-3.5" />
             <span>Reset</span>
@@ -134,43 +134,43 @@ export default function AchievementsPage() {
 
         {/* Achievements Grid */}
         {filteredAchievements.length === 0 ? (
-          <div className="glass-card p-8 rounded-2xl text-center border-gradient">
-            <p className="text-sm text-zinc-400">No achievements found for this filter.</p>
+          <div className="card-elevated p-8 text-center">
+            <p className="text-sm text-secondary">No achievements found for this filter.</p>
           </div>
         ) : (
           <div className="grid grid-cols-3 gap-6">
             {filteredAchievements.map((item) => (
               <div
                 key={item.id}
-                className={`p-5 rounded-2xl border transition-all relative ${
+                className={`p-5 rounded-lg border transition-all relative ${
                   item.unlocked
-                    ? "glass-card border-emerald-500/30 glow-emerald"
-                    : "glass-card border-zinc-800/60 opacity-60"
+                    ? "card border-accent/30"
+                    : "card border-white/10 opacity-60"
                 }`}
               >
                 <div className="flex items-start justify-between">
-                  <div className="w-12 h-12 rounded-xl glass-card border border-zinc-800 flex items-center justify-center text-2xl">
+                  <div className="w-12 h-12 rounded-lg card border border-white/10 flex items-center justify-center text-2xl">
                     {item.icon || "🏆"}
                   </div>
                   {item.unlocked ? (
-                    <span className="w-6 h-6 rounded-full glass-card border border-emerald-500/40 text-emerald-400 flex items-center justify-center">
+                    <span className="w-6 h-6 rounded-full card border border-accent/40 text-accent flex items-center justify-center">
                       <FiCheck className="w-3.5 h-3.5" />
                     </span>
                   ) : (
-                    <span className="w-6 h-6 rounded-full glass-card border border-zinc-800 text-zinc-500 flex items-center justify-center">
+                    <span className="w-6 h-6 rounded-full card border border-white/10 text-muted flex items-center justify-center">
                       <FiLock className="w-3.5 h-3.5" />
                     </span>
                   )}
                 </div>
 
                 <div className="mt-4 space-y-1">
-                  <h4 className="text-sm font-bold text-zinc-100 flex items-center justify-between">
+                  <h4 className="text-sm font-semibold text-primary flex items-center justify-between">
                     <span>{item.title}</span>
-                    <span className="text-[10px] text-amber-400 badge-premium font-semibold">
+                    <span className="text-xs text-amber-400 badge font-medium">
                       +{item.xp || 100} XP
                     </span>
                   </h4>
-                  <p className="text-xs text-zinc-400 leading-relaxed">{item.description}</p>
+                  <p className="text-sm text-secondary leading-relaxed">{item.description}</p>
                 </div>
               </div>
             ))}

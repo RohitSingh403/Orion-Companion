@@ -26,14 +26,14 @@ export default function Topbar({
   };
 
   return (
-    <header className="w-full flex items-center justify-between px-8 py-5 border-b border-zinc-800/50 glass-card sticky top-0 z-30 select-none">
+    <header className="w-full flex items-center justify-between px-8 py-4 border-b border-white/6 bg-white/[0.02] sticky top-0 z-30 select-none">
       {/* Title & Subtitle */}
       <div>
-        <h1 className="text-xl font-bold text-gradient-emerald tracking-tight">
+        <h1 className="text-xl font-semibold text-primary tracking-tight">
           {greeting}
         </h1>
         {subtitle && (
-          <p className="text-xs text-zinc-400 mt-0.5">{subtitle}</p>
+          <p className="text-xs text-secondary mt-0.5">{subtitle}</p>
         )}
       </div>
 
@@ -41,13 +41,13 @@ export default function Topbar({
       <div className="flex items-center gap-3">
         {/* Global Search Bar */}
         <div className="relative flex items-center">
-          <FiSearch className="absolute left-3 w-3.5 h-3.5 text-zinc-400" />
+          <FiSearch className="absolute left-3 w-3.5 h-3.5 text-muted" />
           <input
             type="text"
             placeholder="Search anything..."
-            className="w-56 h-9 pl-9 pr-8 input-premium rounded-xl text-xs text-zinc-200 placeholder-zinc-500 transition-all"
+            className="w-56 h-9 pl-9 pr-8 input rounded-lg text-sm text-primary placeholder-muted"
           />
-          <kbd className="absolute right-2.5 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400 bg-zinc-800/80 border border-zinc-700/60 rounded badge-premium">
+          <kbd className="absolute right-2.5 px-1.5 py-0.5 text-[10px] font-medium text-muted bg-white/5 border border-white/10 rounded">
             ⌘K
           </kbd>
         </div>
@@ -56,16 +56,16 @@ export default function Topbar({
         <div className="relative">
           <button
             onClick={() => setQuickAddOpen(!quickAddOpen)}
-            className="h-9 px-3.5 btn-premium text-zinc-950 font-semibold text-xs rounded-xl flex items-center gap-1.5 transition-all"
+            className="h-9 px-3.5 btn-primary font-medium text-sm rounded-lg flex items-center gap-1.5"
           >
             <FiPlus className="w-4 h-4 stroke-[2.5]" />
             <span>Quick Add</span>
           </button>
 
           {quickAddOpen && (
-            <div className="absolute right-0 mt-2 w-72 p-3 glass-card rounded-2xl shadow-2xl z-50 animate-in fade-in zoom-in-95 border-gradient">
+            <div className="absolute right-0 mt-2 w-72 p-3 card-elevated shadow-2xl z-50">
               <form onSubmit={handleQuickAdd} className="space-y-2.5">
-                <h4 className="text-xs font-semibold text-zinc-300">
+                <h4 className="text-xs font-semibold text-primary">
                   Quick Add Task
                 </h4>
                 <input
@@ -74,19 +74,19 @@ export default function Topbar({
                   onChange={(e) => setTaskTitle(e.target.value)}
                   placeholder="Task title..."
                   autoFocus
-                  className="w-full h-8 px-3 input-premium rounded-lg text-xs text-zinc-200 transition-all"
+                  className="w-full h-8 px-3 input rounded-lg text-sm text-primary"
                 />
                 <div className="flex justify-end gap-2 pt-1">
                   <button
                     type="button"
                     onClick={() => setQuickAddOpen(false)}
-                    className="px-2.5 py-1 text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
+                    className="px-2.5 py-1 text-sm text-secondary hover:text-primary transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-3 py-1 btn-premium text-zinc-950 text-xs font-semibold rounded-md"
+                    className="px-3 py-1 btn-primary text-sm font-medium rounded-md"
                   >
                     Save
                   </button>
@@ -97,13 +97,13 @@ export default function Topbar({
         </div>
 
         {/* Notification Bell */}
-        <button className="w-9 h-9 glass-card rounded-xl flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:border-emerald-500/30 transition-all relative">
+        <button className="icon-btn relative">
           <FiBell className="w-4 h-4" />
-          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-500 glow-emerald"></span>
+          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent"></span>
         </button>
 
         {/* User Avatar */}
-        <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 border border-emerald-500/40 flex items-center justify-center text-zinc-950 font-bold text-xs shadow-lg glow-emerald">
+        <div className="avatar">
           RS
         </div>
       </div>

@@ -45,50 +45,50 @@ export default function DashboardContent() {
         {/* Top 3 Metric Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {/* Card 1: Today's Goal */}
-          <div className="glass-card glass-card-hover p-6 rounded-2xl space-y-4 border-gradient">
+          <div className="card-elevated p-6 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xs font-semibold text-zinc-400">Today's Goal</h3>
-                <p className="text-xs text-zinc-500">Focus for {targetHours.toFixed(1)} hours</p>
+                <h3 className="text-xs font-semibold text-secondary">Today's Goal</h3>
+                <p className="text-xs text-muted">Focus for {targetHours.toFixed(1)} hours</p>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded badge-premium text-emerald-400">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded badge-success text-accent">
                 {goalProgress}%
               </span>
             </div>
 
             <div className="space-y-2">
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-gradient-emerald">{completedHours}h</span>
-                <span className="text-xs text-zinc-400 font-medium">/ {targetHours.toFixed(1)}h</span>
+                <span className="text-2xl font-bold text-accent">{completedHours}h</span>
+                <span className="text-xs text-secondary font-medium">/ {targetHours.toFixed(1)}h</span>
               </div>
 
-              <div className="progress-premium w-full h-2 rounded-full">
+              <div className="progress w-full">
                 <div
                   style={{ width: `${goalProgress}%` }}
-                  className="progress-premium-bar h-full rounded-full transition-all duration-500"
+                  className="progress-bar transition-all duration-500"
                 />
               </div>
             </div>
           </div>
 
           {/* Card 2: Focus Score */}
-          <div className="glass-card glass-card-hover p-6 rounded-2xl space-y-3 border-gradient">
+          <div className="card-elevated p-6 space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xs font-semibold text-zinc-400">Focus Score</h3>
-                <p className="text-xs text-emerald-400 font-semibold mt-0.5">
+                <h3 className="text-xs font-semibold text-secondary">Focus Score</h3>
+                <p className="text-xs text-accent font-semibold mt-0.5">
                   {focusScore >= 80 ? "Great Focus!" : focusScore >= 50 ? "Good Progress!" : "Keep Going!"}
                 </p>
               </div>
-              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 glow-emerald">
+              <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-accent">
                 <FiTrendingUp className="w-4 h-4" />
               </div>
             </div>
 
             <div className="flex items-end justify-between">
               <div>
-                <span className="text-3xl font-bold text-gradient-emerald">{focusScore}</span>
-                <p className="text-[10px] text-emerald-400 font-medium mt-1">Daily goal progress</p>
+                <span className="text-3xl font-bold text-accent">{focusScore}</span>
+                <p className="text-[10px] text-accent font-medium mt-1">Daily goal progress</p>
               </div>
 
               {/* Sparkline Visual */}
@@ -97,7 +97,7 @@ export default function DashboardContent() {
                   <div
                     key={i}
                     style={{ height: `${h}%` }}
-                    className="w-1.5 bg-gradient-to-t from-emerald-500/60 to-emerald-400/80 rounded-t-sm transition-all duration-300 hover:from-emerald-500 hover:to-emerald-300"
+                    className="w-1.5 bg-accent/60 rounded-t-sm transition-all duration-300 hover:bg-accent"
                   />
                 ))}
               </div>
@@ -105,24 +105,24 @@ export default function DashboardContent() {
           </div>
 
           {/* Card 3: Current Streak */}
-          <div className="glass-card glass-card-hover p-6 rounded-2xl space-y-3 border-gradient">
+          <div className="card-elevated p-6 space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xs font-semibold text-zinc-400">Current Streak</h3>
+                <h3 className="text-xs font-semibold text-secondary">Current Streak</h3>
                 <p className="text-xs text-amber-400 font-semibold mt-0.5">Keep it up!</p>
               </div>
-              <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 glow-amber">
+              <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-amber-400">
                 <FiZap className="w-4 h-4" />
               </div>
             </div>
 
             <div className="space-y-3">
-              <span className="text-3xl font-bold text-gradient-emerald">{currentStreak || 12} Days</span>
+              <span className="text-3xl font-bold text-accent">{currentStreak || 12} Days</span>
               <div className="flex items-center gap-1.5 pt-1">
                 {[1, 2, 3, 4, 5].map((day) => (
                   <span
                     key={day}
-                    className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-[10px] glow-emerald"
+                    className="w-5 h-5 rounded-full bg-accent/10 border border-accent/20 text-accent flex items-center justify-center text-[10px]"
                   >
                     <FiCheckCircle className="w-3 h-3" />
                   </span>
@@ -135,64 +135,64 @@ export default function DashboardContent() {
         {/* Middle Row: Focus Timer & Today's Tasks */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
           {/* Main Focus Timer Container (Col 6) */}
-          <div className="lg:col-span-6 glass-card p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center relative border-gradient">
+          <div className="lg:col-span-6 card-elevated p-4 md:p-6 flex flex-col items-center justify-center relative">
             <div className="w-full flex justify-between items-center mb-4">
-              <h3 className="text-xs font-bold text-zinc-300 tracking-wide uppercase">
+              <h3 className="text-xs font-bold text-secondary tracking-wide uppercase">
                 Focus Timer
               </h3>
-              <span className="text-[10px] text-zinc-500 badge-premium">Deep Work Session</span>
+              <span className="text-[10px] text-muted badge">Deep Work Session</span>
             </div>
             <FocusTimer />
           </div>
 
           {/* Today's Tasks Container (Col 6) */}
-          <div className="lg:col-span-6 glass-card p-4 md:p-6 rounded-2xl flex flex-col justify-between space-y-4 border-gradient">
-            <div className="flex items-center justify-between border-b border-zinc-800/50 pb-3">
+          <div className="lg:col-span-6 card-elevated p-4 md:p-6 flex flex-col justify-between space-y-4">
+            <div className="flex items-center justify-between border-b border-white/6 pb-3">
               <div>
-                <h3 className="text-sm font-bold text-zinc-100">Today's Tasks</h3>
-                <p className="text-xs text-zinc-500 mt-0.5">
+                <h3 className="text-sm font-bold text-primary">Today's Tasks</h3>
+                <p className="text-xs text-muted mt-0.5">
                   {tasks.filter((t) => t.completed).length} of {tasks.length} completed
                 </p>
               </div>
               <Link
                 to="/tasks"
-                className="text-xs text-emerald-400 hover:text-emerald-300 hover:underline font-semibold transition-colors"
+                className="text-xs text-accent hover:underline font-medium transition-colors"
               >
                 View all
               </Link>
             </div>
 
             {/* Task List Items */}
-            <div className="flex-1 space-y-2.5 overflow-y-auto max-h-48 no-scrollbar pr-1">
+            <div className="flex-1 space-y-2 overflow-y-auto max-h-48 no-scrollbar pr-1">
               {tasks.length === 0 ? (
-                <p className="text-xs text-zinc-500 text-center py-6">
+                <p className="text-xs text-muted text-center py-6">
                   No tasks for today. Add one below!
                 </p>
               ) : (
                 tasks.slice(0, 4).map((task) => (
                   <div
                     key={task.id}
-                    className="flex items-center justify-between p-3 glass-card rounded-xl hover:border-emerald-500/30 transition-all"
+                    className="flex items-center justify-between p-3 card hover:bg-white/5 transition-all"
                   >
                     <div className="flex items-center gap-3">
                       <input
                         type="checkbox"
                         checked={task.completed}
                         onChange={() => toggleTask(task.id)}
-                        className="w-4 h-4 rounded accent-emerald-500 cursor-pointer"
+                        className="w-4 h-4 rounded accent-accent cursor-pointer"
                       />
                       <span
-                        className={`text-xs font-medium ${
+                        className={`text-sm font-medium ${
                           task.completed
-                            ? "line-through text-zinc-500"
-                            : "text-zinc-200"
+                            ? "line-through text-muted"
+                            : "text-primary"
                         }`}
                       >
                         {task.title}
                       </span>
                     </div>
 
-                    <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded badge-premium text-zinc-400">
+                    <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded badge">
                       {task.completedFocusSessions}/{task.estimatedFocusSessions}
                     </span>
                   </div>
@@ -201,17 +201,17 @@ export default function DashboardContent() {
             </div>
 
             {/* Add New Task Quick Input */}
-            <form onSubmit={handleAddTask} className="flex gap-2 pt-2 border-t border-zinc-800/50">
+            <form onSubmit={handleAddTask} className="flex gap-2 pt-2 border-t border-white/6">
               <input
                 type="text"
                 value={newTaskTitle}
                 onChange={(e) => setNewTaskTitle(e.target.value)}
                 placeholder="+ Add New Task"
-                className="flex-1 h-9 px-3 input-premium rounded-xl text-xs text-zinc-200 placeholder-zinc-500 transition-all"
+                className="flex-1 h-9 px-3 input rounded-lg text-sm text-primary placeholder-muted"
               />
               <button
                 type="submit"
-                className="h-9 px-3 btn-premium text-zinc-950 rounded-xl text-xs font-semibold transition-all"
+                className="h-9 px-3 btn-primary rounded-lg text-sm font-medium"
               >
                 <FiPlus className="w-4 h-4" />
               </button>
@@ -220,7 +220,7 @@ export default function DashboardContent() {
         </div>
 
         {/* Bottom Row: Session History */}
-        <div className="glass-card p-4 md:p-6 rounded-2xl border-gradient">
+        <div className="card-elevated p-4 md:p-6">
           <SessionHistory />
         </div>
       </div>

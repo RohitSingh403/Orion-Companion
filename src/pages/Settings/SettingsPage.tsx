@@ -77,18 +77,18 @@ export default function SettingsPage() {
 
   const renderFocusSettings = () => (
     <div className="space-y-6">
-      <h3 className="text-base font-bold text-gradient-emerald pb-3 border-b border-zinc-800/50">
+      <h3 className="text-base font-semibold text-accent pb-3 border-b border-white/6">
         Focus & Timer Configuration
       </h3>
 
       <div className="grid grid-cols-2 gap-6">
         {/* Focus Duration */}
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-zinc-300">Focus Duration (minutes)</label>
+          <label className="text-sm font-medium text-secondary">Focus Duration (minutes)</label>
           <select
             value={focusMinutes}
             onChange={(e) => setFocusMinutes(Number(e.target.value))}
-            className="w-full h-10 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
+            className="w-full h-10 px-3 input rounded-lg text-sm text-primary"
           >
             <option value={15}>15 minutes</option>
             <option value={25}>25 minutes (Standard)</option>
@@ -100,11 +100,11 @@ export default function SettingsPage() {
 
         {/* Break Duration */}
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-zinc-300">Short Break (minutes)</label>
+          <label className="text-sm font-medium text-secondary">Short Break (minutes)</label>
           <select
             value={breakMinutes}
             onChange={(e) => setBreakMinutes(Number(e.target.value))}
-            className="w-full h-10 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
+            className="w-full h-10 px-3 input rounded-lg text-sm text-primary"
           >
             <option value={3}>3 minutes</option>
             <option value={5}>5 minutes (Standard)</option>
@@ -115,11 +115,11 @@ export default function SettingsPage() {
 
         {/* Daily Goal */}
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-zinc-300">Daily Session Goal</label>
+          <label className="text-sm font-medium text-secondary">Daily Session Goal</label>
           <select
             value={dailyGoal}
             onChange={(e) => setDailyGoal(Number(e.target.value))}
-            className="w-full h-10 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
+            className="w-full h-10 px-3 input rounded-lg text-sm text-primary"
           >
             <option value={4}>4 sessions</option>
             <option value={6}>6 sessions</option>
@@ -130,44 +130,30 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="space-y-4 pt-4 border-t border-zinc-800/50">
+      <div className="space-y-4 pt-4 border-t border-white/6">
         {/* Auto Start Break Toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-xs font-bold text-zinc-200">Auto-start Breaks</h4>
-            <p className="text-[10px] text-zinc-500">Automatically start break timer when focus ends</p>
+            <h4 className="text-sm font-medium text-primary">Auto-start Breaks</h4>
+            <p className="text-xs text-muted">Automatically start break timer when focus ends</p>
           </div>
           <button
             onClick={() => setAutoStartBreak(!autoStartBreak)}
-            className={`w-11 h-6 rounded-full transition-colors relative p-0.5 ${
-              autoStartBreak ? "bg-emerald-500 glow-emerald" : "bg-zinc-800"
-            }`}
+            className={`toggle ${autoStartBreak ? "active" : ""}`}
           >
-            <div
-              className={`w-5 h-5 rounded-full bg-zinc-950 shadow transition-transform ${
-                autoStartBreak ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
           </button>
         </div>
 
         {/* Auto Start Focus Toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-xs font-bold text-zinc-200">Auto-start Focus</h4>
-            <p className="text-[10px] text-zinc-500">Automatically start next focus session when break ends</p>
+            <h4 className="text-sm font-medium text-primary">Auto-start Focus</h4>
+            <p className="text-xs text-muted">Automatically start next focus session when break ends</p>
           </div>
           <button
             onClick={() => setAutoStartFocus(!autoStartFocus)}
-            className={`w-11 h-6 rounded-full transition-colors relative p-0.5 ${
-              autoStartFocus ? "bg-emerald-500 glow-emerald" : "bg-zinc-800"
-            }`}
+            className={`toggle ${autoStartFocus ? "active" : ""}`}
           >
-            <div
-              className={`w-5 h-5 rounded-full bg-zinc-950 shadow transition-transform ${
-                autoStartFocus ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
           </button>
         </div>
       </div>
@@ -176,7 +162,7 @@ export default function SettingsPage() {
 
   const renderSoundSettings = () => (
     <div className="space-y-6">
-      <h3 className="text-base font-bold text-gradient-emerald pb-3 border-b border-zinc-800/50">
+      <h3 className="text-base font-semibold text-accent pb-3 border-b border-white/6">
         Sound Configuration
       </h3>
 
@@ -184,31 +170,24 @@ export default function SettingsPage() {
         {/* Sound Enabled Toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-xs font-bold text-zinc-200">Enable Sounds</h4>
-            <p className="text-[10px] text-zinc-500">Play audio cues on timer transitions</p>
+            <h4 className="text-sm font-medium text-primary">Enable Sounds</h4>
+            <p className="text-xs text-muted">Play audio cues on timer transitions</p>
           </div>
           <button
             onClick={toggleSound}
-            className={`w-11 h-6 rounded-full transition-colors relative p-0.5 ${
-              soundEnabled ? "bg-emerald-500 glow-emerald" : "bg-zinc-800"
-            }`}
+            className={`toggle ${soundEnabled ? "active" : ""}`}
           >
-            <div
-              className={`w-5 h-5 rounded-full bg-zinc-950 shadow transition-transform ${
-                soundEnabled ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
           </button>
         </div>
 
         {/* Break Sound Select */}
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-zinc-300">Break Start Sound</label>
+          <label className="text-sm font-medium text-secondary">Break Start Sound</label>
           <select
             value={breakSound}
             onChange={(e) => setBreakSound(e.target.value)}
             disabled={!soundEnabled}
-            className="w-full h-10 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-10 px-3 input rounded-lg text-sm text-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <option value="break.mp3">Default Chime</option>
             <option value="bell.mp3">Bell</option>
@@ -219,12 +198,12 @@ export default function SettingsPage() {
 
         {/* Focus Sound Select */}
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-zinc-300">Focus Start Sound</label>
+          <label className="text-sm font-medium text-secondary">Focus Start Sound</label>
           <select
             value={focusSound}
             onChange={(e) => setFocusSound(e.target.value)}
             disabled={!soundEnabled}
-            className="w-full h-10 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-10 px-3 input rounded-lg text-sm text-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <option value="complete.mp3">Complete Chime</option>
             <option value="motivation.mp3">Motivation</option>
@@ -238,7 +217,7 @@ export default function SettingsPage() {
 
   const renderNotificationSettings = () => (
     <div className="space-y-6">
-      <h3 className="text-base font-bold text-gradient-emerald pb-3 border-b border-zinc-800/50">
+      <h3 className="text-base font-semibold text-accent pb-3 border-b border-white/6">
         Notification Settings
       </h3>
 
@@ -246,40 +225,26 @@ export default function SettingsPage() {
         {/* Desktop Notifications Toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-xs font-bold text-zinc-200">Desktop Notifications</h4>
-            <p className="text-[10px] text-zinc-500">Show system notifications on timer events</p>
+            <h4 className="text-sm font-medium text-primary">Desktop Notifications</h4>
+            <p className="text-xs text-muted">Show system notifications on timer events</p>
           </div>
           <button
             onClick={() => setDesktopNotifications(!desktopNotifications)}
-            className={`w-11 h-6 rounded-full transition-colors relative p-0.5 ${
-              desktopNotifications ? "bg-emerald-500 glow-emerald" : "bg-zinc-800"
-            }`}
+            className={`toggle ${desktopNotifications ? "active" : ""}`}
           >
-            <div
-              className={`w-5 h-5 rounded-full bg-zinc-950 shadow transition-transform ${
-                desktopNotifications ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
           </button>
         </div>
 
         {/* Break Reminder Toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-xs font-bold text-zinc-200">Break Reminder</h4>
-            <p className="text-[10px] text-zinc-500">Remind you to take breaks during long sessions</p>
+            <h4 className="text-sm font-medium text-primary">Break Reminder</h4>
+            <p className="text-xs text-muted">Remind you to take breaks during long sessions</p>
           </div>
           <button
             onClick={() => setBreakReminder(!breakReminder)}
-            className={`w-11 h-6 rounded-full transition-colors relative p-0.5 ${
-              breakReminder ? "bg-emerald-500 glow-emerald" : "bg-zinc-800"
-            }`}
+            className={`toggle ${breakReminder ? "active" : ""}`}
           >
-            <div
-              className={`w-5 h-5 rounded-full bg-zinc-950 shadow transition-transform ${
-                breakReminder ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
           </button>
         </div>
       </div>
@@ -288,23 +253,23 @@ export default function SettingsPage() {
 
   const renderAppearanceSettings = () => (
     <div className="space-y-6">
-      <h3 className="text-base font-bold text-gradient-emerald pb-3 border-b border-zinc-800/50">
+      <h3 className="text-base font-semibold text-accent pb-3 border-b border-white/6">
         Appearance Settings
       </h3>
 
       <div className="space-y-4">
         {/* Theme Select */}
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-zinc-300">Theme</label>
+          <label className="text-sm font-medium text-secondary">Theme</label>
           <select
             value={theme}
             onChange={(e) => setTheme(e.target.value as "dark" | "light")}
-            className="w-full h-10 px-3 input-premium rounded-xl text-xs text-zinc-200 transition-all"
+            className="w-full h-10 px-3 input rounded-lg text-sm text-primary"
           >
             <option value="dark">Dark Mode</option>
             <option value="light">Light Mode</option>
           </select>
-          <p className="text-[10px] text-zinc-500">Light mode coming soon</p>
+          <p className="text-xs text-muted">Light mode coming soon</p>
         </div>
       </div>
     </div>
@@ -312,7 +277,7 @@ export default function SettingsPage() {
 
   const renderGeneralSettings = () => (
     <div className="space-y-6">
-      <h3 className="text-base font-bold text-gradient-emerald pb-3 border-b border-zinc-800/50">
+      <h3 className="text-base font-semibold text-accent pb-3 border-b border-white/6">
         General Settings
       </h3>
 
@@ -320,20 +285,13 @@ export default function SettingsPage() {
         {/* Auto Launch Toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-xs font-bold text-zinc-200">Auto Launch on Startup</h4>
-            <p className="text-[10px] text-zinc-500">Start Focus Companion automatically when your computer starts</p>
+            <h4 className="text-sm font-medium text-primary">Auto Launch on Startup</h4>
+            <p className="text-xs text-muted">Start Focus Companion automatically when your computer starts</p>
           </div>
           <button
             onClick={handleToggleAutoLaunch}
-            className={`w-11 h-6 rounded-full transition-colors relative p-0.5 ${
-              autoLaunchEnabled ? "bg-emerald-500 glow-emerald" : "bg-zinc-800"
-            }`}
+            className={`toggle ${autoLaunchEnabled ? "active" : ""}`}
           >
-            <div
-              className={`w-5 h-5 rounded-full bg-zinc-950 shadow transition-transform ${
-                autoLaunchEnabled ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
           </button>
         </div>
       </div>
@@ -342,11 +300,11 @@ export default function SettingsPage() {
 
   const renderPlaceholder = (title: string) => (
     <div className="space-y-6">
-      <h3 className="text-base font-bold text-gradient-emerald pb-3 border-b border-zinc-800/50">
+      <h3 className="text-base font-semibold text-accent pb-3 border-b border-white/6">
         {title}
       </h3>
-      <div className="text-center py-12 border border-dashed border-zinc-800/50 rounded-xl glass-card">
-        <p className="text-xs text-zinc-500">This section is coming soon.</p>
+      <div className="text-center py-12 border border-dashed border-white/10 rounded-lg card">
+        <p className="text-sm text-muted">This section is coming soon.</p>
       </div>
     </div>
   );
@@ -356,7 +314,7 @@ export default function SettingsPage() {
       <Topbar greeting="Settings ⚙️" subtitle="Configure focus timer, sound cues & app preferences" />
       <div className="flex-1 overflow-hidden p-8 flex gap-6">
         {/* Left Sub-Sidebar */}
-        <div className="w-64 glass-card rounded-2xl p-4 flex flex-col gap-1 flex-shrink-0 border-gradient">
+        <div className="w-64 card-elevated rounded-lg p-4 flex flex-col gap-1 flex-shrink-0">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -364,10 +322,10 @@ export default function SettingsPage() {
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-gradient-to-r from-emerald-500/20 to-emerald-500/10 text-emerald-400 border border-emerald-500/30 glow-emerald"
-                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 hover:border hover:border-zinc-700/50"
+                    ? "bg-white/10 text-white"
+                    : "text-secondary hover:text-white hover:bg-white/5"
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -378,7 +336,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Right Settings Panel */}
-        <div className="flex-1 glass-card rounded-2xl p-6 overflow-y-auto no-scrollbar border-gradient">
+        <div className="flex-1 card-elevated rounded-lg p-6 overflow-y-auto no-scrollbar">
           {activeTab === "focus" && renderFocusSettings()}
           {activeTab === "sounds" && renderSoundSettings()}
           {activeTab === "notifications" && renderNotificationSettings()}
