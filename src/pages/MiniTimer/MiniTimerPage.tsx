@@ -24,14 +24,14 @@ export default function MiniTimerPage() {
   }, []);
 
   return (
-    <div className="w-full h-full bg-zinc-900/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 text-zinc-100">
+    <div className="w-full h-full bg-black/70 backdrop-blur-xl flex flex-col items-center justify-center p-4 text-primary">
       {/* Timer Display */}
-      <div className="text-5xl font-bold mb-2 tabular-nums tracking-tight text-gradient-emerald">
+      <div className="text-5xl font-semibold mb-2 tabular-nums tracking-tight text-accent">
         {timeStr}
       </div>
 
       {/* Session Type */}
-      <div className="text-xs font-medium text-zinc-400 mb-4 uppercase tracking-wider badge-premium">
+      <div className="text-sm font-medium text-secondary mb-4 uppercase tracking-wider badge">
         {session === "focus" ? "Focus" : "Break"}
       </div>
 
@@ -40,14 +40,14 @@ export default function MiniTimerPage() {
         {running ? (
           <button
             onClick={pause}
-            className="w-10 h-10 rounded-full glass-card border border-zinc-700/50 hover:border-zinc-600/50 flex items-center justify-center transition-all"
+            className="icon-btn"
           >
             <FiPause className="w-4 h-4" />
           </button>
         ) : (
           <button
             onClick={start}
-            className="w-10 h-10 rounded-full btn-premium flex items-center justify-center transition-all text-zinc-950 glow-emerald"
+            className="w-10 h-10 rounded-full btn-primary flex items-center justify-center"
           >
             <FiPlay className="w-4 h-4 ml-0.5" />
           </button>
@@ -55,7 +55,7 @@ export default function MiniTimerPage() {
 
         <button
           onClick={reset}
-          className="w-10 h-10 rounded-full glass-card border border-zinc-700/50 hover:border-zinc-600/50 flex items-center justify-center transition-all"
+          className="icon-btn"
         >
           <FiSkipForward className="w-4 h-4" />
         </button>
