@@ -111,7 +111,7 @@ export default function ProgressRing() {
             initial={{ opacity: 0.5, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.15 }}
-            className="text-6xl font-extrabold tracking-tighter text-zinc-50 font-mono leading-none"
+            className="text-6xl font-extrabold tracking-tighter text-primary font-mono leading-none"
           >
             {formatTime(remainingTime)}
           </motion.span>

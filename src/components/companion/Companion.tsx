@@ -49,9 +49,9 @@ export default function Companion() {
   }
 
   return (
-    <div className={`glass-card p-5 rounded-2xl border ${ringColor} ${bgGlow} transition-all duration-500 flex flex-col items-center text-center space-y-4`}>
+    <div className={`card-elevated p-5 rounded-2xl border ${ringColor} ${bgGlow} transition-all duration-500 flex flex-col items-center text-center space-y-4`}>
       {/* Header */}
-      <div className="w-full flex items-center justify-between text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">
+      <div className="w-full flex items-center justify-between text-[10px] font-semibold text-muted uppercase tracking-wider">
         <span>Companion</span>
         <span className={`px-2 py-0.5 rounded-full border text-[10px] font-bold ${moodColor} border-current bg-current/10`}>
           {mood}
@@ -73,11 +73,11 @@ export default function Companion() {
             <motion.div
               animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.7, 0.4] }}
               transition={{ repeat: Infinity, duration: 2 }}
-              className="absolute inset-0 rounded-full bg-emerald-500/20 blur-xl"
+              className="absolute inset-0 rounded-full bg-accent/20 blur-xl"
             />
           )}
 
-          <div className="relative w-20 h-20 rounded-full bg-zinc-900/80 border border-zinc-700/80 flex items-center justify-center text-4xl shadow-lg">
+          <div className="relative w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-4xl shadow-lg">
             {emoji}
           </div>
         </motion.div>
@@ -91,16 +91,16 @@ export default function Companion() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -5 }}
           transition={{ duration: 0.25 }}
-          className="text-xs text-zinc-400 leading-relaxed px-2"
+          className="text-xs text-secondary leading-relaxed px-2"
         >
           {message}
         </motion.p>
       </AnimatePresence>
 
       {/* Session count mini stat */}
-      <div className="w-full pt-3 border-t border-zinc-800/80 flex items-center justify-center gap-2">
-        <span className="text-[10px] text-zinc-500">Today's Sessions</span>
-        <span className="text-xs font-bold text-emerald-400">
+      <div className="w-full pt-3 border-t border-white/10 flex items-center justify-center gap-2">
+        <span className="text-[10px] text-muted">Today's Sessions</span>
+        <span className="text-xs font-bold text-accent">
           {completedSessions}
         </span>
       </div>

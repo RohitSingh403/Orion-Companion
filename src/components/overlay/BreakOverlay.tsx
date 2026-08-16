@@ -39,14 +39,14 @@ export default function BreakOverlay({
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.92, y: 20 }}
             transition={{ duration: 0.35 }}
-            className="relative z-10 flex flex-col items-center max-w-md w-full p-8 text-center glass-card rounded-3xl border border-zinc-800/80 shadow-2xl space-y-6"
+            className="relative z-10 flex flex-col items-center max-w-md w-full p-8 text-center card-elevated rounded-3xl border border-white/10 shadow-2xl space-y-6"
           >
             {/* Title & Subtitle */}
             <div className="space-y-1">
-              <h1 className="text-3xl font-extrabold text-zinc-100 tracking-tight">
+              <h1 className="text-3xl font-extrabold text-primary tracking-tight">
                 Take a Break!
               </h1>
-              <p className="text-xs text-zinc-400">Relax your mind and body</p>
+              <p className="text-xs text-secondary">Relax your mind and body</p>
             </div>
 
             {/* Glowing Circular Timer Ring */}
@@ -72,11 +72,11 @@ export default function BreakOverlay({
                   strokeDashoffset={
                     2 * Math.PI * 80 * (1 - remainingTime / (5 * 60))
                   }
-                  className="transition-all duration-500 glow-blue"
+                  className="transition-all duration-500"
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-4xl font-extrabold text-zinc-100 tracking-tight font-mono">
+                <span className="text-4xl font-extrabold text-primary tracking-tight font-mono">
                   {formatTime(remainingTime)}
                 </span>
                 <span className="text-[10px] font-semibold text-blue-400 mt-1 uppercase tracking-widest">
@@ -89,13 +89,13 @@ export default function BreakOverlay({
             <div className="flex items-center gap-3 w-full pt-2">
               <button
                 onClick={reset}
-                className="flex-1 py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-semibold rounded-xl transition"
+                className="flex-1 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-secondary text-xs font-semibold rounded-xl transition"
               >
                 Skip Break
               </button>
               <button
                 onClick={reset}
-                className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 text-xs font-bold rounded-xl shadow glow-emerald transition flex items-center justify-center gap-1.5"
+                className="flex-1 py-2.5 btn-primary text-zinc-950 text-xs font-bold rounded-xl shadow transition flex items-center justify-center gap-1.5"
               >
                 <FiCheck className="w-4 h-4 stroke-[3]" />
                 <span>End Break</span>
@@ -103,20 +103,20 @@ export default function BreakOverlay({
             </div>
 
             {/* Quick Activity Badges */}
-            <div className="pt-4 border-t border-zinc-800/80 w-full grid grid-cols-4 gap-2 text-zinc-400">
-              <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-zinc-900/60 border border-zinc-800/60 text-[10px]">
+            <div className="pt-4 border-t border-white/10 w-full grid grid-cols-4 gap-2 text-secondary">
+              <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/5 border border-white/10 text-[10px]">
                 <FiDroplet className="w-4 h-4 text-blue-400" />
                 <span>Drink Water</span>
               </div>
-              <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-zinc-900/60 border border-zinc-800/60 text-[10px]">
+              <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/5 border border-white/10 text-[10px]">
                 <FiActivity className="w-4 h-4 text-amber-400" />
                 <span>Stretch</span>
               </div>
-              <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-zinc-900/60 border border-zinc-800/60 text-[10px]">
+              <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/5 border border-white/10 text-[10px]">
                 <span className="text-sm">🚶</span>
                 <span>Walk</span>
               </div>
-              <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-zinc-900/60 border border-zinc-800/60 text-[10px]">
+              <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/5 border border-white/10 text-[10px]">
                 <FiWind className="w-4 h-4 text-teal-400" />
                 <span>Breathe</span>
               </div>

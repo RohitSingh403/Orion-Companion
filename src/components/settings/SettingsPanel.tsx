@@ -166,22 +166,22 @@ function SettingRow({ title, value, onIncrease, onDecrease }: SettingRowProps) {
   return (
     <div className="mb-5 flex items-center justify-between">
       <div>
-        <p className="font-medium">{title}</p>
+        <p className="font-medium text-primary">{title}</p>
 
-        <p className="text-sm text-zinc-400">{value}</p>
+        <p className="text-sm text-secondary">{value}</p>
       </div>
 
       <div className="flex gap-2">
         <button
           onClick={onDecrease}
-          className="rounded-lg bg-zinc-800 px-3 py-2 hover:bg-zinc-700"
+          className="rounded-lg bg-white/5 px-3 py-2 hover:bg-white/10 border border-white/10 text-primary transition"
         >
           −
         </button>
 
         <button
           onClick={onIncrease}
-          className="rounded-lg bg-zinc-800 px-3 py-2 hover:bg-zinc-700"
+          className="rounded-lg bg-white/5 px-3 py-2 hover:bg-white/10 border border-white/10 text-primary transition"
         >
           +
         </button>

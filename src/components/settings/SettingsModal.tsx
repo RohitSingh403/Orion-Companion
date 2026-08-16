@@ -44,16 +44,16 @@ export default function SettingsModal({ open, onClose }: SettingsModalProps) {
             <Card>
               <div className="mb-6 flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold">⚙️ Settings</h2>
+                  <h2 className="text-2xl font-bold text-primary">⚙️ Settings</h2>
 
-                  <p className="text-sm text-zinc-400">
+                  <p className="text-sm text-secondary">
                     Customize your focus experience
                   </p>
                 </div>
 
                 <button
                   onClick={onClose}
-                  className="text-3xl text-zinc-400 transition hover:text-white"
+                  className="text-3xl text-secondary transition hover:text-primary"
                 >
                   ×
                 </button>
