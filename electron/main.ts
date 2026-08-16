@@ -85,6 +85,43 @@ app.whenReady().then(() => {
     }).show();
   });
 
+  // Auto-launch handlers
+  ipcMain.handle("get-auto-launch-status", async () => {
+    try {
+      const AutoLaunch = (await import("electron-auto-launch")).default;
+      const autoLaunch = new AutoLaunch({
+        name: "Focus Companion",
+        path: process.execPath,
+      });
+      const isEnabled = await autoLaunch.isEnabled();
+      return isEnabled;
+    } catch (error) {
+      console.error("Failed to get auto-launch status:", error);
+      return false;
+    }
+  });
+
+  ipcMain.handle("toggle-auto-launch", async (_event, enable: boolean) => {
+    try {
+      const AutoLaunch = (await import("electron-auto-launch")).default;
+      const autoLaunch = new AutoLaunch({
+        name: "Focus Companion",
+        path: process.execPath,
+      });
+      
+      if (enable) {
+        await autoLaunch.enable();
+        return true;
+      } else {
+        await autoLaunch.disable();
+        return false;
+      }
+    } catch (error) {
+      console.error("Failed to toggle auto-launch:", error);
+      return false;
+    }
+  });
+
   // Auto-updater configuration
   if (!VITE_DEV_SERVER_URL) {
     const server = "https://github.com/RohitSingh403/Orion-Companion/releases";
