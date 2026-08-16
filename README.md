@@ -1,4 +1,4 @@
-# Orion Companion v1.0.0
+# Focus Companion v1.0.0
 
 A complete personal productivity operating system built around Focus Sessions (Pomodoro). Everything connects to the Focus Timer — tasks, reminders, analytics, achievements, projects, notes, and statistics.
 
@@ -10,7 +10,7 @@ A complete personal productivity operating system built around Focus Sessions (P
 
 ## Overview
 
-Orion Companion is a production-ready, single-user desktop application designed for deep work and productivity. Built with Electron, React, and TypeScript, it provides a complete productivity ecosystem with intelligent insights, local AI companion, and a premium glassmorphism UI.
+Focus Companion is a production-ready, single-user desktop application designed for deep work and productivity. Built with Electron, React, and TypeScript, it provides a complete productivity ecosystem with intelligent insights, local AI companion, and a modern professional UI design system.
 
 **Key Features:**
 - 🎯 Focus Timer with Pomodoro sessions
@@ -21,8 +21,10 @@ Orion Companion is a production-ready, single-user desktop application designed 
 - 🔔 Reminders with custom recurring schedules
 - 🤖 Local AI Companion for personalized suggestions
 - 🏆 Achievements and XP system
+- ⚙️ Comprehensive Settings with real-time sync
 - 🖥️ Desktop integration (system tray, global shortcuts, mini timer)
 - 🔄 Auto-updates via GitHub releases
+- 🎨 Modern professional UI design system
 
 ---
 
@@ -160,12 +162,14 @@ Orion Companion is a production-ready, single-user desktop application designed 
 
 ### Settings
 - Comprehensive settingsStore with persist middleware
-- Focus Settings tab (focus duration, break duration, daily goal)
-- Sounds tab (sound enabled toggle, break/focus sound selection)
-- Notifications tab (desktop notifications, break reminder toggles)
-- Appearance tab (theme selection)
-- All settings persist across app restarts
-- Real-time UI updates on setting changes
+- **Focus Settings**: Focus duration (15-60 min), break duration (3-15 min), daily session goal (4-12 sessions)
+- **Sounds**: Sound enabled toggle, custom break/focus sound selection (Default Chime, Bell, Gentle Tone, Motivation, Subtle Tone)
+- **Notifications**: Desktop notifications toggle, break reminder toggle
+- **Appearance**: Theme selection (Dark/Light mode) with real-time application
+- **General**: Auto-launch on startup toggle
+- **Auto-start Features**: Auto-start break timer when focus completes, auto-start focus when break ends
+- **Real-time Sync**: All settings immediately applied to timer behavior via usePomodoro hook
+- Settings persist across app restarts with localStorage
 
 ### Desktop Features
 - System Tray with right-click context menu (Start Focus, Pause, Resume, Quick Add Task, Today's Progress, Quit)
@@ -276,26 +280,44 @@ src/
 
 ## Design System
 
-The UI features an ultra-dark glassmorphism theme built for desktop-first experience:
+The UI features a modern professional design system built for desktop-first experience with consistent styling across all components.
 
 ### Color Palette
-- Base: `#09090b` (zinc-950)
-- Cards: `rgba(18, 18, 21, 0.75)` with backdrop blur
-- Accent: Emerald-500 (primary), Amber-500 (warnings), Blue-500 (breaks)
+- Base: `#0a0a0a` (dark background)
+- Cards: `rgba(255, 255, 255, 0.05)` with subtle borders
+- Accent: Emerald-500 (primary), Amber-500 (warnings), Blue-500 (breaks), Purple-400 (AI)
 - Text: Zinc-100 (headings), Zinc-400 (body), Zinc-500 (muted)
 
+### Design Tokens
+- `.card` - Standard card with background and border
+- `.card-elevated` - Elevated card with shadow
+- `.btn-primary` - Primary action button with accent color
+- `.btn-secondary` - Secondary action button
+- `.btn-ghost` - Ghost button for subtle actions
+- `.input` - Form input with consistent styling
+- `.toggle` - Toggle switch component
+- `.badge` - Small status badges
+- `.icon-btn` - Icon-only buttons
+- `.text-primary` - Primary text color
+- `.text-secondary` - Secondary text color
+- `.text-muted` - Muted text color
+- `.text-accent` - Accent text color
+
 ### Components
-- `.glass-card` - Standard card with backdrop blur
-- `.glass-card-hover` - Hover state with subtle lift and shadow
-- `.glow-emerald` / `.glow-blue` - Ambient glow effects
-- Custom scrollbars (8px width, zinc-900 track, rounded)
+- Custom scrollbars with dark theme
 - GitHub-style heatmap levels (0-4 intensity)
+- Progress bars with smooth transitions
+- Status dots for indicators
+- Modal backdrops with blur
+- Toast notifications
+- Skeleton loaders
 
 ### Design Principles
 - **Simplicity** — the next action should always be obvious
 - **Positive reinforcement** — achievements, stats, and animations encourage consistency
 - **Desktop-first** — built for focused desktop work, not a mobile port
 - **Modular by default** — every feature is isolated for easy extension
+- **Consistent styling** — design tokens ensure visual harmony across all pages
 
 ---
 
@@ -374,6 +396,7 @@ Build configuration is defined in `package.json` under the `build` section:
 - **Product Name**: `Focus Companion`
 - **Output Directory**: `release/`
 - **Update Provider**: GitHub Releases
+- **Platforms**: macOS (x64, arm64), Windows, Linux
 
 ### Auto-Updates
 
@@ -516,9 +539,18 @@ The project follows strict development rules to maintain code quality and archit
 
 **Version:** v1.0.0 (Production Ready)
 
-**Last Updated:** August 3, 2026
+**Last Updated:** August 16, 2026
 
 **Status:** Production-ready single-user desktop application with full feature set
+
+**Recent Updates (August 2026):**
+- ✅ UI Redesign: Complete migration to professional design system with consistent styling across all pages
+- ✅ Settings Integration: Fixed critical bug where settings weren't applied to timer behavior
+- ✅ Theme Support: Added dark/light theme toggle with real-time application
+- ✅ Auto-start Features: Implemented auto-start break and auto-start focus functionality
+- ✅ Sound Integration: Custom sound selection now properly integrated with timer
+- ✅ Notification Control: Desktop notifications now controlled by settings
+- ✅ All Pages Verified: Dashboard, Focus, Tasks, Calendar, Notes, Analytics, Achievements, Settings, Reminders, AI Companion, MiniTimer
 
 **All Phases Complete:**
 - ✅ Phase 1: Desktop Excellence
@@ -526,6 +558,7 @@ The project follows strict development rules to maintain code quality and archit
 - ✅ Phase 3: Reminder System
 - ✅ Phase 4: Local AI Companion
 - ✅ Phase 5: Production Release
+- ✅ Phase 6: UI Redesign & Settings Integration
 
 ---
 
