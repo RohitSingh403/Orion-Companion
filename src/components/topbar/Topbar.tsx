@@ -84,7 +84,7 @@ export default function Topbar({
           </button>
 
           {quickAddOpen && (
-            <div className="absolute right-0 mt-2 w-72 p-3 card-elevated shadow-2xl z-50 border border-white/10">
+            <div className="absolute right-0 mt-2 w-72 p-3 bg-[#1a1a1e] border border-white/20 shadow-2xl z-50 rounded-lg">
               <form onSubmit={handleQuickAdd} className="space-y-2.5">
                 <h4 className="text-xs font-semibold text-primary">
                   Quick Add Task
@@ -95,7 +95,7 @@ export default function Topbar({
                   onChange={(e) => setTaskTitle(e.target.value)}
                   placeholder="Task title..."
                   autoFocus
-                  className="w-full h-8 px-3 input rounded-lg text-sm text-primary"
+                  className="w-full h-8 px-3 bg-white/5 border border-white/10 rounded-lg text-sm text-primary placeholder-muted focus:border-accent/50 focus:outline-none"
                 />
                 <div className="flex justify-end gap-2 pt-1">
                   <button

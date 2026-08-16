@@ -57,7 +57,7 @@ export default function AchievementsPage() {
   if (!Array.isArray(achievements) || achievements.length === 0) {
     return (
       <AppLayout>
-        <Topbar greeting="Gamified Achievements 🏆" subtitle="Unlock badges and level up your focus habit" />
+        <Topbar subtitle="Unlock badges and level up your focus habit" />
         <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
           <div className="card-elevated p-8 text-center">
             <p className="text-sm text-secondary mb-4">Achievements data is corrupted or missing.</p>
@@ -75,7 +75,7 @@ export default function AchievementsPage() {
 
   return (
     <AppLayout>
-      <Topbar greeting="Gamified Achievements 🏆" subtitle="Unlock badges and level up your focus habit" />
+      <Topbar subtitle="Unlock badges and level up your focus habit" />
       <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
         {/* Level Banner Card */}
         <div className="card-elevated p-6 flex items-center justify-between relative overflow-hidden">

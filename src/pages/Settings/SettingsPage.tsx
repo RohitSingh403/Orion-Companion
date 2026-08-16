@@ -326,7 +326,7 @@ export default function SettingsPage() {
 
   return (
     <AppLayout>
-      <Topbar greeting="Settings ⚙️" subtitle="Configure focus timer, sound cues & app preferences" />
+      <Topbar subtitle="Configure focus timer, sound cues & app preferences" />
       <div className="flex-1 overflow-hidden p-8 flex gap-6">
         {/* Left Sub-Sidebar */}
         <div className="w-64 card-elevated rounded-lg p-4 flex flex-col gap-1 flex-shrink-0">

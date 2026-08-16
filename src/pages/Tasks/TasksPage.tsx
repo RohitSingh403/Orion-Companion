@@ -56,7 +56,7 @@ export default function TasksPage() {
 
   return (
     <AppLayout>
-      <Topbar greeting="Workspace Tasks 💼" subtitle="Manage tasks & focus session estimates" />
+      <Topbar subtitle="Manage tasks & focus session estimates" />
       <div className="flex-1 overflow-hidden p-6 md:p-8 flex flex-col md:flex-row gap-6">
         {/* Left Sub-Sidebar (Workspace Categories, Projects, Tags) */}
         <div className="w-full md:w-64 card-elevated rounded-xl p-4 flex flex-col justify-between flex-shrink-0 space-y-6">

@@ -75,7 +75,7 @@ export default function RemindersPage() {
 
   return (
     <AppLayout>
-      <Topbar greeting="Reminders 🔔" subtitle="Never forget important tasks and events" />
+      <Topbar subtitle="Never forget important tasks and events" />
       <div className="flex-1 overflow-hidden p-8">
         <div className="card-elevated rounded-lg p-6 h-full flex flex-col">
           {/* Header */}

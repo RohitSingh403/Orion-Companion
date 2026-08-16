@@ -96,7 +96,7 @@ export default function AnalyticsPage() {
 
   return (
     <AppLayout>
-      <Topbar greeting="Productivity Analytics 📈" subtitle="Visualize focus trends & GitHub-style heatmap" />
+      <Topbar subtitle="Visualize focus trends & GitHub-style heatmap" />
       <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
         {/* Navigation Tabs */}
         <div className="flex items-center justify-between border-b border-white/6 pb-3">

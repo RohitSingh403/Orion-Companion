@@ -49,7 +49,7 @@ export default function FocusPage() {
 
   return (
     <AppLayout>
-      <Topbar greeting="Deep Work Mode 🎯" subtitle="Distraction-free focus environment" />
+      <Topbar subtitle="Distraction-free focus environment" />
       <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 no-scrollbar">
         {/* Top Header Banner & Mode Toggle */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between card-elevated p-4 gap-4">

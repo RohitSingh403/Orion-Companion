@@ -47,7 +47,7 @@ export default function AICompanionPage() {
 
   return (
     <AppLayout>
-      <Topbar greeting="AI Companion 🤖" subtitle="Personalized productivity insights based on your patterns" />
+      <Topbar subtitle="Personalized productivity insights based on your patterns" />
       <div className="flex-1 overflow-hidden p-8">
         <div className="card-elevated rounded-lg p-6 h-full flex flex-col">
           {/* Header */}
