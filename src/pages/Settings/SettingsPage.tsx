@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import AppLayout from "../../layouts/AppLayout";
 import Topbar from "../../components/topbar/Topbar";
 import { useSettingsStore } from "../../store/settingsStore";
+import { useFocusStore } from "../../store/focusStore";
 import {
   FiSliders,
   FiEye,
@@ -42,6 +43,8 @@ export default function SettingsPage() {
     setBreakReminder,
     setTheme,
   } = useSettingsStore();
+
+  const { setFocusDuration, setBreakDuration, setDailyGoal: setFocusDailyGoal } = useFocusStore();
 
   // Load auto-launch status on mount
   useEffect(() => {
@@ -87,7 +90,11 @@ export default function SettingsPage() {
           <label className="text-sm font-medium text-secondary">Focus Duration (minutes)</label>
           <select
             value={focusMinutes}
-            onChange={(e) => setFocusMinutes(Number(e.target.value))}
+            onChange={(e) => {
+              const minutes = Number(e.target.value);
+              setFocusMinutes(minutes);
+              setFocusDuration(minutes);
+            }}
             className="w-full h-10 px-3 input rounded-lg text-sm text-primary"
           >
             <option value={15}>15 minutes</option>
@@ -103,7 +110,11 @@ export default function SettingsPage() {
           <label className="text-sm font-medium text-secondary">Short Break (minutes)</label>
           <select
             value={breakMinutes}
-            onChange={(e) => setBreakMinutes(Number(e.target.value))}
+            onChange={(e) => {
+              const minutes = Number(e.target.value);
+              setBreakMinutes(minutes);
+              setBreakDuration(minutes);
+            }}
             className="w-full h-10 px-3 input rounded-lg text-sm text-primary"
           >
             <option value={3}>3 minutes</option>
@@ -118,7 +129,11 @@ export default function SettingsPage() {
           <label className="text-sm font-medium text-secondary">Daily Session Goal</label>
           <select
             value={dailyGoal}
-            onChange={(e) => setDailyGoal(Number(e.target.value))}
+            onChange={(e) => {
+              const goal = Number(e.target.value);
+              setDailyGoal(goal);
+              setFocusDailyGoal(goal);
+            }}
             className="w-full h-10 px-3 input rounded-lg text-sm text-primary"
           >
             <option value={4}>4 sessions</option>
