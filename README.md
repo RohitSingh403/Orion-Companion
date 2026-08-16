@@ -168,6 +168,7 @@ Focus Companion is a production-ready, single-user desktop application designed 
 - **Appearance**: Theme selection (Dark/Light mode) with real-time application
 - **General**: Auto-launch on startup toggle
 - **Auto-start Features**: Auto-start break timer when focus completes, auto-start focus when break ends
+- **Data & Backup**: Reset all stats button to clear focus sessions, history, streaks, and daily statistics
 - **Real-time Sync**: All settings immediately applied to timer behavior via usePomodoro hook
 - Settings persist across app restarts with localStorage
 
@@ -550,6 +551,9 @@ The project follows strict development rules to maintain code quality and archit
 - ✅ Auto-start Features: Implemented auto-start break and auto-start focus functionality
 - ✅ Sound Integration: Custom sound selection now properly integrated with timer
 - ✅ Notification Control: Desktop notifications now controlled by settings
+- ✅ Dynamic Greeting: Time-based greeting (Good Morning/Afternoon/Evening) that updates automatically
+- ✅ Quick Add UI: Improved visibility with better contrast and styling
+- ✅ Data Management: Added reset stats button to clear all focus data
 - ✅ All Pages Verified: Dashboard, Focus, Tasks, Calendar, Notes, Analytics, Achievements, Settings, Reminders, AI Companion, MiniTimer
 
 **All Phases Complete:**
