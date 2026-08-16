@@ -15,7 +15,22 @@ export default function Topbar({
 }: TopbarProps) {
   const [quickAddOpen, setQuickAddOpen] = useState(false);
   const [taskTitle, setTaskTitle] = useState("");
-  const [dynamicGreeting, setDynamicGreeting] = useState("");
+  
+  // Initialize greeting immediately based on current time
+  const getInitialGreeting = () => {
+    const hour = new Date().getHours();
+    let greeting = "Good Morning";
+    
+    if (hour >= 12 && hour < 17) {
+      greeting = "Good Afternoon";
+    } else if (hour >= 17) {
+      greeting = "Good Evening";
+    }
+    
+    return `${greeting}, Rohit 👋`;
+  };
+  
+  const [dynamicGreeting, setDynamicGreeting] = useState(getInitialGreeting());
   const addTask = useTaskStore((s) => s.addTask);
 
   // Update greeting based on time of day
@@ -23,20 +38,22 @@ export default function Topbar({
     const updateGreeting = () => {
       const hour = new Date().getHours();
       let greeting = "Good Morning";
-      
+
       if (hour >= 12 && hour < 17) {
         greeting = "Good Afternoon";
       } else if (hour >= 17) {
         greeting = "Good Evening";
       }
-      
+
       setDynamicGreeting(`${greeting}, Rohit 👋`);
     };
 
-    updateGreeting();
     const interval = setInterval(updateGreeting, 60000); // Update every minute
     return () => clearInterval(interval);
   }, []);
+
+  // Initialize greeting immediately on mount
+  const displayGreeting = propGreeting || dynamicGreeting;
 
   const handleQuickAdd = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +68,7 @@ export default function Topbar({
       {/* Title & Subtitle */}
       <div>
         <h1 className="text-xl font-semibold text-primary tracking-tight">
-          {propGreeting || dynamicGreeting}
+          {displayGreeting}
         </h1>
         {propSubtitle && (
           <p className="text-xs text-secondary mt-0.5">{propSubtitle}</p>

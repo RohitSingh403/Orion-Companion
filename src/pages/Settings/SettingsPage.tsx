@@ -44,7 +44,7 @@ export default function SettingsPage() {
     setTheme,
   } = useSettingsStore();
 
-  const { setFocusDuration, setBreakDuration, setDailyGoal: setFocusDailyGoal } = useFocusStore();
+  const { setFocusDuration, setBreakDuration, setDailyGoal: setFocusDailyGoal, resetAllData } = useFocusStore();
 
   // Load auto-launch status on mount
   useEffect(() => {
@@ -313,6 +313,38 @@ export default function SettingsPage() {
     </div>
   );
 
+  const renderDataSettings = () => (
+    <div className="space-y-6">
+      <h3 className="text-base font-semibold text-accent pb-3 border-b border-white/6">
+        Data & Backup
+      </h3>
+
+      <div className="space-y-4">
+        {/* Reset Stats */}
+        <div className="flex items-center justify-between p-4 rounded-lg border border-red-500/20 bg-red-500/5">
+          <div>
+            <h4 className="text-sm font-medium text-primary">Reset All Stats</h4>
+            <p className="text-xs text-muted">Clear all focus sessions, history, streaks, and daily statistics</p>
+          </div>
+          <button
+            onClick={() => {
+              if (confirm("Are you sure you want to reset all stats? This cannot be undone.")) {
+                resetAllData();
+              }
+            }}
+            className="px-3 py-1.5 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-sm font-medium hover:bg-red-500/30 transition-colors"
+          >
+            Reset Stats
+          </button>
+        </div>
+
+        <div className="text-center py-8 border border-dashed border-white/10 rounded-lg card">
+          <p className="text-sm text-muted">Backup and export features coming soon.</p>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderPlaceholder = (title: string) => (
     <div className="space-y-6">
       <h3 className="text-base font-semibold text-accent pb-3 border-b border-white/6">
@@ -357,7 +389,7 @@ export default function SettingsPage() {
           {activeTab === "notifications" && renderNotificationSettings()}
           {activeTab === "appearance" && renderAppearanceSettings()}
           {activeTab === "general" && renderGeneralSettings()}
-          {activeTab === "data" && renderPlaceholder("Data & Backup")}
+          {activeTab === "data" && renderDataSettings()}
           {activeTab === "advanced" && renderPlaceholder("Advanced Settings")}
         </div>
       </div>
