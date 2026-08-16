@@ -1,6 +1,6 @@
 // src/components/topbar/Topbar.tsx
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiSearch, FiPlus, FiBell } from "react-icons/fi";
 import { useTaskStore } from "../../store/taskStore";
 
@@ -10,12 +10,33 @@ interface TopbarProps {
 }
 
 export default function Topbar({
-  greeting = "Good Morning, Rohit 👋",
-  subtitle = "Let's make today productive!",
+  greeting: propGreeting,
+  subtitle: propSubtitle,
 }: TopbarProps) {
   const [quickAddOpen, setQuickAddOpen] = useState(false);
   const [taskTitle, setTaskTitle] = useState("");
+  const [dynamicGreeting, setDynamicGreeting] = useState("");
   const addTask = useTaskStore((s) => s.addTask);
+
+  // Update greeting based on time of day
+  useEffect(() => {
+    const updateGreeting = () => {
+      const hour = new Date().getHours();
+      let greeting = "Good Morning";
+      
+      if (hour >= 12 && hour < 17) {
+        greeting = "Good Afternoon";
+      } else if (hour >= 17) {
+        greeting = "Good Evening";
+      }
+      
+      setDynamicGreeting(`${greeting}, Rohit 👋`);
+    };
+
+    updateGreeting();
+    const interval = setInterval(updateGreeting, 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, []);
 
   const handleQuickAdd = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,10 +51,10 @@ export default function Topbar({
       {/* Title & Subtitle */}
       <div>
         <h1 className="text-xl font-semibold text-primary tracking-tight">
-          {greeting}
+          {propGreeting || dynamicGreeting}
         </h1>
-        {subtitle && (
-          <p className="text-xs text-secondary mt-0.5">{subtitle}</p>
+        {propSubtitle && (
+          <p className="text-xs text-secondary mt-0.5">{propSubtitle}</p>
         )}
       </div>
 
@@ -63,7 +84,7 @@ export default function Topbar({
           </button>
 
           {quickAddOpen && (
-            <div className="absolute right-0 mt-2 w-72 p-3 card-elevated shadow-2xl z-50">
+            <div className="absolute right-0 mt-2 w-72 p-3 card-elevated shadow-2xl z-50 border border-white/10">
               <form onSubmit={handleQuickAdd} className="space-y-2.5">
                 <h4 className="text-xs font-semibold text-primary">
                   Quick Add Task
