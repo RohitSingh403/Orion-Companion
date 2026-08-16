@@ -13,14 +13,14 @@ export default function FocusTimer() {
       {/* Animated SVG Progress Ring */}
       <ProgressRing />
 
-      {/* Timer Controls matching mockup design */}
+      {/* Timer Controls matching new design system */}
       <div className="flex items-center gap-3">
         {!running ? (
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={start}
-            className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-zinc-950 font-bold text-xs rounded-xl flex items-center gap-2 shadow-lg glow-emerald transition-all"
+            className="px-6 py-2.5 btn-primary font-bold text-sm rounded-lg flex items-center gap-2"
           >
             <FiPlay className="w-4 h-4 fill-current" />
             <span>Start</span>
@@ -30,7 +30,7 @@ export default function FocusTimer() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={pause}
-            className="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs rounded-xl flex items-center gap-2 shadow-lg transition-all"
+            className="px-6 py-2.5 btn-secondary font-bold text-sm rounded-lg flex items-center gap-2"
           >
             <FiPause className="w-4 h-4 fill-current" />
             <span>Pause</span>
@@ -41,7 +41,7 @@ export default function FocusTimer() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={reset}
-          className="px-4 py-2.5 bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all"
+          className="px-4 py-2.5 btn-ghost text-sm font-semibold flex items-center gap-2"
         >
           <FiRotateCcw className="w-3.5 h-3.5" />
           <span>Reset</span>
