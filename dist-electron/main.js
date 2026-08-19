@@ -1,94 +1,136 @@
-import { app as c, BrowserWindow as u, ipcMain as r, Notification as l, autoUpdater as o } from "electron";
-import { fileURLToPath as f } from "node:url";
-import n from "node:path";
-const p = n.dirname(f(import.meta.url));
-process.env.APP_ROOT = n.join(p, "..");
-const d = process.env.VITE_DEV_SERVER_URL, R = n.join(process.env.APP_ROOT, "dist-electron"), h = n.join(process.env.APP_ROOT, "dist");
-process.env.VITE_PUBLIC = d ? n.join(process.env.APP_ROOT, "public") : h;
-let t;
-function w() {
-  t = new u({
+import { app, BrowserWindow, ipcMain, Notification, autoUpdater } from "electron";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+const __dirname$1 = path.dirname(fileURLToPath(import.meta.url));
+process.env.APP_ROOT = path.join(__dirname$1, "..");
+const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
+const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
+const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
+process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
+let win;
+function createWindow() {
+  win = new BrowserWindow({
     width: 1280,
     height: 820,
     minWidth: 1100,
     minHeight: 700,
     title: "Focus Companion",
-    autoHideMenuBar: !0,
-    icon: n.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
+    autoHideMenuBar: true,
+    icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     webPreferences: {
-      preload: n.join(p, "preload.mjs")
+      preload: path.join(__dirname$1, "preload.mjs")
     }
-  }), t.webContents.on("did-finish-load", () => {
-    t == null || t.webContents.send(
+  });
+  win.webContents.on("did-finish-load", () => {
+    win == null ? void 0 : win.webContents.send(
       "main-process-message",
       (/* @__PURE__ */ new Date()).toLocaleString()
     );
-  }), d ? t.loadURL(d) : t.loadFile(n.join(h, "index.html"));
+  });
+  if (VITE_DEV_SERVER_URL) {
+    win.loadURL(VITE_DEV_SERVER_URL);
+  } else {
+    win.loadFile(path.join(RENDERER_DIST, "index.html"));
+  }
 }
-c.on("window-all-closed", () => {
-  process.platform !== "darwin" && (c.quit(), t = null);
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+    win = null;
+  }
 });
-c.on("activate", () => {
-  u.getAllWindows().length === 0 && w();
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
 });
-c.whenReady().then(() => {
-  w(), r.on("show-break-notification", () => {
-    new l({
+app.whenReady().then(() => {
+  createWindow();
+  ipcMain.on("show-break-notification", () => {
+    new Notification({
       title: "☕ Break Time!",
       body: "Great work! Stand up, stretch, and drink some water."
     }).show();
-  }), r.on("show-focus-notification", () => {
-    new l({
+  });
+  ipcMain.on("show-focus-notification", () => {
+    new Notification({
       title: "🧠 Focus Time!",
       body: "Your break is over. Ready for another deep focus session?"
     }).show();
-  }), r.on("show-reminder-notification", (a, i, e) => {
-    new l({
-      title: `🔔 ${i}`,
-      body: e
+  });
+  ipcMain.on("show-reminder-notification", (_event, title, body) => {
+    new Notification({
+      title: `🔔 ${title}`,
+      body
     }).show();
-  }), r.handle("get-auto-launch-status", async () => {
+  });
+  ipcMain.handle("get-auto-launch-status", async () => {
     try {
-      const a = (await import("./index-BYV84ozA.js").then((s) => s.i)).default;
-      return await new a({
-        name: "Focus Companion",
-        path: process.execPath
-      }).isEnabled();
-    } catch (a) {
-      return console.error("Failed to get auto-launch status:", a), !1;
-    }
-  }), r.handle("toggle-auto-launch", async (a, i) => {
-    try {
-      const e = (await import("./index-BYV84ozA.js").then((m) => m.i)).default, s = new e({
+      const AutoLaunch = (await import("./index-By-8j1zb.js").then((n) => n.i)).default;
+      const autoLaunch = new AutoLaunch({
         name: "Focus Companion",
         path: process.execPath
       });
-      return i ? (await s.enable(), !0) : (await s.disable(), !1);
-    } catch (e) {
-      return console.error("Failed to toggle auto-launch:", e), !1;
+      const isEnabled = await autoLaunch.isEnabled();
+      return isEnabled;
+    } catch (error) {
+      console.error("Failed to get auto-launch status:", error);
+      return false;
     }
-  }), d || (o.setFeedURL({
-    url: "https://github.com/RohitSingh403/Orion-Companion/releases/latest",
-    headers: { Accept: "application/json" }
-  }), o.on("checking-for-update", () => {
-    console.log("Checking for update...");
-  }), o.on("update-available", (e) => {
-    console.log("Update available:", e);
-  }), o.on("update-not-available", (e) => {
-    console.log("Update not available:", e);
-  }), o.on("error", (e) => {
-    console.error("Auto-updater error:", e);
-  }), o.on("update-downloaded", (e) => {
-    console.log("Update downloaded:", e), new l({
-      title: "Update Available",
-      body: "A new version is ready to install. Restart to apply."
-    }).show();
-  }), setInterval(() => {
-    o.checkForUpdates();
-  }, 4 * 60 * 60 * 1e3), o.checkForUpdates());
+  });
+  ipcMain.handle("toggle-auto-launch", async (_event, enable) => {
+    try {
+      const AutoLaunch = (await import("./index-By-8j1zb.js").then((n) => n.i)).default;
+      const autoLaunch = new AutoLaunch({
+        name: "Focus Companion",
+        path: process.execPath
+      });
+      if (enable) {
+        await autoLaunch.enable();
+        return true;
+      } else {
+        await autoLaunch.disable();
+        return false;
+      }
+    } catch (error) {
+      console.error("Failed to toggle auto-launch:", error);
+      return false;
+    }
+  });
+  if (!VITE_DEV_SERVER_URL) {
+    const server = "https://github.com/RohitSingh403/Orion-Companion/releases";
+    const feed = `${server}/latest`;
+    autoUpdater.setFeedURL({
+      url: feed,
+      headers: { "Accept": "application/json" }
+    });
+    autoUpdater.on("checking-for-update", () => {
+      console.log("Checking for update...");
+    });
+    autoUpdater.on("update-available", (info) => {
+      console.log("Update available:", info);
+    });
+    autoUpdater.on("update-not-available", (info) => {
+      console.log("Update not available:", info);
+    });
+    autoUpdater.on("error", (err) => {
+      console.error("Auto-updater error:", err);
+    });
+    autoUpdater.on("update-downloaded", (info) => {
+      console.log("Update downloaded:", info);
+      new Notification({
+        title: "Update Available",
+        body: "A new version is ready to install. Restart to apply."
+      }).show();
+    });
+    setInterval(() => {
+      autoUpdater.checkForUpdates();
+    }, 4 * 60 * 60 * 1e3);
+    autoUpdater.checkForUpdates();
+  }
 });
 export {
-  R as MAIN_DIST,
-  h as RENDERER_DIST,
-  d as VITE_DEV_SERVER_URL
+  MAIN_DIST,
+  RENDERER_DIST,
+  VITE_DEV_SERVER_URL
 };
