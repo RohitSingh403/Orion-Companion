@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 
 import { Achievement } from "../types/achievement";
 import { defaultAchievements } from "../data/achievements";
+import { useToastStore } from "./toastStore";
 
 interface AchievementState {
   achievements: Achievement[];
@@ -51,6 +52,7 @@ export const useAchievementStore = create<AchievementState>()(
               ? {
                   ...achievement,
                   unlocked: true,
+                  unlockedAt: new Date().toISOString(),
                 }
               : achievement,
           ),
@@ -58,6 +60,15 @@ export const useAchievementStore = create<AchievementState>()(
         }));
 
         get().checkLevelUp();
+
+        // Show toast with rarity and icon
+        const { showToast } = useToastStore.getState();
+        showToast(
+          achievement.title,
+          achievement.description,
+          achievement.rarity,
+          achievement.icon
+        );
       },
 
       addXP: (amount) => {

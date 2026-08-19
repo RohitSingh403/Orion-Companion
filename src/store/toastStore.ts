@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { AchievementRarity } from "../types/achievement";
 
 interface ToastState {
   visible: boolean;
@@ -7,7 +8,11 @@ interface ToastState {
 
   message: string;
 
-  showToast: (title: string, message: string) => void;
+  rarity?: AchievementRarity;
+
+  icon?: string;
+
+  showToast: (title: string, message: string, rarity?: AchievementRarity, icon?: string) => void;
 
   hideToast: () => void;
 }
@@ -19,11 +24,17 @@ export const useToastStore = create<ToastState>((set) => ({
 
   message: "",
 
-  showToast: (title, message) => {
+  rarity: "common",
+
+  icon: undefined,
+
+  showToast: (title, message, rarity = "common", icon) => {
     set({
       visible: true,
       title,
       message,
+      rarity,
+      icon,
     });
 
     setTimeout(() => {
