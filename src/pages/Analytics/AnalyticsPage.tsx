@@ -23,7 +23,7 @@ export default function AnalyticsPage() {
 
   // Generate real heatmap data based on time range
   const heatmapData = useMemo(() => {
-    const weeks = timeRange === "week" ? 1 : timeRange === "month" ? 4 : 52;
+    const weeks = timeRange === "week" ? 1 : timeRange === "month" ? 4 : timeRange === "custom" ? 2 : 52;
     const days = 7;
     const data: number[][] = [];
 
@@ -46,6 +46,7 @@ export default function AnalyticsPage() {
   const trendData = useMemo(() => {
     const days = timeRange === "week" ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] : 
                    timeRange === "month" ? ["Week 1", "Week 2", "Week 3", "Week 4"] :
+                   timeRange === "custom" ? ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"] :
                    ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const dataPoints = days.length;
     
@@ -61,14 +62,14 @@ export default function AnalyticsPage() {
 
   // Calculate statistics based on time range
   const rangeStats = useMemo(() => {
-    const multiplier = timeRange === "week" ? 1 : timeRange === "month" ? 4 : 52;
+    const multiplier = timeRange === "week" ? 1 : timeRange === "month" ? 4 : timeRange === "custom" ? 1 : 52;
     const totalSessions = completedSessions * multiplier;
     const totalMinutes = totalSessions * focusDuration;
     const totalHours = Math.floor(totalMinutes / 60);
     const remainingMinutes = totalMinutes % 60;
     const totalFocusTimeDisplay = `${totalHours}h ${remainingMinutes}m`;
     
-    const daysInPeriod = timeRange === "week" ? 7 : timeRange === "month" ? 30 : 365;
+    const daysInPeriod = timeRange === "week" ? 7 : timeRange === "month" ? 30 : timeRange === "custom" ? 7 : 365;
     const avgSessionsPerDay = totalSessions > 0 ? (totalSessions / daysInPeriod).toFixed(1) : "0";
     const avgFocusPerDay = totalSessions > 0 ? ((totalSessions * focusDuration) / daysInPeriod / 60).toFixed(1) : "0";
     
@@ -82,13 +83,13 @@ export default function AnalyticsPage() {
 
   // Calculate period-specific statistics
   const periodStats = useMemo(() => {
-    const daysInPeriod = timeRange === "week" ? 7 : timeRange === "month" ? 30 : 365;
-    const multiplier = timeRange === "week" ? 1 : timeRange === "month" ? 4 : 52;
+    const daysInPeriod = timeRange === "week" ? 7 : timeRange === "month" ? 30 : timeRange === "custom" ? 7 : 365;
+    const multiplier = timeRange === "week" ? 1 : timeRange === "month" ? 4 : timeRange === "custom" ? 1 : 52;
     const totalSessions = completedSessions * multiplier;
     
     const avgSessionsPerDay = totalSessions > 0 ? (totalSessions / daysInPeriod).toFixed(1) : "0";
     const avgFocusPerDay = totalSessions > 0 ? ((totalSessions * focusDuration) / daysInPeriod / 60).toFixed(1) : "0";
-    const bestDay = timeRange === "week" ? "Wednesday" : timeRange === "month" ? "Week 3" : "December";
+    const bestDay = timeRange === "week" ? "Wednesday" : timeRange === "month" ? "Week 3" : timeRange === "custom" ? "Day 3" : "December";
     
     return {
       avgSessionsPerDay,
@@ -96,6 +97,31 @@ export default function AnalyticsPage() {
       bestDay,
     };
   }, [completedSessions, focusDuration, timeRange]);
+
+  // Export analytics data
+  const handleExport = () => {
+    const exportData = {
+      timeRange,
+      stats: rangeStats,
+      periodStats,
+      productivityComparison,
+      focusInsights,
+      completedSessions,
+      bestStreak,
+      focusDuration,
+      exportDate: new Date().toISOString(),
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `focus-companion-analytics-${timeRange}-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <AppLayout>
@@ -119,7 +145,7 @@ export default function AnalyticsPage() {
             ))}
           </div>
           <div className="flex items-center gap-1 card p-1 rounded-lg">
-            {(["week", "month", "year"] as const).map((range) => (
+            {(["week", "month", "year", "custom"] as const).map((range) => (
               <button
                 key={range}
                 onClick={() => setTimeRange(range)}
@@ -133,7 +159,49 @@ export default function AnalyticsPage() {
               </button>
             ))}
           </div>
+          
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm text-secondary hover:text-accent hover:bg-white/5 rounded-lg transition-all"
+          >
+            <FiDownload className="w-4 h-4" />
+            <span>Export</span>
+          </button>
         </div>
+
+        {/* Custom Date Range Picker */}
+        {timeRange === "custom" && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            className="card-elevated p-4 space-y-3"
+          >
+            <div className="flex items-center gap-2">
+              <FiCalendar className="w-4 h-4 text-secondary" />
+              <span className="text-sm font-medium text-primary">Custom Date Range</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <label className="text-xs text-muted mb-1 block">Start Date</label>
+                <input
+                  type="date"
+                  value={customStartDate}
+                  onChange={(e) => setCustomStartDate(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-primary focus:outline-none focus:border-accent/50"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="text-xs text-muted mb-1 block">End Date</label>
+                <input
+                  type="date"
+                  value={customEndDate}
+                  onChange={(e) => setCustomEndDate(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-primary focus:outline-none focus:border-accent/50"
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* Top 3 Stat Cards */}
         <div className="grid grid-cols-3 gap-6">
@@ -208,6 +276,76 @@ export default function AnalyticsPage() {
             ))}
           </div>
         </div>
+
+        {/* Productivity Scorecard */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="card-elevated p-6 space-y-4"
+        >
+          <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
+            <FiTrendingUp className="text-accent" /> Productivity Scorecard
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="card p-4 border border-white/10">
+              <p className="text-xs text-muted font-medium">Focus Consistency</p>
+              <div className="flex items-center gap-2 mt-2">
+                <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-accent to-teal-500 rounded-full"
+                    style={{ width: `${Math.min((completedSessions / 10) * 100, 100)}%` }}
+                  />
+                </div>
+                <span className="text-sm font-semibold text-primary">
+                  {Math.min(Math.round((completedSessions / 10) * 100), 100)}%
+                </span>
+              </div>
+            </div>
+            <div className="card p-4 border border-white/10">
+              <p className="text-xs text-muted font-medium">Goal Achievement</p>
+              <div className="flex items-center gap-2 mt-2">
+                <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
+                    style={{ width: `${Math.min((completedSessions / 20) * 100, 100)}%` }}
+                  />
+                </div>
+                <span className="text-sm font-semibold text-primary">
+                  {Math.min(Math.round((completedSessions / 20) * 100), 100)}%
+                </span>
+              </div>
+            </div>
+            <div className="card p-4 border border-white/10">
+              <p className="text-xs text-muted font-medium">Streak Strength</p>
+              <div className="flex items-center gap-2 mt-2">
+                <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full"
+                    style={{ width: `${Math.min((bestStreak / 7) * 100, 100)}%` }}
+                  />
+                </div>
+                <span className="text-sm font-semibold text-primary">
+                  {Math.min(Math.round((bestStreak / 7) * 100), 100)}%
+                </span>
+              </div>
+            </div>
+            <div className="card p-4 border border-white/10">
+              <p className="text-xs text-muted font-medium">Overall Score</p>
+              <div className="flex items-center gap-2 mt-2">
+                <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-emerald-500 to-green-500 rounded-full"
+                    style={{ width: `${Math.min(((completedSessions + bestStreak) / 30) * 100, 100)}%` }}
+                  />
+                </div>
+                <span className="text-sm font-semibold text-accent">
+                  {Math.min(Math.round(((completedSessions + bestStreak) / 30) * 100), 100)}%
+                </span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
 
         {/* Focus Time Trend Chart */}
         <div className="card-elevated p-6 space-y-4">
