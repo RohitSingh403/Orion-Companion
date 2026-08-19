@@ -1,14 +1,17 @@
 // src/pages/Analytics/AnalyticsPage.tsx
 
 import { useState, useMemo } from "react";
+import { motion } from "framer-motion";
 import AppLayout from "../../layouts/AppLayout";
 import Topbar from "../../components/topbar/Topbar";
 import { useFocusStore } from "../../store/focusStore";
-import { FiClock, FiTrendingUp, FiActivity } from "react-icons/fi";
+import { FiClock, FiTrendingUp, FiActivity, FiDownload, FiCalendar } from "react-icons/fi";
 
 export default function AnalyticsPage() {
   const [activeTab, setActiveTab] = useState<"overview" | "focus" | "tasks" | "trends">("overview");
-  const [timeRange, setTimeRange] = useState<"week" | "month" | "year">("week");
+  const [timeRange, setTimeRange] = useState<"week" | "month" | "year" | "custom">("week");
+  const [customStartDate, setCustomStartDate] = useState<string>("");
+  const [customEndDate, setCustomEndDate] = useState<string>("");
 
   const { completedSessions, focusDuration, bestStreak, getProductivityComparison, getFocusInsights } = useFocusStore();
 

@@ -9,6 +9,13 @@ export type TaskStatus =
 
 export type RecurrenceType = "none" | "daily" | "weekly" | "monthly" | "yearly";
 
+export interface Subtask {
+  id: string;
+  title: string;
+  completed: boolean;
+  completedAt: string | null;
+}
+
 export interface Task {
   id: string;
 
@@ -43,4 +50,10 @@ export interface Task {
   recurrence?: RecurrenceType;
 
   recurrenceEndDate?: string | null;
+
+  subtasks?: Subtask[];
+
+  timeSpent?: number; // in minutes
+
+  parentTaskId?: string | null; // for nested tasks
 }

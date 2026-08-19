@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import type { Task, TaskPriority, RecurrenceType } from "../types/task";
+import type { Task, TaskPriority, RecurrenceType, Subtask } from "../types/task";
 
 export interface CreateTaskData {
   title: string;
@@ -15,6 +15,8 @@ export interface CreateTaskData {
   tags?: string[];
   recurrence?: RecurrenceType;
   recurrenceEndDate?: string | null;
+  subtasks?: Subtask[];
+  parentTaskId?: string | null;
 }
 
 interface TaskStore {
@@ -29,6 +31,15 @@ interface TaskStore {
   incrementTaskFocusSession: (id: string) => void;
   clearCompleted: () => void;
   generateRecurringTasks: () => void;
+  
+  // Subtask management
+  addSubtask: (taskId: string, title: string) => void;
+  toggleSubtask: (taskId: string, subtaskId: string) => void;
+  deleteSubtask: (taskId: string, subtaskId: string) => void;
+  updateSubtask: (taskId: string, subtaskId: string, title: string) => void;
+  
+  // Time tracking
+  addTimeSpent: (taskId: string, minutes: number) => void;
 }
 
 export const useTaskStore = create<TaskStore>()(
@@ -61,6 +72,9 @@ export const useTaskStore = create<TaskStore>()(
           updatedAt: new Date().toISOString(),
           recurrence: input.recurrence || "none",
           recurrenceEndDate: input.recurrenceEndDate || null,
+          subtasks: input.subtasks || [],
+          timeSpent: 0,
+          parentTaskId: input.parentTaskId || null,
         };
 
         set((state) => ({
@@ -195,6 +209,95 @@ export const useTaskStore = create<TaskStore>()(
             tasks: [...state.tasks, ...newTasks],
           };
         }),
+
+      // Subtask management
+      addSubtask: (taskId, title) =>
+        set((state) => ({
+          tasks: state.tasks.map((task) =>
+            task.id === taskId
+              ? {
+                  ...task,
+                  subtasks: [
+                    ...(task.subtasks || []),
+                    {
+                      id: crypto.randomUUID(),
+                      title,
+                      completed: false,
+                      completedAt: null,
+                    },
+                  ],
+                  updatedAt: new Date().toISOString(),
+                }
+              : task
+          ),
+        })),
+
+      toggleSubtask: (taskId, subtaskId) =>
+        set((state) => ({
+          tasks: state.tasks.map((task) =>
+            task.id === taskId
+              ? {
+                  ...task,
+                  subtasks: task.subtasks?.map((subtask) =>
+                    subtask.id === subtaskId
+                      ? {
+                          ...subtask,
+                          completed: !subtask.completed,
+                          completedAt: !subtask.completed
+                            ? new Date().toISOString()
+                            : null,
+                        }
+                      : subtask
+                  ),
+                  updatedAt: new Date().toISOString(),
+                }
+              : task
+          ),
+        })),
+
+      deleteSubtask: (taskId, subtaskId) =>
+        set((state) => ({
+          tasks: state.tasks.map((task) =>
+            task.id === taskId
+              ? {
+                  ...task,
+                  subtasks: task.subtasks?.filter((s) => s.id !== subtaskId),
+                  updatedAt: new Date().toISOString(),
+                }
+              : task
+          ),
+        })),
+
+      updateSubtask: (taskId, subtaskId, title) =>
+        set((state) => ({
+          tasks: state.tasks.map((task) =>
+            task.id === taskId
+              ? {
+                  ...task,
+                  subtasks: task.subtasks?.map((subtask) =>
+                    subtask.id === subtaskId
+                      ? { ...subtask, title }
+                      : subtask
+                  ),
+                  updatedAt: new Date().toISOString(),
+                }
+              : task
+          ),
+        })),
+
+      // Time tracking
+      addTimeSpent: (taskId, minutes) =>
+        set((state) => ({
+          tasks: state.tasks.map((task) =>
+            task.id === taskId
+              ? {
+                  ...task,
+                  timeSpent: (task.timeSpent || 0) + minutes,
+                  updatedAt: new Date().toISOString(),
+                }
+              : task
+          ),
+        })),
     }),
     {
       name: "focus-companion-tasks",
