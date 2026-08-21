@@ -1,3 +1,4 @@
+import { memo } from "react";
 import FadeIn from "../animations/FadeIn";
 
 interface CardProps {
@@ -5,7 +6,7 @@ interface CardProps {
   className?: string;
 }
 
-export default function Card({ children, className = "" }: CardProps) {
+const Card = memo(function Card({ children, className = "" }: CardProps) {
   return (
     <FadeIn>
       <div
@@ -27,4 +28,6 @@ export default function Card({ children, className = "" }: CardProps) {
       </div>
     </FadeIn>
   );
-}
+});
+
+export default Card;

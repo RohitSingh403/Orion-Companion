@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, memo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ScaleIn from "../animations/ScaleIn";
 
@@ -17,13 +17,55 @@ const sizeClasses = {
   xl: "max-w-4xl",
 };
 
-export default function Modal({ 
+const Modal = memo(function Modal({ 
   isOpen, 
   onClose, 
   children, 
   title,
   size = "md" 
 }: ModalProps) {
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+
+    // Trap focus within modal
+    const handleTab = (e: KeyboardEvent) => {
+      if (!isOpen) return;
+      
+      const focusableElements = document.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      const firstElement = focusableElements[0] as HTMLElement;
+      const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+      if (e.key === "Tab") {
+        if (e.shiftKey && document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement?.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement?.focus();
+        }
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("keydown", handleEscape);
+      document.addEventListener("keydown", handleTab);
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener("keydown", handleTab);
+      document.body.style.overflow = "";
+    };
+  }, [isOpen, onClose]);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -36,20 +78,25 @@ export default function Modal({
             transition={{ duration: 0.2 }}
             onClick={onClose}
             className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50"
+            role="presentation"
           />
           
           {/* Modal */}
           <div className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none">
             <ScaleIn duration={0.3}>
               <div 
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby={title ? "modal-title" : undefined}
                 className={`w-full ${sizeClasses[size]} card-elevated rounded-xl p-6 pointer-events-auto max-h-[90vh] overflow-y-auto no-scrollbar`}
               >
                 {title && (
                   <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/6">
-                    <h3 className="text-lg font-semibold text-accent">{title}</h3>
+                    <h3 id="modal-title" className="text-lg font-semibold text-accent">{title}</h3>
                     <button
                       onClick={onClose}
-                      className="text-secondary hover:text-primary transition-colors"
+                      className="text-secondary hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-accent rounded p-1"
+                      aria-label="Close modal"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -65,4 +112,6 @@ export default function Modal({
       )}
     </AnimatePresence>
   );
-}
+});
+
+export default Modal;
