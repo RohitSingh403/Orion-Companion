@@ -2,9 +2,10 @@
 
 import type { ReactNode } from "react";
 import { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import Sidebar from "./Sidebar";
 import { useSettingsStore } from "../store/settingsStore";
+import SlideIn from "../components/animations/SlideIn";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -36,15 +37,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
         <AnimatePresence mode="wait">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2, ease: "easeInOut" }}
-            className="flex-1 flex flex-col h-full overflow-hidden"
-          >
-            {children}
-          </motion.div>
+          <SlideIn direction="right" duration={0.3}>
+            <div className="flex-1 flex flex-col h-full overflow-hidden">
+              {children}
+            </div>
+          </SlideIn>
         </AnimatePresence>
       </main>
     </div>
