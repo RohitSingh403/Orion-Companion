@@ -30,15 +30,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }, [theme]);
 
   return (
-    <div className={`flex h-screen w-screen text-primary overflow-hidden font-sans select-none ${theme === "light" ? "bg-gray-50" : "bg-[#0a0a0a]"}`}>
+    <div className={`flex h-screen w-screen text-primary font-sans select-none ${theme === "light" ? "bg-gray-50" : "bg-[#0a0a0a]"}`}>
       {/* Permanent Fixed Left Sidebar */}
       <Sidebar />
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
+      <main className="flex-1 flex flex-col h-screen relative overflow-hidden">
         <AnimatePresence mode="wait">
           <SlideIn direction="right" duration={0.3}>
-            <div className="flex-1 flex flex-col h-full overflow-hidden">
+            <div className="flex-1 flex flex-col h-full overflow-auto">
               {children}
             </div>
           </SlideIn>
