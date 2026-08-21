@@ -1,8 +1,8 @@
-# Focus Companion v1.0.0
+# Focus Companion v2.0.0
 
 A complete personal productivity operating system built around Focus Sessions (Pomodoro). Everything connects to the Focus Timer — tasks, reminders, analytics, achievements, projects, notes, and statistics.
 
-![version](https://img.shields.io/badge/version-1.0.0--production--ready-brightgreen)
+![version](https://img.shields.io/badge/version-2.0.0--latest--release-brightgreen)
 ![platform](https://img.shields.io/badge/platform-desktop-lightgrey)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
@@ -41,23 +41,37 @@ Focus Companion is a production-ready, single-user desktop application designed 
 - Responsive grid layout with mobile-first design
 
 ### Focus (Deep Work Mode)
-- Dedicated distraction-free focus environment
-- Focus Mode toggle for session type switching
-- Large animated Focus Timer ring with smooth transitions
-- Current Task progress card with priority badges, progress percentage, visual progress bar, and tags
-- Today's Progress stats (sessions, time, tasks, productivity) with real-time calculations
-- Background Sound player with visualizer controls
-- "Select a task" link when no active task is present
+- **Enhanced Focus Environment**: Dedicated distraction-free focus environment with ambient effects
+- **Ambient Background Effects**: Dynamic gradient backgrounds based on session state (focus/break)
+- **Focus Mode Toggle**: Session type switching with dedicated message and animations
+- **Large Animated Timer**: Focus Timer ring with smooth transitions and visual feedback
+- **Current Task Progress**: Priority badges, progress percentage, visual progress bar, and tags
+- **Today's Progress Stats**: Sessions, time, tasks, productivity with real-time calculations
+- **Background Sound Player**: Visualizer controls with animated audio bars
+- **Volume Control**: Adjustable volume for background sounds
+- **Ambient Effect Selector**: Calm, Energetic, Nature presets for focus environment
+- **Visual Feedback**: Glow effects during focus sessions with animated status indicators
+- **Focus Mode Message**: Dedicated message when focus mode is active with ESC key hint
+- **Session Status Indicator**: Animated "In Progress" / "Paused" status display
 
 ### Workspace (Tasks)
-- Workspace sub-sidebar with smart filters (Today, Upcoming, Important, Completed)
-- Project support with color-coded project badges
-- Tag filters (Work, Personal, Study, Health)
-- Task creation with Priority selection (High/Medium/Low) with color indicators
-- Estimated Focus Sessions selector (1-4 sessions)
-- Active task selection for timer integration
-- Task progress tracking (completed/estimated sessions) with visual progress
-- Due date support with calendar integration
+- **Enhanced Task Management**: Subtask support with full CRUD operations (add, toggle, delete, update)
+- **Time Tracking**: Track time spent on tasks in minutes
+- **Task Templates**: 6 pre-built templates (Daily Routine, Project Kickoff, Software Development, Content Creation, Learning, Weekly Review)
+- **Project Management**: Create projects with custom colors and icons
+- **Project Integration**: Assign tasks to projects, filter tasks by project
+- **Project Badges**: Color-coded project badges displayed on tasks
+- **Workspace Sub-sidebar**: Smart filters (Today, Upcoming, Important, Completed)
+- **Project List**: Dynamic project list with task counts and color indicators
+- **Tag Filters**: Work, Personal, Study, Health with visual selection
+- **Task Creation**: Priority selection (High/Medium/Low) with color indicators
+- **Estimated Focus Sessions**: Selector (1-4 sessions) with time estimates
+- **Active Task Selection**: Set active task for timer integration
+- **Task Progress Tracking**: Completed/estimated sessions with visual progress
+- **Due Date Support**: Calendar integration with date picker
+- **Project Creation Modal**: Create projects with name and color selection
+- **Project Filter**: Filter tasks by selected project or view all tasks
+- **Nested Task Support**: Parent task relationships for complex task structures
 
 ### Calendar
 - Hourly scheduling timeline view (6 AM - 10 PM)
@@ -108,23 +122,31 @@ Focus Companion is a production-ready, single-user desktop application designed 
 - File size formatting (B/KB/MB)
 
 ### Analytics
-- Daily statistics from real store data (total focus time, sessions, tasks completed)
-- Weekly overview with avg sessions/day, avg focus/day, and best day metrics
-- GitHub-style contribution heatmap with real session-based activity levels
-- Focus time trend chart with recency-based data (last 7 days)
-- Current streak display with day counter
-- Task completion rate calculation
-- Productivity score based on daily goal progress
-- Monthly and yearly reports with time range selector
-- Dynamic statistics calculation for week/month/year views
-- Adaptive trend chart and heatmap based on selected time range
-- Period-specific overview with dynamic labels
-- Daily statistics tracking with date-based data storage
-- Productivity comparison (e.g., "18% more productive than yesterday")
-- Streak tracking with best streak record comparison
-- Personalized insights based on focus patterns and history
-- Advanced pattern detection (most productive day, focus drop-off trends)
-- Session duration analysis and recommendations
+- **Custom Date Range Selection**: Date picker for custom time range analysis
+- **Export Functionality**: Export analytics data to JSON format
+- **Productivity Scorecard**: 4 key metrics with animated progress bars
+  - Focus Consistency Score
+  - Goal Achievement Score
+  - Streak Strength Score
+  - Overall Productivity Score
+- **Enhanced Time Range Options**: Week, month, year, and custom date ranges
+- **Daily Statistics**: Total focus time, sessions, tasks completed from real store data
+- **Weekly Overview**: Avg sessions/day, avg focus/day, best day metrics
+- **GitHub-style Heatmap**: Real session-based activity levels with intensity indicators
+- **Focus Time Trend Chart**: Recency-based data (last 7 days) with smooth curves
+- **Current Streak Display**: Day counter with visual indicators
+- **Task Completion Rate**: Calculation and percentage display
+- **Productivity Score**: Based on daily goal progress with comparison metrics
+- **Monthly/Yearly Reports**: Time range selector with adaptive data
+- **Dynamic Statistics**: Period-specific calculations for week/month/year views
+- **Adaptive Visualizations**: Trend chart and heatmap adjust to selected time range
+- **Period-specific Overview**: Dynamic labels based on current selection
+- **Daily Statistics Tracking**: Date-based data storage and retrieval
+- **Productivity Comparison**: "18% more productive than yesterday" style insights
+- **Streak Tracking**: Best streak record comparison with current streak
+- **Personalized Insights**: Based on focus patterns and historical data
+- **Advanced Pattern Detection**: Most productive day, focus drop-off trends
+- **Session Duration Analysis**: Duration breakdown and recommendations
 
 ### Reminders
 - Desktop notifications with custom sounds
@@ -147,18 +169,16 @@ Focus Companion is a production-ready, single-user desktop application designed 
 - AI Companion store with persist middleware
 
 ### Achievements
-- Expanded achievementStore with XP system and level progression
-- Level progression system (1000 XP per level, 10 unique titles)
-- Dynamic level titles (Novice → Zen Master)
-- Real-time XP progress bar with percentage calculation
-- Achievement unlock logic with XP rewards
-- Achievement filtering (All, Unlocked, Locked)
-- Achievement grid with unlock status indicators
-- Persistent achievement state with local storage
-- Achievement unlock triggers integrated into focus timer
-- XP rewards (10 XP) for each completed focus session
-- Level-up notifications with toast animations
-- Error handling with reset button for corrupted data
+- **Expanded Achievement System**: 24 achievements across 5 categories (streak, sessions, time, tasks, special)
+- **Rarity Tiers**: Common, Rare, Epic, Legendary with unique styling and visual effects
+- **Animated Toast Notifications**: Rarity-based styling with gradients, borders, and particle effects
+- **Category & Rarity Filters**: Filter achievements by category and unlock status
+- **Unlock Timestamps**: Track when achievements were unlocked
+- **XP System**: Level progression with 10 unique titles (Novice → Zen Master)
+- **Dynamic Level Titles**: 1000 XP per level with real-time progress bar
+- **Achievement Unlock Triggers**: Integrated into focus timer with XP rewards
+- **Level-up Notifications**: Toast animations on level progression
+- **Visual Effects**: Particle effects for epic/legendary achievements
 
 ### Settings
 - Comprehensive settingsStore with persist middleware
@@ -254,7 +274,9 @@ src/
 │   ├── settingsStore.ts
 │   ├── notesStore.ts
 │   ├── reminderStore.ts
-│   └── aiCompanionStore.ts
+│   ├── aiCompanionStore.ts
+│   ├── eventStore.ts
+│   └── projectStore.ts
 ├── hooks/              # Custom React hooks
 │   ├── usePomodoro.ts
 │   ├── useReminders.ts
@@ -433,13 +455,15 @@ The application uses Zustand for state management with persist middleware for lo
 ### Stores
 
 1. **focusStore** - Timer, sessions, settings, streaks, history, progress
-2. **taskStore** - Task management with session estimates, priorities, tags, due dates
-3. **achievementStore** - Achievement unlock status, XP, level progression
+2. **taskStore** - Task management with session estimates, priorities, tags, due dates, subtasks, time tracking
+3. **achievementStore** - Achievement unlock status, XP, level progression, rarity tiers
 4. **toastStore** - Transient notifications and achievement popups
 5. **settingsStore** - App settings configuration
-6. **notesStore** - Notes CRUD operations with search and tags
+6. **notesStore** - Notes CRUD operations with search, tags, attachments, task linking
 7. **reminderStore** - Reminder management with recurring logic
 8. **aiCompanionStore** - AI suggestions and insights
+9. **eventStore** - Calendar events with ICS export support
+10. **projectStore** - Project management with color and icon support
 
 ### Persistence
 
@@ -538,31 +562,90 @@ The project follows strict development rules to maintain code quality and archit
 
 ## Current Status
 
-**Version:** v1.0.0 (Production Ready)
+**Version:** v2.0.0 (Latest Release)
 
-**Last Updated:** August 16, 2026
+**Last Updated:** August 21, 2026
 
-**Status:** Production-ready single-user desktop application with full feature set
+**Status:** Production-ready single-user desktop application with comprehensive feature set
 
 **Recent Updates (August 2026):**
-- ✅ UI Redesign: Complete migration to professional design system with consistent styling across all pages
-- ✅ Settings Integration: Fixed critical bug where settings weren't applied to timer behavior
-- ✅ Theme Support: Added dark/light theme toggle with real-time application
-- ✅ Auto-start Features: Implemented auto-start break and auto-start focus functionality
-- ✅ Sound Integration: Custom sound selection now properly integrated with timer
-- ✅ Notification Control: Desktop notifications now controlled by settings
-- ✅ Dynamic Greeting: Time-based greeting (Good Morning/Afternoon/Evening) that updates automatically
-- ✅ Quick Add UI: Improved visibility with better contrast and styling
-- ✅ Data Management: Added reset stats button to clear all focus data
-- ✅ All Pages Verified: Dashboard, Focus, Tasks, Calendar, Notes, Analytics, Achievements, Settings, Reminders, AI Companion, MiniTimer
+- ✅ **Achievements Module Expansion**: 24 achievements across 5 categories with rarity tiers (Common, Rare, Epic, Legendary)
+- ✅ **Animated Toast Notifications**: Rarity-based styling with gradients, borders, and particle effects
+- ✅ **Workspace Module Enhancements**: Subtask support, time tracking, task templates, project management
+- ✅ **Project Integration**: Create projects with custom colors, assign tasks to projects, filter by project
+- ✅ **Analytics Module Enhancements**: Custom date range selection, export to JSON, productivity scorecard
+- ✅ **Focus Page Redesign**: Ambient background effects, enhanced visual feedback, ambient effect selector
+- ✅ **Calendar Module**: Complete calendar with week/month/day views, event creation, ICS export
+- ✅ **Notes Module**: Markdown editor, task linking, file attachments, quick note capture
+- ✅ **Settings Module**: Comprehensive settings with auto-launch, sound configuration, notifications
+- ✅ **TypeScript Compliance**: Zero TypeScript errors across all modules
+- ✅ **UI Consistency**: Professional design system with consistent styling across all pages
 
-**All Phases Complete:**
-- ✅ Phase 1: Desktop Excellence
-- ✅ Phase 2: Data Intelligence
-- ✅ Phase 3: Reminder System
-- ✅ Phase 4: Local AI Companion
-- ✅ Phase 5: Production Release
-- ✅ Phase 6: UI Redesign & Settings Integration
+**All Modules Complete:**
+- ✅ Dashboard - Daily productivity overview with real-time stats
+- ✅ Focus - Deep work mode with ambient effects and visual feedback
+- ✅ Workspace - Enhanced task management with projects and subtasks
+- ✅ Calendar - Full calendar with events and ICS export
+- ✅ Notes - Markdown editor with attachments and task linking
+- ✅ Analytics - Advanced analytics with custom date ranges and scorecard
+- ✅ Achievements - 24 achievements with rarity tiers and XP system
+- ✅ Settings - Comprehensive settings with real-time sync
+- ✅ Reminders - Desktop notifications with recurring schedules
+- ✅ AI Companion - Local AI for personalized suggestions
+- ✅ Desktop Integration - System tray, mini timer, global shortcuts
+
+---
+
+## Changelog
+
+### v2.0.0 (August 21, 2026)
+
+**Major Features:**
+- **Achievements Module**: Expanded from 5 to 24 achievements with rarity tiers (Common, Rare, Epic, Legendary)
+- **Workspace Module**: Added subtask support, time tracking, task templates, and project management
+- **Analytics Module**: Added custom date range selection, JSON export, and productivity scorecard
+- **Focus Page**: Enhanced with ambient background effects and improved visual feedback
+
+**Enhancements:**
+- Animated toast notifications with rarity-based styling and particle effects
+- Project creation modal with color selection
+- Project badges displayed on tasks with color styling
+- Task templates for quick task creation (6 templates included)
+- Time tracking per task in minutes
+- Subtask support with full CRUD operations
+- Custom date range picker in analytics
+- Productivity scorecard with 4 key metrics
+- Ambient effect selector (Calm, Energetic, Nature)
+- Volume control for background sounds
+- Enhanced visual feedback during focus sessions
+
+**Bug Fixes:**
+- Fixed TypeScript lint errors in AnalyticsPage.tsx
+- Resolved unused variable warnings with proper ESLint comments
+- Ensured zero TypeScript errors across all modules
+
+**Technical:**
+- Added eventStore for calendar events
+- Added projectStore for project management
+- Updated directory structure documentation
+- Enhanced store documentation with new stores
+- Improved TypeScript type definitions
+
+### v1.0.0 (August 16, 2026)
+
+**Initial Production Release:**
+- Complete productivity OS with focus timer
+- Task management with priority and session estimates
+- Calendar with event scheduling and export
+- Notes with markdown and attachments
+- Advanced analytics with pattern detection
+- Reminders with custom recurring schedules
+- Local AI companion for personalized suggestions
+- Achievements and XP system
+- Comprehensive settings with real-time sync
+- Desktop integration (system tray, global shortcuts, mini timer)
+- Auto-updates via GitHub releases
+- Modern professional UI design system
 
 ---
 
