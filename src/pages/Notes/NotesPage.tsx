@@ -194,7 +194,7 @@ export default function NotesPage() {
         </div>
 
         {/* Right Note Markdown Editor Panel */}
-        <div className="flex-1 card-elevated rounded-xl p-6 flex flex-col gap-4">
+        <div className="flex-1 card-elevated rounded-xl p-6 flex flex-col gap-4 overflow-auto">
           {activeNote ? (
             <>
               {/* Editor Header Toolbar */}
