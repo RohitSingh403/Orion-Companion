@@ -282,7 +282,7 @@ export default function CalendarPage() {
   return (
     <AppLayout>
       <Topbar subtitle="Plan your focus sessions & meetings" />
-      <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
+      <div className="flex-1 p-8 space-y-6 overflow-auto no-scrollbar">
         {/* Header Controls */}
         <div className="flex items-center justify-between card-elevated p-4">
           <div className="flex items-center gap-2 card p-1 rounded-lg">

@@ -130,7 +130,7 @@ export default function NotesPage() {
   return (
     <AppLayout>
       <Topbar subtitle="Capture ideas and link tasks to your focus sessions" />
-      <div className="flex-1 overflow-hidden p-8 flex gap-6 relative">
+      <div className="flex-1 p-8 flex gap-6 relative overflow-auto">
         {/* Quick Note Toast */}
         {showQuickNoteToast && (
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 card border border-accent/40 text-accent px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-lg z-50">

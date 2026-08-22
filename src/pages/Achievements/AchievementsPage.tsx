@@ -111,7 +111,7 @@ export default function AchievementsPage() {
     return (
       <AppLayout>
         <Topbar subtitle="Unlock badges and level up your focus habit" />
-        <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
+        <div className="flex-1 p-8 space-y-6 overflow-auto no-scrollbar">
           <div className="card-elevated p-8 text-center">
             <p className="text-sm text-secondary mb-4">Achievements data is corrupted or missing.</p>
             <button
@@ -129,7 +129,7 @@ export default function AchievementsPage() {
   return (
     <AppLayout>
       <Topbar subtitle="Unlock badges and level up your focus habit" />
-      <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
+      <div className="flex-1 p-8 space-y-6 overflow-auto no-scrollbar">
         {/* Level Banner Card */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}

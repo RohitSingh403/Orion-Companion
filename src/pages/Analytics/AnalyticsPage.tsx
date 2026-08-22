@@ -128,7 +128,7 @@ export default function AnalyticsPage() {
   return (
     <AppLayout>
       <Topbar subtitle="Visualize focus trends & GitHub-style heatmap" />
-      <div className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
+      <div className="flex-1 p-8 space-y-6 overflow-auto no-scrollbar">
         {/* Navigation Tabs */}
         <div className="flex items-center justify-between border-b border-white/6 pb-3">
           <div className="flex items-center gap-2">

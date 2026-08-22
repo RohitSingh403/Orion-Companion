@@ -70,7 +70,7 @@ export default function FocusPage() {
       {/* Ambient Background Effect */}
       <div className={`fixed inset-0 pointer-events-none transition-all duration-1000 bg-gradient-to-br ${getAmbientGradient()}`} />
 
-      <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 no-scrollbar relative">
+      <div className="flex-1 p-6 md:p-8 space-y-6 overflow-auto no-scrollbar relative">
         {/* Top Header Banner & Mode Toggle */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}

@@ -48,7 +48,7 @@ export default function AICompanionPage() {
   return (
     <AppLayout>
       <Topbar subtitle="Personalized productivity insights based on your patterns" />
-      <div className="flex-1 overflow-hidden p-8">
+      <div className="flex-1 p-8 overflow-auto">
         <div className="card-elevated rounded-lg p-6 h-full flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
