@@ -351,55 +351,87 @@ export default function AnalyticsPage() {
 
         {/* Focus Time Trend Chart */}
         <div className="card-elevated p-6 space-y-4">
-          <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
-            <FiTrendingUp className="text-accent" /> Focus Time Trend ({timeRange.charAt(0).toUpperCase() + timeRange.slice(1)})
-          </h3>
-          <div className="h-40 flex items-end justify-between gap-3 pt-6 px-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
+              <FiTrendingUp className="text-accent" /> Focus Time Trend ({timeRange.charAt(0).toUpperCase() + timeRange.slice(1)})
+            </h3>
+            <div className="flex items-center gap-2 text-xs text-muted">
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-accent"></span>
+                Focus Time
+              </span>
+            </div>
+          </div>
+          <div className="h-52 flex items-end justify-between gap-3 pt-6 px-4 border-b border-white/10 pb-2">
             {trendData.days.map((day, idx) => (
-              <div key={day} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
-                <div
-                  style={{ height: `${trendData.heights[idx]}%` }}
-                  className="w-full bg-gradient-to-t from-accent/20 to-accent border-t-2 border-accent rounded-t-md transition-all hover:brightness-125"
-                />
-                <span className="text-xs text-muted font-medium">{day}</span>
+              <div key={day} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
+                <div className="relative w-full">
+                  <div
+                    style={{ height: `${trendData.heights[idx]}%` }}
+                    className="w-full bg-gradient-to-t from-accent/30 via-accent/60 to-accent border-t-2 border-accent rounded-t-md transition-all duration-300 hover:brightness-125 cursor-pointer relative"
+                  >
+                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-white/10 backdrop-blur-sm border border-white/20 rounded px-2 py-1 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                      {trendData.heights[idx]}%
+                    </div>
+                  </div>
+                </div>
+                <span className="text-xs text-muted font-medium mt-2">{day}</span>
               </div>
             ))}
+          </div>
+          <div className="flex items-center justify-between text-xs text-muted pt-2">
+            <span>Low activity</span>
+            <span>High activity</span>
           </div>
         </div>
 
         {/* GitHub-style Productivity Heatmap */}
         <div className="card-elevated p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-primary">Productivity Heatmap</h3>
-            <div className="flex items-center gap-1.5 text-xs text-muted font-medium">
+            <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
+              <FiActivity className="text-accent" /> Productivity Heatmap
+            </h3>
+            <div className="flex items-center gap-2 text-xs text-muted font-medium">
               <span>Less</span>
-              <span className="w-2.5 h-2.5 rounded-sm heatmap-level-0 border border-white/10"></span>
-              <span className="w-2.5 h-2.5 rounded-sm heatmap-level-1"></span>
-              <span className="w-2.5 h-2.5 rounded-sm heatmap-level-2"></span>
-              <span className="w-2.5 h-2.5 rounded-sm heatmap-level-3"></span>
-              <span className="w-2.5 h-2.5 rounded-sm heatmap-level-4"></span>
+              <div className="flex gap-1">
+                <span className="w-3 h-3 rounded-sm heatmap-level-0 border border-white/10"></span>
+                <span className="w-3 h-3 rounded-sm heatmap-level-1"></span>
+                <span className="w-3 h-3 rounded-sm heatmap-level-2"></span>
+                <span className="w-3 h-3 rounded-sm heatmap-level-3"></span>
+                <span className="w-3 h-3 rounded-sm heatmap-level-4"></span>
+              </div>
               <span>More</span>
             </div>
           </div>
 
-          <div className="flex gap-2 items-center">
-            <div className="grid grid-rows-7 text-xs text-muted font-medium h-28 justify-between pr-2">
-              <span>Mon</span>
-              <span>Wed</span>
-              <span>Fri</span>
+          <div className="card border border-white/10 rounded-lg p-4 bg-white/[0.02]">
+            <div className="flex gap-2 items-start">
+              <div className="grid grid-rows-7 text-[10px] text-muted font-medium h-32 justify-between pr-2 flex-shrink-0 leading-3">
+                <span className="flex items-center">Mon</span>
+                <span className="flex items-center">Wed</span>
+                <span className="flex items-center">Fri</span>
+              </div>
+              <div className="flex gap-1 overflow-x-auto no-scrollbar pb-2">
+                {heatmapData.map((week, wIdx) => (
+                  <div key={wIdx} className="grid grid-rows-7 gap-1 flex-shrink-0">
+                    {week.map((level, dIdx) => (
+                      <div
+                        key={dIdx}
+                        className={`w-3 h-3 rounded-sm transition-all duration-200 hover:scale-125 hover:z-10 cursor-pointer heatmap-level-${level} relative group`}
+                        title={`Activity level: ${level}`}
+                      >
+                        <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-sm border border-white/20 rounded px-2 py-1 text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none">
+                          {level === 0 ? 'No activity' : `${level} sessions`}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="flex gap-2 overflow-x-auto no-scrollbar">
-              {heatmapData.map((week, wIdx) => (
-                <div key={wIdx} className="grid grid-rows-7 gap-1.5">
-                  {week.map((level, dIdx) => (
-                    <div
-                      key={dIdx}
-                      className={`w-3.5 h-3.5 rounded-sm transition-all hover:scale-125 heatmap-level-${level}`}
-                      title={`Activity level: ${level}`}
-                    />
-                  ))}
-                </div>
-              ))}
+            <div className="flex items-center justify-between text-xs text-muted mt-4 pt-3 border-t border-white/10">
+              <span>Total active days: {heatmapData.reduce((acc, week) => acc + week.filter(l => l > 0).length, 0)}</span>
+              <span>Peak activity: {Math.max(...heatmapData.flat())} sessions</span>
             </div>
           </div>
         </div>
