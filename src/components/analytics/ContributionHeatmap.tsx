@@ -17,23 +17,9 @@ export interface ContributionHeatmapProps {
 
 export default function ContributionHeatmap({
   data,
-  startDate,
-  endDate,
   levelThresholds = [0, 2, 5, 9],
 }: ContributionHeatmapProps) {
   const [hoveredCell, setHoveredCell] = useState<{ date: string; count: number; x: number; y: number } | null>(null);
-
-  // Default to 1 year ago to now
-  const defaultStartDate = useMemo(() => {
-    const date = new Date();
-    date.setFullYear(date.getFullYear() - 1);
-    return date;
-  }, []);
-
-  const defaultEndDate = useMemo(() => new Date(), []);
-
-  const start = startDate || defaultStartDate;
-  const end = endDate || defaultEndDate;
 
   // Process contribution data into a map for easy lookup
   const contributionMap = useMemo(() => {
@@ -49,8 +35,13 @@ export default function ContributionHeatmap({
     const weeks: ContributionDay[][] = [];
     const monthLabels: { month: string; weekIndex: number }[] = [];
     
-    // Start from the Sunday before the start date to align with GitHub
-    const current = new Date(start);
+    // Start from the Sunday approximately 1 year ago
+    const endDate = new Date();
+    const startDate = new Date(endDate);
+    startDate.setFullYear(startDate.getFullYear() - 1);
+    
+    // Adjust to Sunday
+    const current = new Date(startDate);
     const dayOfWeek = current.getDay();
     const sundayOffset = dayOfWeek; // 0 = Sunday, 1 = Monday, etc.
     current.setDate(current.getDate() - sundayOffset);
@@ -59,7 +50,10 @@ export default function ContributionHeatmap({
     let weekIndex = 0;
     let lastMonth = -1;
 
-    while (current <= end) {
+    // Generate exactly 53 weeks to ensure full year coverage
+    const totalWeeks = 53;
+    
+    for (let w = 0; w < totalWeeks; w++) {
       const week: ContributionDay[] = [];
       const currentMonth = current.getMonth();
 
@@ -90,7 +84,7 @@ export default function ContributionHeatmap({
     }
 
     return { weeks, monthLabels };
-  }, [start, end, contributionMap]);
+  }, [contributionMap]);
 
   // Get intensity level based on count
   const getLevel = (count: number): number => {
