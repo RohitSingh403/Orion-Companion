@@ -222,7 +222,7 @@ export default function TasksPage() {
         </div>
 
         {/* Main Task List & Creation Panel */}
-        <div className="flex-1 card-elevated rounded-xl p-6 flex flex-col justify-between overflow-hidden">
+        <div className="flex-1 card-elevated rounded-xl p-6 flex flex-col justify-between overflow-auto">
           {/* Header & Quick Add Form */}
           <div className="space-y-4">
             <div className="flex items-center justify-between border-b border-white/6 pb-3">

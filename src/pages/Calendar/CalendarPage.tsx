@@ -360,7 +360,7 @@ export default function CalendarPage() {
             </div>
 
             {/* Interactive Timeline Grid */}
-            <div className="card-elevated p-6 space-y-4">
+            <div className="card-elevated p-6 space-y-4 overflow-auto">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
                   <FiClock className="text-accent" /> Hourly Schedule

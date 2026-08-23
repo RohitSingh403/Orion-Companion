@@ -35,7 +35,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <Sidebar />
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col h-screen relative overflow-hidden">
+      <main className="flex-1 flex flex-col h-screen relative overflow-auto">
         <AnimatePresence mode="wait">
           <SlideIn direction="right" duration={0.3}>
             <div className="flex-1 flex flex-col h-full overflow-auto">
