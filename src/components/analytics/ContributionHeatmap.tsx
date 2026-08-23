@@ -44,16 +44,16 @@ export default function ContributionHeatmap({
     return map;
   }, [data]);
 
-  // Generate the grid data
+  // Generate the grid data - GitHub style (Sunday-Saturday weeks)
   const { weeks, monthLabels } = useMemo(() => {
     const weeks: ContributionDay[][] = [];
     const monthLabels: { month: string; weekIndex: number }[] = [];
     
-    // Start from the Monday before the start date
+    // Start from the Sunday before the start date to align with GitHub
     const current = new Date(start);
     const dayOfWeek = current.getDay();
-    const mondayOffset = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-    current.setDate(current.getDate() - mondayOffset);
+    const sundayOffset = dayOfWeek; // 0 = Sunday, 1 = Monday, etc.
+    current.setDate(current.getDate() - sundayOffset);
     current.setHours(0, 0, 0, 0);
 
     let weekIndex = 0;
@@ -72,7 +72,7 @@ export default function ContributionHeatmap({
         lastMonth = currentMonth;
       }
 
-      // Create 7 days for this week
+      // Create 7 days for this week (Sunday-Saturday)
       for (let i = 0; i < 7; i++) {
         const dateStr = current.toISOString().split("T")[0];
         const count = contributionMap.get(dateStr) || 0;
@@ -123,7 +123,7 @@ export default function ContributionHeatmap({
             <div
               key={`${label.month}-${label.weekIndex}`}
               className="text-[10px] text-muted font-medium"
-              style={{ marginLeft: label.weekIndex === 0 ? 0 : '12px' }}
+              style={{ marginLeft: label.weekIndex === 0 ? 0 : `${label.weekIndex * 14}px` }}
             >
               {label.month}
             </div>
@@ -131,18 +131,22 @@ export default function ContributionHeatmap({
         </div>
 
         {/* Heatmap Grid */}
-        <div className="flex gap-1 items-start">
-          {/* Day Labels */}
-          <div className="grid grid-rows-7 text-[10px] text-muted font-medium h-32 justify-between pr-2 flex-shrink-0 leading-3">
-            <span className="flex items-center">Mon</span>
-            <span className="flex items-center">Wed</span>
-            <span className="flex items-center">Fri</span>
+        <div className="flex gap-3 items-start">
+          {/* Day Labels - GitHub style (Mon, Wed, Fri) */}
+          <div className="flex flex-col justify-between text-[10px] text-muted font-medium h-[91px] pr-2 flex-shrink-0">
+            <span className="h-[11px]"></span>
+            <span className="h-[11px]">Mon</span>
+            <span className="h-[11px]"></span>
+            <span className="h-[11px]">Wed</span>
+            <span className="h-[11px]"></span>
+            <span className="h-[11px]">Fri</span>
+            <span className="h-[11px]"></span>
           </div>
 
           {/* Weeks */}
-          <div className="flex gap-1 overflow-x-auto no-scrollbar pb-2">
+          <div className="flex gap-[3px]">
             {weeks.map((week, weekIdx) => (
-              <div key={weekIdx} className="grid grid-rows-7 gap-1 flex-shrink-0">
+              <div key={weekIdx} className="grid grid-rows-7 gap-[3px] flex-shrink-0">
                 {week.map((day) => (
                   <ContributionCell
                     key={day.date}
@@ -204,7 +208,13 @@ function ContributionCell({ date, count, level, onHover, onLeave }: Contribution
 
   return (
     <div
-      className={`w-3 h-3 rounded-sm transition-all duration-200 hover:scale-125 hover:z-10 cursor-pointer heatmap-level-${level} relative group`}
+      className="w-[11px] h-[11px] rounded-[2px] transition-all duration-200 hover:scale-125 hover:z-10 cursor-pointer relative group"
+      style={{
+        backgroundColor: level === 0 ? '#161b22' : 
+                       level === 1 ? '#0e4429' : 
+                       level === 2 ? '#006d32' : 
+                       level === 3 ? '#26a641' : '#39d353'
+      }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={onLeave}
     >
@@ -217,15 +227,19 @@ function ContributionCell({ date, count, level, onHover, onLeave }: Contribution
 
 // Legend Component
 function ContributionLegend() {
+  const colors = ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'];
+  
   return (
     <div className="flex items-center gap-2 text-[10px] text-muted font-medium">
       <span>Less</span>
-      <div className="flex gap-1">
-        <span className="w-3 h-3 rounded-sm heatmap-level-0"></span>
-        <span className="w-3 h-3 rounded-sm heatmap-level-1"></span>
-        <span className="w-3 h-3 rounded-sm heatmap-level-2"></span>
-        <span className="w-3 h-3 rounded-sm heatmap-level-3"></span>
-        <span className="w-3 h-3 rounded-sm heatmap-level-4"></span>
+      <div className="flex gap-[3px]">
+        {colors.map((color, idx) => (
+          <div
+            key={idx}
+            className="w-[11px] h-[11px] rounded-[2px]"
+            style={{ backgroundColor: color }}
+          />
+        ))}
       </div>
       <span>More</span>
     </div>
