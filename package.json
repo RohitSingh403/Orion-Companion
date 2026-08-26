@@ -44,6 +44,7 @@
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
     "@vitejs/plugin-react": "^4.2.1",
+    "@vitest/ui": "^4.1.11",
     "autoprefixer": "^10.5.4",
     "electron": "^30.0.1",
     "electron-builder": "^24.13.3",
