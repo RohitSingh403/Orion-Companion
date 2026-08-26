@@ -52,7 +52,7 @@ export default function Sidebar() {
         </div>
 
         {/* Navigation Links */}
-        <nav className="space-y-1">
+        <nav aria-label="Main navigation" className="space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -61,13 +61,16 @@ export default function Sidebar() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 ${
+                aria-label={`Navigate to ${item.label}`}
+                aria-current={isActive ? "page" : undefined}
+                className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:ring-offset-2 focus:ring-offset-[#0f0f12] ${
                   isActive
                     ? "bg-accent/15 text-accent border border-accent/30 shadow-sm"
                     : "text-secondary hover:text-primary hover:bg-white/5 hover:translate-x-0.5"
                 }`}
               >
                 <Icon
+                  aria-hidden="true"
                   className={`w-4 h-4 transition-transform duration-200 group-hover:scale-110 ${
                     isActive ? "text-accent" : "text-secondary"
                   }`}

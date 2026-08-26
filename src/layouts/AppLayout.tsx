@@ -30,15 +30,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }, [theme]);
 
   return (
-    <div className={`flex h-screen w-screen text-primary font-sans select-none ${theme === "light" ? "bg-gray-50" : "bg-[#0a0a0a]"}`}>
+    <div className={`flex h-screen w-screen text-primary font-sans select-none ${theme === "light" ? "bg-gray-50" : "bg-[#0a0a0a]"}`} role="application" aria-label="Focus Companion Application">
       {/* Permanent Fixed Left Sidebar */}
       <Sidebar />
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col h-screen relative overflow-auto">
+      <main className="flex-1 flex flex-col h-screen relative overflow-auto" role="main" aria-label="Main content">
         <AnimatePresence mode="wait">
           <SlideIn direction="right" duration={0.3}>
-            <div className="flex-1 flex flex-col h-full overflow-auto">
+            <div className="flex-1 flex flex-col h-full overflow-auto" id="main-content">
               {children}
             </div>
           </SlideIn>

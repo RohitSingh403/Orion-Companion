@@ -1,4 +1,5 @@
 import AppRouter from "./router/AppRouter";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 import usePomodoro from "./hooks/usePomodoro";
 import useTray from "./hooks/useTray";
@@ -9,5 +10,9 @@ export default function App() {
   useTray();
   useReminders();
 
-  return <AppRouter />;
+  return (
+    <ErrorBoundary>
+      <AppRouter />
+    </ErrorBoundary>
+  );
 }
