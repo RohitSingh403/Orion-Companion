@@ -1,6 +1,6 @@
 // src/pages/Focus/FocusPage.tsx
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "../../layouts/AppLayout";
@@ -8,15 +8,16 @@ import Topbar from "../../components/topbar/Topbar";
 import FocusTimer from "../../components/timer/FocusTimer";
 import { useTaskStore } from "../../store/taskStore";
 import { useFocusStore } from "../../store/focusStore";
-import { FiMusic, FiPlay, FiPause, FiArrowRight, FiTarget, FiMaximize, FiMinimize, FiVolume2, FiWind } from "react-icons/fi";
+import { FiMusic, FiPlay, FiPause, FiArrowRight, FiTarget, FiMaximize, FiMinimize, FiVolume2, FiWind, FiClock, FiList, FiCheckCircle, FiZap } from "react-icons/fi";
 
 export default function FocusPage() {
   const [focusMode, setFocusMode] = useState(false);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [volume, setVolume] = useState(70);
   const [ambientEffect, setAmbientEffect] = useState("none");
-  const { tasks, activeTaskId } = useTaskStore();
-  const { running, session, completedSessions, focusDuration, dailyGoal } = useFocusStore();
+  const [showTaskQueue, setShowTaskQueue] = useState(true);
+  const { tasks, activeTaskId, setActiveTask } = useTaskStore();
+  const { running, session, completedSessions, focusDuration, dailyGoal, history } = useFocusStore();
 
   const activeTask = tasks.find((t: any) => t.id === activeTaskId);
   const completedMinutes = Math.floor((completedSessions * focusDuration) / 60);
@@ -49,6 +50,26 @@ export default function FocusPage() {
         return "bg-white/5 text-secondary border-white/10";
     }
   };
+
+  // Get task queue (upcoming incomplete tasks)
+  const taskQueue = useMemo(() => {
+    return tasks
+      .filter((t: any) => !t.completed && t.id !== activeTaskId)
+      .sort((a: any, b: any) => {
+        // Sort by priority first
+        const priorityOrder: { [key: string]: number } = { high: 0, medium: 1, low: 2 };
+        const priorityDiff = (priorityOrder[a.priority] ?? 1) - (priorityOrder[b.priority] ?? 1);
+        if (priorityDiff !== 0) return priorityDiff;
+        // Then by estimated sessions
+        return a.estimatedFocusSessions - b.estimatedFocusSessions;
+      })
+      .slice(0, 5);
+  }, [tasks, activeTaskId]);
+
+  // Get recent session history
+  const recentSessions = useMemo(() => {
+    return history.slice(0, 5);
+  }, [history]);
 
   // Ambient background gradient based on session state
   const getAmbientGradient = () => {
@@ -118,14 +139,14 @@ export default function FocusPage() {
           </div>
         </motion.div>
 
-        {/* Main Grid: Timer on Left (Col 7), Context Panel on Right (Col 5) */}
+        {/* Main Grid: Timer on Left (Col 8), Context Panel on Right (Col 4) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column: Big Focus Ring Timer */}
+          {/* Left Column: Enhanced Focus Timer */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="lg:col-span-7 card-elevated p-8 flex flex-col items-center justify-center min-h-[420px] relative overflow-hidden"
+            className="lg:col-span-8 card-elevated p-8 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden"
           >
             {/* Ambient glow effect when running */}
             <AnimatePresence>
@@ -139,8 +160,26 @@ export default function FocusPage() {
               )}
             </AnimatePresence>
 
-            <div className="relative z-10">
+            <div className="relative z-10 w-full max-w-lg">
               <FocusTimer />
+              
+              {/* Session Progress Ring */}
+              <div className="mt-8 flex items-center justify-center gap-8">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-accent">{completedSessions}</div>
+                  <div className="text-xs text-muted mt-1">Sessions Today</div>
+                </div>
+                <div className="w-px h-12 bg-white/10"></div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary">{productivityScore}%</div>
+                  <div className="text-xs text-muted mt-1">Daily Goal</div>
+                </div>
+                <div className="w-px h-12 bg-white/10"></div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-secondary">{focusTimeDisplay}</div>
+                  <div className="text-xs text-muted mt-1">Focus Time</div>
+                </div>
+              </div>
             </div>
 
             {/* Session status indicator */}
@@ -153,7 +192,7 @@ export default function FocusPage() {
             </motion.div>
           </motion.div>
 
-          {/* Right Column: Task context, Today's stats, Background sound */}
+          {/* Right Column: Enhanced Context Panel */}
           <AnimatePresence mode="wait">
             {!focusMode ? (
               <motion.div
@@ -162,7 +201,7 @@ export default function FocusPage() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.3 }}
-                className="lg:col-span-5 space-y-6"
+                className="lg:col-span-4 space-y-4"
               >
                 {/* Card 1: Current Task */}
                 <motion.div
@@ -230,43 +269,104 @@ export default function FocusPage() {
                   )}
                 </motion.div>
 
-                {/* Card 2: Today's Progress Stats */}
+                {/* Card 2: Task Queue */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25 }}
+                  className="card-elevated p-5 space-y-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-semibold text-primary uppercase tracking-wider flex items-center gap-2">
+                      <FiList className="w-3.5 h-3.5" />
+                      Upcoming Tasks
+                    </h4>
+                    <button
+                      onClick={() => setShowTaskQueue(!showTaskQueue)}
+                      className="text-muted hover:text-primary transition-colors"
+                    >
+                      {showTaskQueue ? <FiMinimize className="w-3.5 h-3.5" /> : <FiMaximize className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+
+                  <AnimatePresence>
+                    {showTaskQueue && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="space-y-2"
+                      >
+                        {taskQueue.length === 0 ? (
+                          <p className="text-xs text-muted text-center py-4">No upcoming tasks</p>
+                        ) : (
+                          taskQueue.map((task: any, idx: number) => (
+                            <motion.div
+                              key={task.id}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: idx * 0.05 }}
+                              className="flex items-center justify-between p-2 rounded-lg card hover:bg-white/5 cursor-pointer transition-all"
+                              onClick={() => setActiveTask(task.id)}
+                            >
+                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                <span className="text-[10px] font-mono text-muted">#{idx + 1}</span>
+                                <span className="text-xs font-medium text-primary truncate">{task.title}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className={`text-[9px] font-medium px-1.5 py-0.2 rounded border uppercase badge ${getPriorityColor(task.priority)}`}>
+                                  {task.priority[0]}
+                                </span>
+                                <span className="text-[10px] text-muted">{task.estimatedFocusSessions}×</span>
+                              </div>
+                            </motion.div>
+                          ))
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+
+                {/* Card 3: Session History */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
                   className="card-elevated p-5 space-y-3"
                 >
-                  <h4 className="text-xs font-semibold text-primary uppercase tracking-wider border-b border-white/6 pb-2">
-                    Today's Progress
+                  <h4 className="text-xs font-semibold text-primary uppercase tracking-wider flex items-center gap-2">
+                    <FiClock className="w-3.5 h-3.5" />
+                    Recent Sessions
                   </h4>
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div className="card p-3">
-                      <span className="text-muted text-[10px] block">Focus Sessions</span>
-                      <span className="text-base font-semibold text-accent mt-0.5 block">{completedSessions} / {dailyGoal}</span>
-                    </div>
-                    <div className="card p-3">
-                      <span className="text-muted text-[10px] block">Focus Time</span>
-                      <span className="text-base font-semibold text-accent mt-0.5 block">{focusTimeDisplay}</span>
-                    </div>
-                    <div className="card p-3">
-                      <span className="text-muted text-[10px] block">Tasks Completed</span>
-                      <span className="text-base font-semibold text-accent mt-0.5 block">
-                        {tasks.filter((t: any) => t.completed).length} / {tasks.length}
-                      </span>
-                    </div>
-                    <div className="card p-3">
-                      <span className="text-muted text-[10px] block">Productivity</span>
-                      <span className="text-base font-semibold text-accent mt-0.5 block">{productivityScore}%</span>
-                    </div>
+
+                  <div className="space-y-2">
+                    {recentSessions.length === 0 ? (
+                      <p className="text-xs text-muted text-center py-4">No sessions yet</p>
+                    ) : (
+                      recentSessions.map((session: any, idx: number) => (
+                        <motion.div
+                          key={session.id}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.05 }}
+                          className="flex items-center justify-between p-2 rounded-lg card"
+                        >
+                          <div className="flex items-center gap-2">
+                            <FiCheckCircle className="w-3 h-3 text-accent" />
+                            <span className="text-xs text-secondary">{session.time}</span>
+                          </div>
+                          <span className="text-[10px] text-muted">{Math.round(session.duration / 60)}m</span>
+                        </motion.div>
+                      ))
+                    )}
                   </div>
                 </motion.div>
 
-                {/* Card 3: Background Sound Controls */}
+                {/* Card 4: Background Sound Controls */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
+                  transition={{ delay: 0.35 }}
                   className="card-elevated p-5 space-y-3"
                 >
                   <div className="flex items-center justify-between">
@@ -319,11 +419,11 @@ export default function FocusPage() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.3 }}
-                className="lg:col-span-5"
+                className="lg:col-span-4"
               >
                 <div className="card-elevated p-8 text-center space-y-4">
                   <div className="w-16 h-16 mx-auto rounded-full bg-accent/10 border border-accent/30 flex items-center justify-center">
-                    <FiTarget className="w-8 h-8 text-accent" />
+                    <FiZap className="w-8 h-8 text-accent" />
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-primary">Focus Mode Active</h3>
