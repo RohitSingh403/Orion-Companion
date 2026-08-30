@@ -2,11 +2,14 @@
 
 import { motion } from "framer-motion";
 import { useFocusStore } from "../../store/focusStore";
+import { useSettingsStore } from "../../store/settingsStore";
 import { formatTime } from "../../utils/time";
 
 export default function ProgressRing() {
   const { remainingTime, session, focusDuration, breakDuration, running } =
     useFocusStore();
+  const theme = useSettingsStore((s) => s.theme);
+  const isDark = theme === "dark";
 
   const duration = session === "focus" ? focusDuration : breakDuration;
 
@@ -22,26 +25,29 @@ export default function ProgressRing() {
   const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
 
   // Dynamic ring color: green → amber → red for focus; blue for break
-  let ringColor = "#22c55e";
-  let labelBg = "bg-emerald-500/15";
-  let labelText = "text-emerald-400";
+  let ringColor = "#10b981";
+  let labelBg = "bg-green-500/15";
+  let labelText = "text-green-600";
 
   if (session === "break") {
     ringColor = "#3b82f6";
     labelBg = "bg-blue-500/15";
-    labelText = "text-blue-400";
+    labelText = "text-blue-600";
   } else {
     if (progress < 0.5) {
       ringColor = "#f59e0b";
       labelBg = "bg-amber-500/15";
-      labelText = "text-amber-400";
+      labelText = "text-amber-600";
     }
     if (progress < 0.2) {
       ringColor = "#ef4444";
       labelBg = "bg-red-500/15";
-      labelText = "text-red-400";
+      labelText = "text-red-600";
     }
   }
+
+  // Track color based on theme
+  const trackColor = isDark ? "#374151" : "#e5e7eb";
 
   const isEnding = running && remainingTime <= 10 && session === "focus";
 
@@ -76,7 +82,7 @@ export default function ProgressRing() {
             cx={CENTER}
             cy={CENTER}
             r={NORMALIZED_RADIUS}
-            stroke="#1c1c1f"
+            stroke={trackColor}
             strokeWidth={STROKE}
             fill="none"
           />
@@ -111,7 +117,9 @@ export default function ProgressRing() {
             initial={{ opacity: 0.5, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.15 }}
-            className="text-6xl font-extrabold tracking-tighter text-primary font-mono leading-none"
+            className={`text-6xl font-extrabold tracking-tighter font-mono leading-none ${
+              isDark ? "text-gray-100" : "text-gray-900"
+            }`}
           >
             {formatTime(remainingTime)}
           </motion.span>
@@ -120,7 +128,7 @@ export default function ProgressRing() {
           <motion.div
             animate={{ opacity: [0.75, 1, 0.75] }}
             transition={{ repeat: Infinity, duration: 2.5 }}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold ${labelBg} ${labelText} border border-current/20`}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold border border-current/20 ${labelBg} ${labelText}`}
           >
             {sessionLabel}
           </motion.div>
