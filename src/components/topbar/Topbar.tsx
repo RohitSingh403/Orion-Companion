@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { FiSearch, FiPlus, FiBell } from "react-icons/fi";
 import { useTaskStore } from "../../store/taskStore";
+import { useSettingsStore } from "../../store/settingsStore";
 
 interface TopbarProps {
   greeting?: string;
@@ -15,6 +16,7 @@ export default function Topbar({
 }: TopbarProps) {
   const [quickAddOpen, setQuickAddOpen] = useState(false);
   const [taskTitle, setTaskTitle] = useState("");
+  const theme = useSettingsStore((s) => s.theme);
   
   // Initialize greeting immediately based on current time
   const getInitialGreeting = () => {
@@ -63,15 +65,25 @@ export default function Topbar({
     setQuickAddOpen(false);
   };
 
+  const isDark = theme === "dark";
+
   return (
-    <header className="w-full flex items-center justify-between px-8 py-4 border-b border-white/6 bg-white/[0.02] sticky top-0 z-30 select-none">
+    <header className={`w-full flex items-center justify-between px-8 py-4 border-b sticky top-0 z-30 select-none ${
+    isDark 
+      ? "bg-gray-900 border-gray-800" 
+      : "bg-white border-gray-200"
+  }`}>
       {/* Title & Subtitle */}
       <div>
-        <h1 className="text-xl font-semibold text-primary tracking-tight">
+        <h1 className={`text-xl font-semibold tracking-tight ${
+          isDark ? "text-gray-100" : "text-gray-900"
+        }`}>
           {displayGreeting}
         </h1>
         {propSubtitle && (
-          <p className="text-xs text-secondary mt-0.5">{propSubtitle}</p>
+          <p className={`text-xs mt-0.5 ${
+            isDark ? "text-gray-500" : "text-gray-500"
+          }`}>{propSubtitle}</p>
         )}
       </div>
 
@@ -79,13 +91,23 @@ export default function Topbar({
       <div className="flex items-center gap-3">
         {/* Global Search Bar */}
         <div className="relative flex items-center">
-          <FiSearch className="absolute left-3 w-3.5 h-3.5 text-muted" />
+          <FiSearch className={`absolute left-3 w-3.5 h-3.5 ${
+            isDark ? "text-gray-500" : "text-gray-400"
+          }`} />
           <input
             type="text"
             placeholder="Search anything..."
-            className="w-56 h-9 pl-9 pr-8 input rounded-lg text-sm text-primary placeholder-muted"
+            className={`w-56 h-9 pl-9 pr-8 rounded-lg text-sm ${
+              isDark 
+                ? "bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-500 focus:border-blue-500" 
+                : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-500"
+            } border px-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all`}
           />
-          <kbd className="absolute right-2.5 px-1.5 py-0.5 text-[10px] font-medium text-muted bg-white/5 border border-white/10 rounded">
+          <kbd className={`absolute right-2.5 px-1.5 py-0.5 text-[10px] font-medium rounded border ${
+            isDark 
+              ? "text-gray-500 bg-gray-800 border-gray-700" 
+              : "text-gray-500 bg-gray-100 border-gray-300"
+          }`}>
             ⌘K
           </kbd>
         </div>
@@ -94,16 +116,22 @@ export default function Topbar({
         <div className="relative">
           <button
             onClick={() => setQuickAddOpen(!quickAddOpen)}
-            className="h-9 px-3.5 btn-primary font-medium text-sm rounded-lg flex items-center gap-1.5"
+            className="h-9 px-3.5 font-medium text-sm rounded-lg flex items-center gap-1.5 bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             <FiPlus className="w-4 h-4 stroke-[2.5]" />
             <span>Quick Add</span>
           </button>
 
           {quickAddOpen && (
-            <div className="absolute right-0 mt-2 w-72 p-3 bg-[#1a1a1e] border border-white/20 shadow-2xl z-50 rounded-lg">
+            <div className={`absolute right-0 mt-2 w-72 p-3 shadow-xl z-50 rounded-lg border ${
+              isDark 
+                ? "bg-gray-800 border-gray-700" 
+                : "bg-white border-gray-200"
+            }`}>
               <form onSubmit={handleQuickAdd} className="space-y-2.5">
-                <h4 className="text-xs font-semibold text-primary">
+                <h4 className={`text-xs font-semibold ${
+                  isDark ? "text-gray-100" : "text-gray-900"
+                }`}>
                   Quick Add Task
                 </h4>
                 <input
@@ -112,19 +140,25 @@ export default function Topbar({
                   onChange={(e) => setTaskTitle(e.target.value)}
                   placeholder="Task title..."
                   autoFocus
-                  className="w-full h-8 px-3 bg-white/5 border border-white/10 rounded-lg text-sm text-primary placeholder-muted focus:border-accent/50 focus:outline-none"
+                  className={`w-full h-8 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${
+                    isDark 
+                      ? "bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-500 focus:border-blue-500" 
+                      : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-500"
+                  } border`}
                 />
                 <div className="flex justify-end gap-2 pt-1">
                   <button
                     type="button"
                     onClick={() => setQuickAddOpen(false)}
-                    className="px-2.5 py-1 text-sm text-secondary hover:text-primary transition-colors"
+                    className={`px-2.5 py-1 text-sm transition-colors ${
+                      isDark ? "text-gray-400 hover:text-gray-100" : "text-gray-600 hover:text-gray-900"
+                    }`}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-3 py-1 btn-primary text-sm font-medium rounded-md"
+                    className="px-3 py-1 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   >
                     Save
                   </button>
@@ -135,13 +169,21 @@ export default function Topbar({
         </div>
 
         {/* Notification Bell */}
-        <button className="icon-btn relative">
+        <button className={`w-9 h-9 flex items-center justify-center rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+          isDark 
+            ? "text-gray-400 hover:bg-gray-800 hover:text-gray-100" 
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+        }`}>
           <FiBell className="w-4 h-4" />
-          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent"></span>
+          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-blue-600"></span>
         </button>
 
         {/* User Avatar */}
-        <div className="avatar">
+        <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shadow ${
+          isDark 
+            ? "bg-gradient-to-tr from-blue-500 to-cyan-400 text-gray-900" 
+            : "bg-gradient-to-tr from-blue-600 to-cyan-500 text-white"
+        }`}>
           RS
         </div>
       </div>

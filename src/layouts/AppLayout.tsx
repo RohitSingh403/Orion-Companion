@@ -19,18 +19,18 @@ export default function AppLayout({ children }: AppLayoutProps) {
     if (theme === "light") {
       document.documentElement.classList.add("light");
       document.documentElement.classList.remove("dark");
-      document.body.style.background = "#fafafa";
-      document.body.style.color = "#0a0a0a";
+      document.body.style.background = "#f9fafb";
+      document.body.style.color = "#111827";
     } else {
       document.documentElement.classList.add("dark");
       document.documentElement.classList.remove("light");
-      document.body.style.background = "#0a0a0a";
-      document.body.style.color = "#fafafa";
+      document.body.style.background = "#111827";
+      document.body.style.color = "#f9fafb";
     }
   }, [theme]);
 
   return (
-    <div className={`flex h-screen w-screen text-primary font-sans select-none ${theme === "light" ? "bg-gray-50" : "bg-[#0a0a0a]"}`} role="application" aria-label="Focus Companion Application">
+    <div className={`flex h-screen w-screen font-sans select-none ${theme === "light" ? "bg-gray-50" : "bg-gray-900"}`} role="application" aria-label="Focus Companion Application">
       {/* Permanent Fixed Left Sidebar */}
       <Sidebar />
 
