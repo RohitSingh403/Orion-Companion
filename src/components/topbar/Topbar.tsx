@@ -99,9 +99,9 @@ export default function Topbar({
             placeholder="Search anything..."
             className={`w-56 h-9 pl-9 pr-8 rounded-lg text-sm ${
               isDark 
-                ? "bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-500 focus:border-blue-500" 
-                : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-500"
-            } border px-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all`}
+                ? "bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-500 focus:border-violet-500" 
+                : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-violet-500"
+            } border px-3 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all`}
           />
           <kbd className={`absolute right-2.5 px-1.5 py-0.5 text-[10px] font-medium rounded border ${
             isDark 
@@ -116,7 +116,7 @@ export default function Topbar({
         <div className="relative">
           <button
             onClick={() => setQuickAddOpen(!quickAddOpen)}
-            className="h-9 px-3.5 font-medium text-sm rounded-lg flex items-center gap-1.5 bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="h-9 px-3.5 font-semibold text-sm rounded-lg flex items-center gap-1.5 bg-gradient-to-r from-violet-600 to-pink-600 text-white hover:from-violet-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
           >
             <FiPlus className="w-4 h-4 stroke-[2.5]" />
             <span>Quick Add</span>
@@ -140,17 +140,17 @@ export default function Topbar({
                   onChange={(e) => setTaskTitle(e.target.value)}
                   placeholder="Task title..."
                   autoFocus
-                  className={`w-full h-8 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${
+                  className={`w-full h-8 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
                     isDark 
-                      ? "bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-500 focus:border-blue-500" 
-                      : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-500"
+                      ? "bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-500 focus:border-violet-500" 
+                      : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400 focus:border-violet-500"
                   } border`}
                 />
                 <div className="flex justify-end gap-2 pt-1">
                   <button
                     type="button"
                     onClick={() => setQuickAddOpen(false)}
-                    className={`px-2.5 py-1 text-sm transition-colors ${
+                    className={`px-2.5 py-1 text-sm font-medium transition-colors ${
                       isDark ? "text-gray-400 hover:text-gray-100" : "text-gray-600 hover:text-gray-900"
                     }`}
                   >
@@ -158,7 +158,7 @@ export default function Topbar({
                   </button>
                   <button
                     type="submit"
-                    className="px-3 py-1 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="px-3 py-1 text-sm font-semibold rounded-md bg-gradient-to-r from-violet-600 to-pink-600 text-white hover:from-violet-700 hover:to-pink-700 transition-all focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
                   >
                     Save
                   </button>
@@ -169,20 +169,20 @@ export default function Topbar({
         </div>
 
         {/* Notification Bell */}
-        <button className={`w-9 h-9 flex items-center justify-center rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+        <button className={`w-9 h-9 flex items-center justify-center rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
           isDark 
             ? "text-gray-400 hover:bg-gray-800 hover:text-gray-100" 
             : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
         }`}>
           <FiBell className="w-4 h-4" />
-          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-blue-600"></span>
+          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-gradient-to-r from-violet-500 to-pink-500"></span>
         </button>
 
         {/* User Avatar */}
-        <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shadow ${
+        <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shadow-lg ${
           isDark 
-            ? "bg-gradient-to-tr from-blue-500 to-cyan-400 text-gray-900" 
-            : "bg-gradient-to-tr from-blue-600 to-cyan-500 text-white"
+            ? "bg-gradient-to-tr from-violet-500 to-pink-500 text-white" 
+            : "bg-gradient-to-tr from-violet-600 to-pink-600 text-white"
         }`}>
           RS
         </div>

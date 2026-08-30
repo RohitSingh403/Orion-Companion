@@ -24,10 +24,10 @@ export default function ProgressRing() {
   const progress = Math.max(0, remainingTime / duration);
   const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
 
-  // Dynamic ring color: green → amber → red for focus; blue for break
-  let ringColor = "#10b981";
-  let labelBg = "bg-green-500/15";
-  let labelText = "text-green-600";
+  // Dynamic ring color: violet → pink → red for focus; blue for break
+  let ringColor = "#8b5cf6";
+  let labelBg = "bg-violet-500/15";
+  let labelText = "text-violet-600";
 
   if (session === "break") {
     ringColor = "#3b82f6";
@@ -35,9 +35,9 @@ export default function ProgressRing() {
     labelText = "text-blue-600";
   } else {
     if (progress < 0.5) {
-      ringColor = "#f59e0b";
-      labelBg = "bg-amber-500/15";
-      labelText = "text-amber-600";
+      ringColor = "#ec4899";
+      labelBg = "bg-pink-500/15";
+      labelText = "text-pink-600";
     }
     if (progress < 0.2) {
       ringColor = "#ef4444";
@@ -47,7 +47,7 @@ export default function ProgressRing() {
   }
 
   // Track color based on theme
-  const trackColor = isDark ? "#374151" : "#e5e7eb";
+  const trackColor = isDark ? "#3f3f46" : "#e4e4e7";
 
   const isEnding = running && remainingTime <= 10 && session === "focus";
 

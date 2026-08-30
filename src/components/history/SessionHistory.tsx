@@ -19,13 +19,13 @@ export default function SessionHistory() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <FiClock className={`w-4 h-4 ${isDark ? "text-blue-400" : "text-blue-600"}`} />
+          <FiClock className={`w-4 h-4 ${isDark ? "text-violet-400" : "text-violet-600"}`} />
           <h3 className={`text-sm font-bold ${isDark ? "text-gray-100" : "text-gray-900"}`}>Session History</h3>
         </div>
         <Link
           to="/analytics"
-          className={`text-xs hover:underline font-semibold ${
-            isDark ? "text-blue-400" : "text-blue-600"
+          className={`text-xs hover:underline font-semibold transition-colors ${
+            isDark ? "text-violet-400" : "text-violet-600"
           }`}
         >
           View all
@@ -34,7 +34,7 @@ export default function SessionHistory() {
 
       {/* Empty State */}
       {history.length === 0 ? (
-        <div className={`text-center py-10 border border-dashed rounded-lg ${
+        <div className={`text-center py-10 border border-dashed rounded-xl ${
           isDark ? "border-gray-700" : "border-gray-300"
         }`}>
           <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>No sessions recorded yet.</p>
@@ -48,7 +48,7 @@ export default function SessionHistory() {
           {history.map((session) => (
             <div
               key={session.id}
-              className={`flex items-center justify-between px-4 py-3 rounded-lg transition ${
+              className={`flex items-center justify-between px-4 py-3 rounded-xl transition ${
                 isDark 
                   ? "bg-gray-700/50 border border-gray-700 hover:border-gray-600" 
                   : "bg-gray-50 border border-gray-200 hover:border-gray-300"
@@ -58,8 +58,8 @@ export default function SessionHistory() {
               <div className="flex items-center gap-3">
                 <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${
                   isDark 
-                    ? "bg-blue-500/10 border border-blue-500/20 text-blue-400" 
-                    : "bg-blue-50 border border-blue-200 text-blue-600"
+                    ? "bg-violet-500/10 border border-violet-500/20 text-violet-400" 
+                    : "bg-violet-50 border border-violet-200 text-violet-600"
                 }`}>
                   <FiZap className="w-3.5 h-3.5" />
                 </div>
@@ -86,8 +86,8 @@ export default function SessionHistory() {
                 }`}>{session.time}</span>
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border ${
                   isDark 
-                    ? "bg-blue-500/10 text-blue-400 border-blue-500/20" 
-                    : "bg-blue-50 text-blue-600 border-blue-200"
+                    ? "bg-violet-500/10 text-violet-400 border-violet-500/20" 
+                    : "bg-violet-50 text-violet-600 border-violet-200"
                 }`}>
                   25m
                 </span>

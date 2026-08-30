@@ -49,7 +49,7 @@ export default function DashboardContent() {
         {/* Top 3 Metric Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {/* Card 1: Today's Goal */}
-          <div className={`p-6 rounded-lg border shadow-sm ${
+          <div className={`p-6 rounded-xl border shadow-sm ${
             isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
           }`}>
             <div className="flex items-center justify-between">
@@ -61,7 +61,7 @@ export default function DashboardContent() {
                   isDark ? "text-gray-500" : "text-gray-500"
                 }`}>Focus for {targetHours.toFixed(1)} hours</p>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gradient-to-r from-violet-100 to-pink-100 text-violet-700">
                 {goalProgress}%
               </span>
             </div>
@@ -79,14 +79,14 @@ export default function DashboardContent() {
               <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div
                   style={{ width: `${goalProgress}%` }}
-                  className="h-full bg-blue-600 rounded-full transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-violet-500 to-pink-500 rounded-full transition-all duration-500"
                 />
               </div>
             </div>
           </div>
 
           {/* Card 2: Focus Score */}
-          <div className={`p-6 rounded-lg border shadow-sm ${
+          <div className={`p-6 rounded-xl border shadow-sm ${
             isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
           }`}>
             <div className="flex items-center justify-between">
@@ -95,13 +95,13 @@ export default function DashboardContent() {
                   isDark ? "text-gray-400" : "text-gray-600"
                 }`}>Focus Score</h3>
                 <p className={`text-xs font-semibold mt-1 ${
-                  focusScore >= 80 ? "text-green-600" : focusScore >= 50 ? "text-blue-600" : "text-amber-600"
+                  focusScore >= 80 ? "text-green-600" : focusScore >= 50 ? "text-violet-600" : "text-amber-600"
                 }`}>
                   {focusScore >= 80 ? "Great Focus!" : focusScore >= 50 ? "Good Progress!" : "Keep Going!"}
                 </p>
               </div>
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                isDark ? "bg-gray-700 text-blue-400" : "bg-gray-100 text-blue-600"
+                isDark ? "bg-violet-500/10 text-violet-400" : "bg-violet-50 text-violet-600"
               }`}>
                 <FiTrendingUp className="w-4 h-4" />
               </div>
@@ -113,7 +113,7 @@ export default function DashboardContent() {
                   isDark ? "text-gray-100" : "text-gray-900"
                 }`}>{focusScore}</span>
                 <p className={`text-[10px] font-medium mt-1 ${
-                  isDark ? "text-blue-400" : "text-blue-600"
+                  isDark ? "text-violet-400" : "text-violet-600"
                 }`}>Daily goal progress</p>
               </div>
 
@@ -124,7 +124,7 @@ export default function DashboardContent() {
                     key={i}
                     style={{ height: `${h}%` }}
                     className={`w-1.5 rounded-t-sm transition-all duration-300 ${
-                      isDark ? "bg-blue-400/60 hover:bg-blue-400" : "bg-blue-500/60 hover:bg-blue-500"
+                      isDark ? "bg-violet-400/60 hover:bg-violet-400" : "bg-violet-500/60 hover:bg-violet-500"
                     }`}
                   />
                 ))}
@@ -133,7 +133,7 @@ export default function DashboardContent() {
           </div>
 
           {/* Card 3: Current Streak */}
-          <div className={`p-6 rounded-lg border shadow-sm ${
+          <div className={`p-6 rounded-xl border shadow-sm ${
             isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
           }`}>
             <div className="flex items-center justify-between">
@@ -160,8 +160,8 @@ export default function DashboardContent() {
                     key={day}
                     className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${
                       isDark 
-                        ? "bg-blue-500/10 border border-blue-500/20 text-blue-400" 
-                        : "bg-blue-50 border border-blue-200 text-blue-600"
+                        ? "bg-violet-500/10 border border-violet-500/20 text-violet-400" 
+                        : "bg-violet-50 border border-violet-200 text-violet-600"
                     }`}
                   >
                     <FiCheckCircle className="w-3 h-3" />
@@ -175,7 +175,7 @@ export default function DashboardContent() {
         {/* Middle Row: Focus Timer & Today's Tasks */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
           {/* Main Focus Timer Container (Col 6) */}
-          <div className={`lg:col-span-6 p-4 md:p-6 rounded-lg border shadow-sm flex flex-col items-center justify-center relative ${
+          <div className={`lg:col-span-6 p-4 md:p-6 rounded-xl border shadow-sm flex flex-col items-center justify-center relative ${
             isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
           }`}>
             <div className="w-full flex justify-between items-center mb-4">
@@ -185,14 +185,14 @@ export default function DashboardContent() {
                 Focus Timer
               </h3>
               <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                isDark ? "bg-gray-700 text-gray-400" : "bg-gray-100 text-gray-600"
+                isDark ? "bg-violet-500/10 text-violet-400" : "bg-violet-50 text-violet-600"
               }`}>Deep Work Session</span>
             </div>
             <FocusTimer />
           </div>
 
           {/* Today's Tasks Container (Col 6) */}
-          <div className={`lg:col-span-6 p-4 md:p-6 rounded-lg border shadow-sm flex flex-col justify-between space-y-4 ${
+          <div className={`lg:col-span-6 p-4 md:p-6 rounded-xl border shadow-sm flex flex-col justify-between space-y-4 ${
             isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
           }`}>
             <div className={`flex items-center justify-between pb-3 ${
@@ -210,8 +210,8 @@ export default function DashboardContent() {
               </div>
               <Link
                 to="/tasks"
-                className={`text-xs hover:underline font-medium transition-colors ${
-                  isDark ? "text-blue-400" : "text-blue-600"
+                className={`text-xs hover:underline font-semibold transition-colors ${
+                  isDark ? "text-violet-400" : "text-violet-600"
                 }`}
               >
                 View all
@@ -241,10 +241,10 @@ export default function DashboardContent() {
                         type="checkbox"
                         checked={task.completed}
                         onChange={() => toggleTask(task.id)}
-                        className="w-4 h-4 rounded cursor-pointer accent-blue-600"
+                        className="w-4 h-4 rounded cursor-pointer accent-violet-600"
                       />
                       <span
-                        className={`text-sm font-medium ${
+                        className={`text-sm font-semibold ${
                           task.completed
                             ? isDark ? "line-through text-gray-500" : "line-through text-gray-400"
                             : isDark ? "text-gray-100" : "text-gray-900"
@@ -254,7 +254,7 @@ export default function DashboardContent() {
                       </span>
                     </div>
 
-                    <span className={`text-[10px] font-mono font-medium px-2 py-0.5 rounded-full ${
+                    <span className={`text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full ${
                       isDark 
                         ? "bg-gray-700 text-gray-400" 
                         : "bg-gray-100 text-gray-600"
@@ -275,15 +275,15 @@ export default function DashboardContent() {
                 value={newTaskTitle}
                 onChange={(e) => setNewTaskTitle(e.target.value)}
                 placeholder="+ Add New Task"
-                className={`flex-1 h-9 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all ${
+                className={`flex-1 h-9 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
                   isDark 
-                    ? "bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-500 focus:border-blue-500" 
-                    : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400 focus:border-blue-500"
+                    ? "bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-500 focus:border-violet-500" 
+                    : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400 focus:border-violet-500"
                 } border`}
               />
               <button
                 type="submit"
-                className="h-9 px-3 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="h-9 px-3 rounded-lg text-sm font-semibold bg-gradient-to-r from-violet-600 to-pink-600 text-white hover:from-violet-700 hover:to-pink-700 transition-all focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
               >
                 <FiPlus className="w-4 h-4" />
               </button>
@@ -292,7 +292,7 @@ export default function DashboardContent() {
         </div>
 
         {/* Bottom Row: Session History */}
-        <div className={`p-4 md:p-6 rounded-lg border shadow-sm ${
+        <div className={`p-4 md:p-6 rounded-xl border shadow-sm ${
           isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
         }`}>
           <SessionHistory />

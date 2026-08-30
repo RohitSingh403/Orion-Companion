@@ -40,8 +40,8 @@ export default function Sidebar() {
         {/* App Logo & Header */}
         <div className="flex items-center justify-between px-2 pt-2">
           <div className="flex items-center gap-2.5">
-            <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
-              isDark ? "bg-blue-500/10 border border-blue-500/30 text-blue-400" : "bg-blue-50 border border-blue-200 text-blue-600"
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+              isDark ? "bg-violet-500/10 border border-violet-500/30 text-violet-400" : "bg-violet-50 border border-violet-200 text-violet-600"
             }`}>
               <HiSparkles className="w-5 h-5" />
             </div>
@@ -58,10 +58,10 @@ export default function Sidebar() {
               </p>
             </div>
           </div>
-          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
             isDark 
-              ? "bg-blue-500/10 text-blue-400 border-blue-500/20" 
-              : "bg-blue-50 text-blue-600 border-blue-200"
+              ? "bg-gradient-to-r from-violet-500/10 to-pink-500/10 text-violet-400 border-violet-500/20" 
+              : "bg-gradient-to-r from-violet-50 to-pink-50 text-violet-600 border-violet-200"
           }`}>
             v2.0
           </span>
@@ -79,11 +79,11 @@ export default function Sidebar() {
                 to={item.path}
                 aria-label={`Navigate to ${item.label}`}
                 aria-current={isActive ? "page" : undefined}
-                className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
                   isActive
                     ? isDark
-                      ? "bg-blue-500/15 text-blue-400 border border-blue-500/30"
-                      : "bg-blue-50 text-blue-600 border border-blue-200"
+                      ? "bg-gradient-to-r from-violet-500/15 to-pink-500/15 text-violet-400 border border-violet-500/30 shadow-glow"
+                      : "bg-gradient-to-r from-violet-50 to-pink-50 text-violet-600 border border-violet-200 shadow-lg"
                     : isDark
                       ? "text-gray-400 hover:text-gray-100 hover:bg-gray-800"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -92,7 +92,7 @@ export default function Sidebar() {
                 <Icon
                   aria-hidden="true"
                   className={`w-4 h-4 ${
-                    isActive ? "text-blue-500" : ""
+                    isActive ? "text-violet-500" : ""
                   }`}
                 />
                 <span>{item.label}</span>
@@ -110,14 +110,14 @@ export default function Sidebar() {
           isDark ? "hover:bg-gray-800" : "hover:bg-gray-100"
         }`}>
           <div className="relative">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow ${
+            <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shadow-lg ${
               isDark 
-                ? "bg-gradient-to-tr from-blue-500 to-cyan-400 text-gray-900" 
-                : "bg-gradient-to-tr from-blue-600 to-cyan-500 text-white"
+                ? "bg-gradient-to-tr from-violet-500 to-pink-500 text-white" 
+                : "bg-gradient-to-tr from-violet-600 to-pink-600 text-white"
             }`}>
               RS
             </div>
-            <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 ${
+            <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${
               isDark ? "bg-green-500 border-gray-900" : "bg-green-500 border-white"
             }`}></div>
           </div>
