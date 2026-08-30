@@ -11,9 +11,7 @@ import ContributionHeatmap from "../../components/analytics/ContributionHeatmap"
 export default function AnalyticsPage() {
   const [activeTab, setActiveTab] = useState<"overview" | "focus" | "tasks" | "trends">("overview");
   const [timeRange, setTimeRange] = useState<"week" | "month" | "year" | "custom">("week");
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [customStartDate, setCustomStartDate] = useState<string>("");
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [customEndDate, setCustomEndDate] = useState<string>("");
 
   const { completedSessions, focusDuration, bestStreak, getProductivityComparison, getFocusInsights, dailyStats } = useFocusStore();

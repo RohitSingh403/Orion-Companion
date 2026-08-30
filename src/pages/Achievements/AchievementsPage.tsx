@@ -15,7 +15,7 @@ export default function AchievementsPage() {
   
   const store = useAchievementStore();
   
-  const achievements = store.achievements || [];
+  const achievements = useMemo(() => store.achievements || [], [store.achievements]);
   const totalXP = store.totalXP ?? 0;
   const level = store.level ?? 1;
   const xpToNextLevel = store.xpToNextLevel ?? 1000;

@@ -19,7 +19,7 @@ export default function FocusPage() {
   const { tasks, activeTaskId, setActiveTask } = useTaskStore();
   const { running, session, completedSessions, focusDuration, dailyGoal, history } = useFocusStore();
 
-  const activeTask = tasks.find((t: any) => t.id === activeTaskId);
+  const activeTask = tasks.find((t) => t.id === activeTaskId);
   const completedMinutes = Math.floor((completedSessions * focusDuration) / 60);
   const completedHours = Math.floor(completedMinutes / 60);
   const completedMinutesRemainder = completedMinutes % 60;
@@ -54,8 +54,8 @@ export default function FocusPage() {
   // Get task queue (upcoming incomplete tasks)
   const taskQueue = useMemo(() => {
     return tasks
-      .filter((t: any) => !t.completed && t.id !== activeTaskId)
-      .sort((a: any, b: any) => {
+      .filter((t) => !t.completed && t.id !== activeTaskId)
+      .sort((a, b) => {
         // Sort by priority first
         const priorityOrder: { [key: string]: number } = { high: 0, medium: 1, low: 2 };
         const priorityDiff = (priorityOrder[a.priority] ?? 1) - (priorityOrder[b.priority] ?? 1);
@@ -300,7 +300,7 @@ export default function FocusPage() {
                         {taskQueue.length === 0 ? (
                           <p className="text-xs text-muted text-center py-4">No upcoming tasks</p>
                         ) : (
-                          taskQueue.map((task: any, idx: number) => (
+                          taskQueue.map((task, idx) => (
                             <motion.div
                               key={task.id}
                               initial={{ opacity: 0, x: -10 }}
@@ -343,7 +343,7 @@ export default function FocusPage() {
                     {recentSessions.length === 0 ? (
                       <p className="text-xs text-muted text-center py-4">No sessions yet</p>
                     ) : (
-                      recentSessions.map((session: any, idx: number) => (
+                      recentSessions.map((session, idx) => (
                         <motion.div
                           key={session.id}
                           initial={{ opacity: 0, x: -10 }}

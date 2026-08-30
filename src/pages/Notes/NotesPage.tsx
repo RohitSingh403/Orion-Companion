@@ -1,6 +1,6 @@
 // src/pages/Notes/NotesPage.tsx
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import AppLayout from "../../layouts/AppLayout";
 import Topbar from "../../components/topbar/Topbar";
 import { useNotesStore } from "../../store/notesStore";
@@ -39,6 +39,13 @@ export default function NotesPage() {
   const filteredNotes = searchQuery ? searchNotes(searchQuery) : notes;
 
   // Keyboard shortcut for quick note capture (Cmd/Ctrl + N)
+  const handleQuickNote = useCallback(() => {
+    addNote("Quick Note", "# Quick Note\n\nCapture your thoughts...");
+    setViewMode("edit");
+    setShowQuickNoteToast(true);
+    setTimeout(() => setShowQuickNoteToast(false), 2000);
+  }, [addNote]);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "n") {
@@ -49,14 +56,7 @@ export default function NotesPage() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  const handleQuickNote = () => {
-    addNote("Quick Note", "# Quick Note\n\nCapture your thoughts...");
-    setViewMode("edit");
-    setShowQuickNoteToast(true);
-    setTimeout(() => setShowQuickNoteToast(false), 2000);
-  };
+  }, [handleQuickNote]);
 
   const handleLinkTask = (taskId: string) => {
     if (activeNoteId) {

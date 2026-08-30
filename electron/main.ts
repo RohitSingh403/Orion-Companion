@@ -136,11 +136,11 @@ app.whenReady().then(() => {
       console.log("Checking for update...");
     });
 
-    autoUpdater.on("update-available", (info: any) => {
+    autoUpdater.on("update-available", (info: { version: string; files: string[] }) => {
       console.log("Update available:", info);
     });
 
-    autoUpdater.on("update-not-available", (info: any) => {
+    autoUpdater.on("update-not-available", (info: { version: string }) => {
       console.log("Update not available:", info);
     });
 
@@ -148,7 +148,7 @@ app.whenReady().then(() => {
       console.error("Auto-updater error:", err);
     });
 
-    autoUpdater.on("update-downloaded", (info: any) => {
+    autoUpdater.on("update-downloaded", (info: Record<string, unknown>) => {
       console.log("Update downloaded:", info);
       // Notify user that update is ready
       new Notification({

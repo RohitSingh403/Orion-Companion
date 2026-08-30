@@ -181,14 +181,14 @@ describe("taskStore", () => {
       result.current.addSubtask(taskId!, "Subtask 1");
     });
 
-    const task = result.current.tasks[0];
-    const subtaskId = task?.subtasks?.[0]?.id;
+    const subtaskId = result.current.tasks[0]?.subtasks?.[0]?.id;
 
     act(() => {
       result.current.toggleSubtask(taskId!, subtaskId!);
     });
 
-    expect(task?.subtasks?.[0]?.completed).toBe(true);
+    const updatedTask = result.current.tasks[0];
+    expect(updatedTask?.subtasks?.[0]?.completed).toBe(true);
   });
 
   it("should delete subtask", () => {
@@ -204,14 +204,14 @@ describe("taskStore", () => {
       result.current.addSubtask(taskId!, "Subtask 1");
     });
 
-    const task = result.current.tasks[0];
-    const subtaskId = task?.subtasks?.[0]?.id;
+    const subtaskId = result.current.tasks[0]?.subtasks?.[0]?.id;
 
     act(() => {
       result.current.deleteSubtask(taskId!, subtaskId!);
     });
 
-    expect(task?.subtasks?.length).toBe(0);
+    const updatedTask = result.current.tasks[0];
+    expect(updatedTask?.subtasks?.length).toBe(0);
   });
 
   it("should add time spent", () => {

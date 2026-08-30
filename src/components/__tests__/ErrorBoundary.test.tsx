@@ -44,7 +44,7 @@ describe("ErrorBoundary", () => {
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     // Mock import.meta.env.DEV
-    (import.meta.env as any).DEV = true;
+    (import.meta.env as { DEV?: boolean }).DEV = true;
 
     render(
       <ErrorBoundary>
@@ -54,7 +54,7 @@ describe("ErrorBoundary", () => {
 
     expect(screen.getByText(/Test error/)).toBeDefined();
 
-    (import.meta.env as any).DEV = false;
+    (import.meta.env as { DEV?: boolean }).DEV = false;
     consoleSpy.mockRestore();
   });
 });

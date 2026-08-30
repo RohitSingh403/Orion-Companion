@@ -168,7 +168,7 @@ export const useTaskStore = create<TaskStore>()(
             // Check if we've passed the recurrence end date
             if (recurrenceEndDate && today > recurrenceEndDate) return;
             
-            let nextDueDate = new Date(dueDate);
+            const nextDueDate = new Date(dueDate);
             
             // Calculate next due date based on recurrence type
             switch (task.recurrence) {
