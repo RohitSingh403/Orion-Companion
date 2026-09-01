@@ -8,6 +8,7 @@ import Topbar from "../../components/topbar/Topbar";
 import FocusTimer from "../../components/timer/FocusTimer";
 import { useTaskStore } from "../../store/taskStore";
 import { useFocusStore } from "../../store/focusStore";
+import { useSettingsStore } from "../../store/settingsStore";
 import { FiMusic, FiPlay, FiPause, FiArrowRight, FiTarget, FiMaximize, FiMinimize, FiVolume2, FiWind, FiClock, FiList, FiCheckCircle, FiZap } from "react-icons/fi";
 
 export default function FocusPage() {
@@ -18,6 +19,8 @@ export default function FocusPage() {
   const [showTaskQueue, setShowTaskQueue] = useState(true);
   const { tasks, activeTaskId, setActiveTask } = useTaskStore();
   const { running, session, completedSessions, focusDuration, dailyGoal, history } = useFocusStore();
+  const theme = useSettingsStore((s) => s.theme);
+  const isDark = theme === "dark";
 
   const activeTask = tasks.find((t) => t.id === activeTaskId);
   const completedMinutes = Math.floor((completedSessions * focusDuration) / 60);
@@ -47,7 +50,7 @@ export default function FocusPage() {
       case "low":
         return "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
       default:
-        return "bg-white/5 text-secondary border-white/10";
+        return isDark ? "bg-gray-700/50 text-gray-400 border-gray-600" : "bg-gray-100 text-gray-600 border-gray-200";
     }
   };
 
@@ -97,21 +100,29 @@ export default function FocusPage() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex flex-col sm:flex-row items-start sm:items-center justify-between card-elevated p-4 gap-4"
+          className={`flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 gap-4 rounded-xl border shadow-sm ${
+            isDark 
+              ? "bg-gray-800 border-gray-700" 
+              : "bg-white border-gray-200"
+          }`}
         >
           <div>
-            <h2 className="text-lg font-semibold text-accent">Deep Work</h2>
-            <p className="text-xs text-secondary">Build amazing things with focused attention</p>
+            <h2 className={`text-lg font-semibold ${isDark ? "text-violet-400" : "text-violet-600"}`}>Deep Work</h2>
+            <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Build amazing things with focused attention</p>
           </div>
 
           <div className="flex items-center gap-4">
             {/* Ambient Effect Selector */}
             <div className="flex items-center gap-2">
-              <FiWind className="w-4 h-4 text-secondary" />
+              <FiWind className={`w-4 h-4 ${isDark ? "text-gray-500" : "text-gray-500"}`} />
               <select
                 value={ambientEffect}
                 onChange={(e) => setAmbientEffect(e.target.value)}
-                className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-primary focus:outline-none focus:border-accent/50"
+                className={`rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
+                  isDark 
+                    ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500" 
+                    : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500"
+                } border`}
               >
                 <option value="none">None</option>
                 <option value="calm">Calm</option>
@@ -121,7 +132,7 @@ export default function FocusPage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="text-xs font-medium text-secondary">Focus Mode</span>
+              <span className={`text-xs font-medium ${isDark ? "text-gray-500" : "text-gray-500"}`}>Focus Mode</span>
               <button
                 onClick={() => setFocusMode(!focusMode)}
                 className={`toggle ${focusMode ? "active" : ""}`}
@@ -131,7 +142,7 @@ export default function FocusPage() {
 
             <button
               onClick={() => setFocusMode(!focusMode)}
-              className="icon-btn"
+              className="icon-btn focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
               title={focusMode ? "Exit Focus Mode" : "Enter Focus Mode"}
             >
               {focusMode ? <FiMinimize className="w-4 h-4" /> : <FiMaximize className="w-4 h-4" />}
@@ -146,7 +157,11 @@ export default function FocusPage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="lg:col-span-8 card-elevated p-8 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden"
+            className={`lg:col-span-8 p-8 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden rounded-xl border shadow-sm ${
+              isDark 
+                ? "bg-gray-800 border-gray-700" 
+                : "bg-white border-gray-200"
+            }`}
           >
             {/* Ambient glow effect when running */}
             <AnimatePresence>
@@ -155,7 +170,9 @@ export default function FocusPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 0.3 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 bg-gradient-to-br from-accent/20 via-transparent to-teal-500/20 pointer-events-none"
+                  className={`absolute inset-0 bg-gradient-to-br pointer-events-none ${
+                    isDark ? "from-violet-500/20 via-transparent to-pink-500/20" : "from-violet-500/10 via-transparent to-pink-500/10"
+                  }`}
                 />
               )}
             </AnimatePresence>
@@ -166,18 +183,18 @@ export default function FocusPage() {
               {/* Session Progress Ring */}
               <div className="mt-8 flex items-center justify-center gap-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-accent">{completedSessions}</div>
-                  <div className="text-xs text-muted mt-1">Sessions Today</div>
+                  <div className={`text-3xl font-bold ${isDark ? "text-violet-400" : "text-violet-600"}`}>{completedSessions}</div>
+                  <div className={`text-xs mt-1 ${isDark ? "text-gray-500" : "text-gray-500"}`}>Sessions Today</div>
                 </div>
-                <div className="w-px h-12 bg-white/10"></div>
+                <div className={`w-px h-12 ${isDark ? "bg-gray-700" : "bg-gray-200"}`}></div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-primary">{productivityScore}%</div>
-                  <div className="text-xs text-muted mt-1">Daily Goal</div>
+                  <div className={`text-3xl font-bold ${isDark ? "text-gray-100" : "text-gray-900"}`}>{productivityScore}%</div>
+                  <div className={`text-xs mt-1 ${isDark ? "text-gray-500" : "text-gray-500"}`}>Daily Goal</div>
                 </div>
-                <div className="w-px h-12 bg-white/10"></div>
+                <div className={`w-px h-12 ${isDark ? "bg-gray-700" : "bg-gray-200"}`}></div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-secondary">{focusTimeDisplay}</div>
-                  <div className="text-xs text-muted mt-1">Focus Time</div>
+                  <div className={`text-3xl font-bold ${isDark ? "text-gray-400" : "text-gray-600"}`}>{focusTimeDisplay}</div>
+                  <div className={`text-xs mt-1 ${isDark ? "text-gray-500" : "text-gray-500"}`}>Focus Time</div>
                 </div>
               </div>
             </div>
@@ -186,7 +203,11 @@ export default function FocusPage() {
             <motion.div
               animate={running ? { opacity: [0.5, 1, 0.5] } : { opacity: 0.5 }}
               transition={{ repeat: Infinity, duration: 2 }}
-              className="absolute top-4 right-4 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-medium text-secondary"
+              className={`absolute top-4 right-4 px-3 py-1 rounded-full border text-[10px] font-medium ${
+                isDark 
+                  ? "bg-gray-700 border-gray-600 text-gray-400" 
+                  : "bg-gray-100 border-gray-200 text-gray-600"
+              }`}
             >
               {running ? "In Progress" : "Paused"}
             </motion.div>
@@ -208,16 +229,20 @@ export default function FocusPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="card-elevated p-5 space-y-3"
+                  className={`p-5 space-y-3 rounded-xl border shadow-sm ${
+                    isDark 
+                      ? "bg-gray-800 border-gray-700" 
+                      : "bg-white border-gray-200"
+                  }`}
                 >
-                  <div className="flex items-center justify-between text-xs text-secondary">
+                  <div className={`flex items-center justify-between text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>
                     <span className="font-medium uppercase tracking-wider">Current Task</span>
                     {activeTask ? (
                       <span className={`px-2 py-0.5 rounded font-medium border text-[10px] badge ${getPriorityColor(activeTask.priority)}`}>
                         {activeTask.priority.toUpperCase()}
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 rounded badge text-secondary font-medium text-[10px]">
+                      <span className={`px-2 py-0.5 rounded badge font-medium text-[10px] ${isDark ? "text-gray-500" : "text-gray-500"}`}>
                         NONE
                       </span>
                     )}
@@ -226,9 +251,9 @@ export default function FocusPage() {
                   {activeTask ? (
                     <div className="space-y-3">
                       <div>
-                        <h3 className="text-base font-semibold text-primary">{activeTask.title}</h3>
+                        <h3 className={`text-base font-semibold ${isDark ? "text-gray-100" : "text-gray-900"}`}>{activeTask.title}</h3>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-secondary">
+                          <span className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>
                             {activeTask.completedFocusSessions} of {activeTask.estimatedFocusSessions} sessions
                           </span>
                           <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded badge">
@@ -247,7 +272,7 @@ export default function FocusPage() {
                       {activeTask.tags.length > 0 && (
                         <div className="flex items-center gap-1.5 flex-wrap">
                           {activeTask.tags.map((tag: string) => (
-                            <span key={tag} className="text-[9px] font-medium px-1.5 py-0.2 rounded badge text-purple-300">
+                            <span key={tag} className={`text-[9px] font-medium px-1.5 py-0.2 rounded badge ${isDark ? "text-violet-300" : "text-violet-600"}`}>
                               {tag}
                             </span>
                           ))}
@@ -256,10 +281,10 @@ export default function FocusPage() {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <p className="text-xs text-muted">No active task selected.</p>
+                      <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>No active task selected.</p>
                       <Link
                         to="/tasks"
-                        className="flex items-center gap-2 text-xs text-accent hover:underline font-medium transition-colors"
+                        className={`flex items-center gap-2 text-xs font-medium transition-colors ${isDark ? "text-violet-400 hover:underline" : "text-violet-600 hover:underline"}`}
                       >
                         <FiTarget className="w-3.5 h-3.5" />
                         <span>Select a task</span>
@@ -274,16 +299,20 @@ export default function FocusPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.25 }}
-                  className="card-elevated p-5 space-y-3"
+                  className={`p-5 space-y-3 rounded-xl border shadow-sm ${
+                    isDark 
+                      ? "bg-gray-800 border-gray-700" 
+                      : "bg-white border-gray-200"
+                  }`}
                 >
                   <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-semibold text-primary uppercase tracking-wider flex items-center gap-2">
+                    <h4 className={`text-xs font-semibold uppercase tracking-wider flex items-center gap-2 ${isDark ? "text-gray-100" : "text-gray-900"}`}>
                       <FiList className="w-3.5 h-3.5" />
                       Upcoming Tasks
                     </h4>
                     <button
                       onClick={() => setShowTaskQueue(!showTaskQueue)}
-                      className="text-muted hover:text-primary transition-colors"
+                      className={`transition-colors ${isDark ? "text-gray-500 hover:text-gray-100" : "text-gray-500 hover:text-gray-900"}`}
                     >
                       {showTaskQueue ? <FiMinimize className="w-3.5 h-3.5" /> : <FiMaximize className="w-3.5 h-3.5" />}
                     </button>
@@ -298,7 +327,7 @@ export default function FocusPage() {
                         className="space-y-2"
                       >
                         {taskQueue.length === 0 ? (
-                          <p className="text-xs text-muted text-center py-4">No upcoming tasks</p>
+                          <p className={`text-xs text-center py-4 ${isDark ? "text-gray-500" : "text-gray-500"}`}>No upcoming tasks</p>
                         ) : (
                           taskQueue.map((task, idx) => (
                             <motion.div
@@ -306,18 +335,22 @@ export default function FocusPage() {
                               initial={{ opacity: 0, x: -10 }}
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ delay: idx * 0.05 }}
-                              className="flex items-center justify-between p-2 rounded-lg card hover:bg-white/5 cursor-pointer transition-all"
+                              className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all ${
+                                isDark 
+                                  ? "hover:bg-gray-700" 
+                                  : "hover:bg-gray-50"
+                              }`}
                               onClick={() => setActiveTask(task.id)}
                             >
                               <div className="flex items-center gap-2 flex-1 min-w-0">
-                                <span className="text-[10px] font-mono text-muted">#{idx + 1}</span>
-                                <span className="text-xs font-medium text-primary truncate">{task.title}</span>
+                                <span className={`text-[10px] font-mono ${isDark ? "text-gray-500" : "text-gray-500"}`}>#{idx + 1}</span>
+                                <span className={`text-xs font-medium truncate ${isDark ? "text-gray-100" : "text-gray-900"}`}>{task.title}</span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <span className={`text-[9px] font-medium px-1.5 py-0.2 rounded border uppercase badge ${getPriorityColor(task.priority)}`}>
                                   {task.priority[0]}
                                 </span>
-                                <span className="text-[10px] text-muted">{task.estimatedFocusSessions}×</span>
+                                <span className={`text-[10px] ${isDark ? "text-gray-500" : "text-gray-500"}`}>{task.estimatedFocusSessions}×</span>
                               </div>
                             </motion.div>
                           ))
@@ -332,16 +365,20 @@ export default function FocusPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="card-elevated p-5 space-y-3"
+                  className={`p-5 space-y-3 rounded-xl border shadow-sm ${
+                    isDark 
+                      ? "bg-gray-800 border-gray-700" 
+                      : "bg-white border-gray-200"
+                  }`}
                 >
-                  <h4 className="text-xs font-semibold text-primary uppercase tracking-wider flex items-center gap-2">
+                  <h4 className={`text-xs font-semibold uppercase tracking-wider flex items-center gap-2 ${isDark ? "text-gray-100" : "text-gray-900"}`}>
                     <FiClock className="w-3.5 h-3.5" />
                     Recent Sessions
                   </h4>
 
                   <div className="space-y-2">
                     {recentSessions.length === 0 ? (
-                      <p className="text-xs text-muted text-center py-4">No sessions yet</p>
+                      <p className={`text-xs text-center py-4 ${isDark ? "text-gray-500" : "text-gray-500"}`}>No sessions yet</p>
                     ) : (
                       recentSessions.map((session, idx) => (
                         <motion.div
@@ -349,13 +386,17 @@ export default function FocusPage() {
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: idx * 0.05 }}
-                          className="flex items-center justify-between p-2 rounded-lg card"
+                          className={`flex items-center justify-between p-2 rounded-lg ${
+                            isDark 
+                              ? "bg-gray-700/50 border border-gray-700" 
+                              : "bg-gray-50 border border-gray-200"
+                          }`}
                         >
                           <div className="flex items-center gap-2">
-                            <FiCheckCircle className="w-3 h-3 text-accent" />
-                            <span className="text-xs text-secondary">{session.time}</span>
+                            <FiCheckCircle className={`w-3 h-3 ${isDark ? "text-violet-400" : "text-violet-600"}`} />
+                            <span className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>{session.time}</span>
                           </div>
-                          <span className="text-[10px] text-muted">{Math.round(session.duration / 60)}m</span>
+                          <span className={`text-[10px] ${isDark ? "text-gray-500" : "text-gray-500"}`}>{Math.round(session.duration / 60)}m</span>
                         </motion.div>
                       ))
                     )}
@@ -367,12 +408,16 @@ export default function FocusPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.35 }}
-                  className="card-elevated p-5 space-y-3"
+                  className={`p-5 space-y-3 rounded-xl border shadow-sm ${
+                    isDark 
+                      ? "bg-gray-800 border-gray-700" 
+                      : "bg-white border-gray-200"
+                  }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <FiMusic className="text-accent w-4 h-4" />
-                      <span className="text-xs font-semibold text-primary">Background Sound</span>
+                      <FiMusic className={`w-4 h-4 ${isDark ? "text-violet-400" : "text-violet-600"}`} />
+                      <span className={`text-xs font-semibold ${isDark ? "text-gray-100" : "text-gray-900"}`}>Background Sound</span>
                     </div>
                     <button
                       onClick={() => setIsPlayingAudio(!isPlayingAudio)}
@@ -384,20 +429,24 @@ export default function FocusPage() {
 
                   {/* Volume Control */}
                   <div className="flex items-center gap-3">
-                    <FiVolume2 className="w-4 h-4 text-secondary" />
+                    <FiVolume2 className={`w-4 h-4 ${isDark ? "text-gray-500" : "text-gray-500"}`} />
                     <input
                       type="range"
                       min="0"
                       max="100"
                       value={volume}
                       onChange={(e) => setVolume(Number(e.target.value))}
-                      className="flex-1 h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-accent"
+                      className="flex-1 h-1 rounded-lg appearance-none cursor-pointer accent-violet-600"
                     />
-                    <span className="text-xs text-secondary w-8 text-right">{volume}%</span>
+                    <span className={`text-xs w-8 text-right ${isDark ? "text-gray-500" : "text-gray-500"}`}>{volume}%</span>
                   </div>
 
-                  <div className="flex items-center justify-between card p-3">
-                    <span className="text-xs font-medium text-primary">Lo-Fi Beats</span>
+                  <div className={`flex items-center justify-between p-3 rounded-lg ${
+                    isDark 
+                      ? "bg-gray-700 border-gray-600" 
+                      : "bg-gray-50 border-gray-200"
+                  }`}>
+                    <span className={`text-xs font-medium ${isDark ? "text-gray-100" : "text-gray-900"}`}>Lo-Fi Beats</span>
                     {/* Audio visualizer animation bars */}
                     <div className="flex items-end gap-1.5 h-4">
                       {[40, 80, 50, 90, 60].map((h, idx) => (
@@ -405,7 +454,7 @@ export default function FocusPage() {
                           key={idx}
                           animate={isPlayingAudio ? { height: [`${h}%`, `${h * 0.5}%`, `${h}%`] } : { height: "20%" }}
                           transition={{ repeat: Infinity, duration: 0.8, delay: idx * 0.1 }}
-                          className="w-1 bg-accent/60 rounded-full"
+                          className={`w-1 rounded-full ${isDark ? "bg-violet-400/60" : "bg-violet-500/60"}`}
                         />
                       ))}
                     </div>
@@ -421,19 +470,27 @@ export default function FocusPage() {
                 transition={{ duration: 0.3 }}
                 className="lg:col-span-4"
               >
-                <div className="card-elevated p-8 text-center space-y-4">
-                  <div className="w-16 h-16 mx-auto rounded-full bg-accent/10 border border-accent/30 flex items-center justify-center">
-                    <FiZap className="w-8 h-8 text-accent" />
+                <div className={`p-8 text-center space-y-4 rounded-xl border shadow-sm ${
+                  isDark 
+                    ? "bg-gray-800 border-gray-700" 
+                    : "bg-white border-gray-200"
+                }`}>
+                  <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center ${
+                    isDark 
+                      ? "bg-violet-500/10 border border-violet-500/30" 
+                      : "bg-violet-50 border border-violet-200"
+                  }`}>
+                    <FiZap className={`w-8 h-8 ${isDark ? "text-violet-400" : "text-violet-600"}`} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-primary">Focus Mode Active</h3>
-                    <p className="text-sm text-secondary mt-2">
+                    <h3 className={`text-lg font-semibold ${isDark ? "text-gray-100" : "text-gray-900"}`}>Focus Mode Active</h3>
+                    <p className={`text-sm mt-2 ${isDark ? "text-gray-500" : "text-gray-500"}`}>
                       Minimize distractions and stay in the zone. Toggle focus mode off to see your task details and progress.
                     </p>
                   </div>
-                  <div className="pt-4 border-t border-white/10">
-                    <p className="text-xs text-muted">
-                      Press <kbd className="px-2 py-1 bg-white/5 border border-white/10 rounded text-[10px]">Esc</kbd> to exit focus mode
+                  <div className={`pt-4 border-t ${isDark ? "border-gray-700" : "border-gray-200"}`}>
+                    <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>
+                      Press <kbd className={`px-2 py-1 rounded text-[10px] ${isDark ? "bg-gray-700 border-gray-600" : "bg-gray-100 border-gray-300"}`}>Esc</kbd> to exit focus mode
                     </p>
                   </div>
                 </div>
