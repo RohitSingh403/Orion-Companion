@@ -233,12 +233,12 @@ export default function AnalyticsPage() {
           }`}>
             <div className={`flex items-center justify-between ${isDark ? "text-gray-500" : "text-gray-500"}`}>
               <span className="text-sm font-medium">Total Focus Time ({timeRange})</span>
-              <FiClock className={isDark ? "text-violet-400" : "text-violet-600"} />
+              <FiClock className={isDark ? "text-violet-300" : "text-violet-600"} />
             </div>
-            <p className={`text-2xl font-semibold ${isDark ? "text-violet-400" : "text-violet-600"}`}>{rangeStats.totalFocusTimeDisplay}</p>
+            <p className={`text-2xl font-semibold ${isDark ? "text-violet-300" : "text-violet-600"}`}>{rangeStats.totalFocusTimeDisplay}</p>
             <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded ${
               isDark 
-                ? "bg-violet-500/10 text-violet-400 border border-violet-500/30" 
+                ? "bg-violet-500/10 text-violet-300 border border-violet-500/30" 
                 : "bg-violet-50 text-violet-600 border border-violet-200"
             }`}>
               {rangeStats.totalSessions > 0 ? "↑ Building momentum" : "Start your first session"}
@@ -257,7 +257,7 @@ export default function AnalyticsPage() {
             <p className="text-2xl font-semibold text-blue-400">{rangeStats.totalSessions}</p>
             <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded ${
               isDark 
-                ? "bg-violet-500/10 text-violet-400 border border-violet-500/30" 
+                ? "bg-violet-500/10 text-violet-300 border border-violet-500/30" 
                 : "bg-violet-50 text-violet-600 border border-violet-200"
             }`}>
               Best Streak: {bestStreak} days
@@ -278,7 +278,7 @@ export default function AnalyticsPage() {
             </p>
             <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded ${
               isDark 
-                ? "bg-violet-500/10 text-violet-400 border border-violet-500/30" 
+                ? "bg-violet-500/10 text-violet-300 border border-violet-500/30" 
                 : "bg-violet-50 text-violet-600 border border-violet-200"
             }`}>
               {productivityComparison.label}
@@ -293,7 +293,7 @@ export default function AnalyticsPage() {
             : "bg-white border-gray-200"
         }`}>
           <h3 className={`text-sm font-semibold flex items-center gap-2 ${isDark ? "text-gray-100" : "text-gray-900"}`}>
-            <FiActivity className={isDark ? "text-violet-400" : "text-violet-600"} /> {timeRange.charAt(0).toUpperCase() + timeRange.slice(1)} Overview
+            <FiActivity className={isDark ? "text-violet-300" : "text-violet-600"} /> {timeRange.charAt(0).toUpperCase() + timeRange.slice(1)} Overview
           </h3>
           <div className="grid grid-cols-3 gap-4">
             <div className={`p-4 rounded-lg border ${
@@ -318,7 +318,7 @@ export default function AnalyticsPage() {
                 : "bg-gray-50 border-gray-200"
             }`}>
               <p className={`text-xs font-medium ${isDark ? "text-gray-500" : "text-gray-500"}`}>Best {timeRange === "week" ? "Day" : timeRange === "month" ? "Week" : "Month"}</p>
-              <p className={`text-xl font-semibold mt-1 ${isDark ? "text-violet-400" : "text-violet-600"}`}>{periodStats.bestDay}</p>
+              <p className={`text-xl font-semibold mt-1 ${isDark ? "text-violet-300" : "text-violet-600"}`}>{periodStats.bestDay}</p>
             </div>
           </div>
         </div>
@@ -330,7 +330,7 @@ export default function AnalyticsPage() {
             : "bg-white border-gray-200"
         }`}>
           <h3 className={`text-sm font-semibold flex items-center gap-2 ${isDark ? "text-gray-100" : "text-gray-900"}`}>
-            <FiTrendingUp className={isDark ? "text-violet-400" : "text-violet-600"} /> Personalized Insights
+            <FiTrendingUp className={isDark ? "text-violet-300" : "text-violet-600"} /> Personalized Insights
           </h3>
           <div className="space-y-3">
             {focusInsights.map((insight, idx) => (
@@ -339,7 +339,7 @@ export default function AnalyticsPage() {
                   ? "bg-gray-700 border-gray-600 hover:bg-gray-600" 
                   : "bg-gray-50 border-gray-200 hover:bg-gray-100"
               }`}>
-                <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${isDark ? "bg-violet-400" : "bg-violet-600"}`} />
+                <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${isDark ? "bg-violet-300" : "bg-violet-600"}`} />
                 <p className={`text-sm leading-relaxed ${isDark ? "text-gray-500" : "text-gray-500"}`}>{insight}</p>
               </div>
             ))}
@@ -358,7 +358,7 @@ export default function AnalyticsPage() {
           }`}
         >
           <h3 className={`text-sm font-semibold flex items-center gap-2 ${isDark ? "text-gray-100" : "text-gray-900"}`}>
-            <FiTrendingUp className={isDark ? "text-violet-400" : "text-violet-600"} /> Productivity Scorecard
+            <FiTrendingUp className={isDark ? "text-violet-300" : "text-violet-600"} /> Productivity Scorecard
           </h3>
           <div className="grid grid-cols-2 gap-4">
             <div className={`p-4 rounded-lg border ${
@@ -428,7 +428,7 @@ export default function AnalyticsPage() {
                     style={{ width: `${Math.min(((completedSessions + bestStreak) / 30) * 100, 100)}%` }}
                   />
                 </div>
-                <span className={`text-sm font-semibold ${isDark ? "text-violet-400" : "text-violet-600"}`}>
+                <span className={`text-sm font-semibold ${isDark ? "text-violet-300" : "text-violet-600"}`}>
                   {Math.min(Math.round(((completedSessions + bestStreak) / 30) * 100), 100)}%
                 </span>
               </div>
@@ -442,13 +442,13 @@ export default function AnalyticsPage() {
             ? "bg-gray-800 border-gray-700" 
             : "bg-white border-gray-200"
         }`}>
-          <div className="flex items-center justify-between">
+          <div className={`flex items-center justify-between`}>
             <h3 className={`text-sm font-semibold flex items-center gap-2 ${isDark ? "text-gray-100" : "text-gray-900"}`}>
-              <FiTrendingUp className={isDark ? "text-violet-400" : "text-violet-600"} /> Focus Time Trend ({timeRange.charAt(0).toUpperCase() + timeRange.slice(1)})
+              <FiTrendingUp className={isDark ? "text-violet-300" : "text-violet-600"} /> Focus Time Trend ({timeRange.charAt(0).toUpperCase() + timeRange.slice(1)})
             </h3>
             <div className={`flex items-center gap-2 text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>
               <span className="flex items-center gap-1">
-                <span className={`w-2 h-2 rounded-full ${isDark ? "bg-violet-400" : "bg-violet-600"}`}></span>
+                <span className={`w-2 h-2 rounded-full ${isDark ? "bg-violet-300" : "bg-violet-600"}`}></span>
                 Focus Time
               </span>
             </div>
@@ -465,7 +465,7 @@ export default function AnalyticsPage() {
                     style={{ height: `${trendData.heights[idx]}%` }}
                     className={`w-full border-t-2 rounded-t-md transition-all duration-300 hover:brightness-125 cursor-pointer relative ${
                       isDark 
-                        ? "bg-gradient-to-t from-violet-600/30 via-violet-600/60 to-violet-600 border-t-violet-600" 
+                        ? "bg-gradient-to-t from-violet-500/30 via-violet-500/60 to-violet-500 border-t-violet-500" 
                         : "bg-gradient-to-t from-violet-500/30 via-violet-500/60 to-violet-500 border-t-violet-500"
                     }`}
                   >

@@ -138,7 +138,7 @@ export default function NotesPage() {
         {showQuickNoteToast && (
           <div className={`absolute top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-lg z-50 border ${
             isDark 
-              ? "bg-gray-800 border-violet-500/40 text-violet-400" 
+              ? "bg-gray-800 border-violet-500/40 text-violet-300" 
               : "bg-white border-violet-200 text-violet-600"
           }`}>
             <FiZap className="w-4 h-4" />
@@ -154,7 +154,7 @@ export default function NotesPage() {
         }`}>
           <div className="flex items-center justify-between">
             <h3 className={`text-sm font-semibold ${
-              isDark ? "text-violet-400" : "text-violet-600"
+              isDark ? "text-violet-300" : "text-violet-600"
             }`}>Notes</h3>
             <div className="flex items-center gap-2">
               <button 
@@ -268,7 +268,7 @@ export default function NotesPage() {
                         className={`p-1.5 rounded-lg transition-all ${
                           viewMode === "preview"
                             ? isDark 
-                              ? "bg-violet-500/10 text-violet-400" 
+                              ? "bg-violet-500/10 text-violet-300" 
                               : "bg-violet-50 text-violet-600"
                             : isDark 
                               ? "hover:text-gray-100 hover:bg-gray-600" 
@@ -282,7 +282,7 @@ export default function NotesPage() {
                         className={`p-1.5 rounded-lg transition-all ${
                           viewMode === "edit"
                             ? isDark 
-                              ? "bg-violet-500/10 text-violet-400" 
+                              ? "bg-violet-500/10 text-violet-300" 
                               : "bg-violet-50 text-violet-600"
                             : isDark 
                               ? "hover:text-gray-100 hover:bg-gray-600" 
@@ -296,7 +296,7 @@ export default function NotesPage() {
                         className={`p-1.5 rounded-lg transition-all ${
                           activeNote?.linkedTaskId
                             ? isDark 
-                              ? "bg-violet-500/10 text-violet-400" 
+                              ? "bg-violet-500/10 text-violet-300" 
                               : "bg-violet-50 text-violet-600"
                             : isDark 
                               ? "hover:text-gray-100 hover:bg-gray-600" 
@@ -376,7 +376,7 @@ export default function NotesPage() {
                 }`}>
                   <div className="flex items-center justify-between mb-4">
                     <h4 className={`text-sm font-semibold ${
-                      isDark ? "text-violet-400" : "text-violet-600"
+                      isDark ? "text-violet-300" : "text-violet-600"
                     }`}>Link a Task</h4>
                     <button onClick={() => setShowTaskPicker(false)} className={`transition-colors ${
                       isDark ? "text-gray-500 hover:text-gray-100" : "text-gray-500 hover:text-gray-900"
@@ -438,7 +438,7 @@ export default function NotesPage() {
                 ) : (
                   <div className={`w-full h-full rounded-lg p-4 text-sm leading-relaxed overflow-y-auto no-scrollbar prose prose-invert prose-sm max-w-none border transition-all ${
                     isDark 
-                      ? "bg-gray-700 border-gray-600 text-gray-100 hover:border-gray-500 prose-headings:text-gray-100 prose-p:text-gray-400 prose-strong:text-gray-100 prose-code:text-violet-400 prose-pre:bg-gray-800 prose-pre:border-gray-600" 
+                      ? "bg-gray-700 border-gray-600 text-gray-100 hover:border-gray-500 prose-headings:text-gray-100 prose-p:text-gray-400 prose-strong:text-gray-100 prose-code:text-violet-300 prose-pre:bg-gray-800 prose-pre:border-gray-600" 
                       : "bg-gray-50 border-gray-200 text-gray-900 hover:border-gray-300 prose-headings:text-gray-900 prose-p:text-gray-600 prose-strong:text-gray-900 prose-code:text-violet-600 prose-pre:bg-white prose-pre:border-gray-200"
                   }`}>
                     <ReactMarkdown>{activeNote?.content || ""}</ReactMarkdown>
@@ -454,10 +454,10 @@ export default function NotesPage() {
                   }`}>
                     <div className="flex items-center gap-2">
                       <FiTarget className={`w-3.5 h-3.5 ${
-                        isDark ? "text-violet-400" : "text-violet-600"
+                        isDark ? "text-violet-300" : "text-violet-600"
                       }`} />
                       <span className={`text-sm font-medium ${
-                        isDark ? "text-violet-400" : "text-violet-600"
+                        isDark ? "text-violet-300" : "text-violet-600"
                       }`}>
                         {tasks.find((t) => t.id === activeNote.linkedTaskId)?.title || "Linked Task"}
                       </span>
@@ -488,7 +488,7 @@ export default function NotesPage() {
                   activeNote.tags.map((t) => (
                     <span key={t} className={`px-2 py-0.5 rounded text-[10px] font-medium ${
                       isDark 
-                        ? "bg-violet-500/10 text-violet-400 border border-violet-500/30" 
+                        ? "bg-violet-500/10 text-violet-300 border border-violet-500/30" 
                         : "bg-violet-50 text-violet-600 border border-violet-200"
                     }`}>
                       #{t}
@@ -508,7 +508,7 @@ export default function NotesPage() {
                     isDark ? "text-gray-500" : "text-gray-500"
                   }`}>Attachments</span>
                   <label className={`flex items-center gap-1 text-[10px] cursor-pointer ${
-                    isDark ? "text-violet-400 hover:text-violet-300" : "text-violet-600 hover:text-violet-500"
+                    isDark ? "text-violet-300 hover:text-violet-200" : "text-violet-600 hover:text-violet-500"
                   }`}>
                     <FiPaperclip className="w-3 h-3" />
                     <span>Add</span>
