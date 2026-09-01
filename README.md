@@ -303,44 +303,53 @@ src/
 
 ## Design System
 
-The UI features a modern professional design system built for desktop-first experience with consistent styling across all components.
+The UI features a modern vibrant design system built for desktop-first experience with consistent styling across all components, featuring a purple/violet color palette with full light/dark mode support.
 
 ### Color Palette
-- Base: `#0a0a0a` (dark background)
-- Cards: `rgba(255, 255, 255, 0.05)` with subtle borders
-- Accent: Emerald-500 (primary), Amber-500 (warnings), Blue-500 (breaks), Purple-400 (AI)
-- Text: Zinc-100 (headings), Zinc-400 (body), Zinc-500 (muted)
+- **Dark Mode**: 
+  - Background: `#0a0a0a` (base dark background)
+  - Cards: `bg-gray-800` with `border-gray-700`
+  - Secondary cards: `bg-gray-700` with `border-gray-600`
+  - Accent: Violet-400 (primary), Violet-500 (gradients)
+  - Text: Gray-100 (headings), Gray-400 (body), Gray-500 (muted)
+- **Light Mode**:
+  - Background: White
+  - Cards: `bg-white` with `border-gray-200`
+  - Secondary cards: `bg-gray-50` with `border-gray-200`
+  - Accent: Violet-600 (primary), Violet-500 (gradients)
+  - Text: Gray-900 (headings), Gray-600 (body), Gray-500 (muted)
 
 ### Design Tokens
-- `.card` - Standard card with background and border
-- `.card-elevated` - Elevated card with shadow
-- `.btn-primary` - Primary action button with accent color
-- `.btn-secondary` - Secondary action button
-- `.btn-ghost` - Ghost button for subtle actions
-- `.input` - Form input with consistent styling
-- `.toggle` - Toggle switch component
-- `.badge` - Small status badges
-- `.icon-btn` - Icon-only buttons
-- `.text-primary` - Primary text color
-- `.text-secondary` - Secondary text color
-- `.text-muted` - Muted text color
-- `.text-accent` - Accent text color
+- **Cards**: Theme-aware backgrounds with conditional borders (`bg-gray-800`/`bg-white`, `border-gray-700`/`border-gray-200`)
+- **Buttons**: 
+  - `.btn-primary` - Violet-to-pink gradient with hover effects
+  - `.btn-secondary` - Theme-aware secondary button
+  - `.btn-ghost` - Ghost button for subtle actions
+- **Inputs**: Theme-aware with focus rings (`focus:ring-violet-500/20`, `focus:border-violet-500`)
+- **Toggles**: Cubic-bezier transitions with glow effects
+- **Badges**: Theme-aware with violet accent colors
+- **Text Colors**: Dynamic based on theme state (`isDark`)
+- **Borders**: Conditional gray borders (`border-gray-700`/`border-gray-200`)
+- **Shadows**: Subtle shadows with `shadow-sm` class
 
 ### Components
 - Custom scrollbars with dark theme
-- GitHub-style heatmap levels (0-4 intensity)
-- Progress bars with smooth transitions
+- GitHub-style heatmap levels (0-4 intensity) with green color scale
+- Progress bars with violet-to-pink gradients
 - Status dots for indicators
 - Modal backdrops with blur
-- Toast notifications
+- Toast notifications with theme-aware styling
 - Skeleton loaders
+- Glow effects for focus states
+- Smooth transitions and hover states
 
 ### Design Principles
 - **Simplicity** — the next action should always be obvious
 - **Positive reinforcement** — achievements, stats, and animations encourage consistency
 - **Desktop-first** — built for focused desktop work, not a mobile port
 - **Modular by default** — every feature is isolated for easy extension
-- **Consistent styling** — design tokens ensure visual harmony across all pages
+- **Consistent styling** — theme-aware design tokens ensure visual harmony across all pages
+- **Vibrant aesthetics** — purple/violet color palette with modern gradients and glow effects
 
 ---
 
@@ -564,11 +573,19 @@ The project follows strict development rules to maintain code quality and archit
 
 **Version:** v2.0.0 (Latest Release)
 
-**Last Updated:** August 31, 2026
+**Last Updated:** September 1, 2026
 
-**Status:** Production-ready single-user desktop application with comprehensive feature set and full test coverage
+**Status:** Production-ready single-user desktop application with comprehensive feature set, full test coverage, and vibrant modern UI theme
 
-**Recent Updates (August 31, 2026):**
+**Recent Updates (September 1, 2026):**
+- ✅ **UI Theme Overhaul**: Complete vibrant purple/violet theme implementation across all pages
+- ✅ **Light/Dark Mode**: Full theme-aware styling with conditional classes based on `isDark` state
+- ✅ **Consistent Theming**: Updated FocusPage, SettingsPage, AchievementsPage, AnalyticsPage, TasksPage, CalendarPage, NotesPage, RemindersPage, AICompanionPage, and MiniTimerPage
+- ✅ **Component Updates**: Updated Sidebar, Topbar, DashboardContent, FocusTimer, ProgressRing, SessionHistory, and ContributionHeatmap components
+- ✅ **Design System**: New vibrant color palette with violet/pink gradients and glow effects
+- ✅ **Theme-Aware Tokens**: Conditional backgrounds, borders, text colors, and accent colors
+- ✅ **Visual Polish**: Enhanced hover states, focus rings, transitions, and smooth animations
+- ✅ **Accessibility**: Improved focus states and keyboard navigation with theme-aware styling
 - ✅ **Bug Fixes**: Fixed all lint errors and TypeScript issues across the codebase
 - ✅ **Code Quality**: Replaced `any` types with proper TypeScript types
 - ✅ **React Hooks**: Fixed dependency warnings with useMemo and useCallback
