@@ -132,7 +132,7 @@ export default function AnalyticsPage() {
                 className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition-all ${
                   activeTab === tab
                     ? isDark 
-                      ? "bg-violet-500/10 text-violet-400 border border-violet-500/30" 
+                      ? "bg-violet-500/10 text-violet-300 border border-violet-500/30" 
                       : "bg-violet-50 text-violet-600 border border-violet-200"
                     : isDark 
                       ? "text-gray-400 hover:text-gray-100 hover:bg-gray-700" 
@@ -169,7 +169,7 @@ export default function AnalyticsPage() {
             onClick={handleExport}
             className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-all ${
               isDark 
-                ? "text-gray-400 hover:text-violet-400 hover:bg-gray-700" 
+                ? "text-gray-400 hover:text-violet-300 hover:bg-gray-700" 
                 : "text-gray-600 hover:text-violet-600 hover:bg-gray-100"
             }`}
           >
