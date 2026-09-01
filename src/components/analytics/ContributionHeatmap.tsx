@@ -1,6 +1,7 @@
 // src/components/analytics/ContributionHeatmap.tsx
 
 import { useState, useMemo } from "react";
+import { useSettingsStore } from "../../store/settingsStore";
 import { FiActivity, FiDownload, FiX, FiCalendar, FiFilter } from "react-icons/fi";
 
 export interface ContributionDay {
@@ -19,6 +20,8 @@ export default function ContributionHeatmap({
   data,
   levelThresholds = [0, 2, 5, 9],
 }: ContributionHeatmapProps) {
+  const theme = useSettingsStore((s) => s.theme);
+  const isDark = theme === "dark";
   const [hoveredCell, setHoveredCell] = useState<{ date: string; count: number; x: number; y: number } | null>(null);
   const [selectedDay, setSelectedDay] = useState<ContributionDay | null>(null);
   const [filterLevel, setFilterLevel] = useState<FilterLevel>("all");
@@ -160,18 +163,28 @@ export default function ContributionHeatmap({
   };
 
   return (
-    <div className="card-elevated p-6 space-y-4">
+    <div className={`p-6 space-y-4 rounded-xl border shadow-sm ${
+      isDark 
+        ? "bg-gray-800 border-gray-700" 
+        : "bg-white border-gray-200"
+    }`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
-            <FiActivity className="text-accent" /> Contribution Activity
+          <h3 className={`text-sm font-semibold flex items-center gap-2 ${
+            isDark ? "text-gray-100" : "text-gray-900"
+          }`}>
+            <FiActivity className={isDark ? "text-violet-400" : "text-violet-600"} /> Contribution Activity
           </h3>
           
           {/* Year Selector */}
           <select
             value={selectedYear}
             onChange={(e) => setSelectedYear(Number(e.target.value))}
-            className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-primary focus:outline-none focus:border-accent/50"
+            className={`rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
+              isDark 
+                ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500" 
+                : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500"
+            } border`}
           >
             {[selectedYear - 2, selectedYear - 1, selectedYear, selectedYear + 1].map(year => (
               <option key={year} value={year}>{year}</option>
@@ -182,11 +195,15 @@ export default function ContributionHeatmap({
         <div className="flex items-center gap-3">
           {/* Filter Dropdown */}
           <div className="flex items-center gap-2">
-            <FiFilter className="w-3 h-3 text-muted" />
+            <FiFilter className={`w-3 h-3 ${isDark ? "text-gray-500" : "text-gray-500"}`} />
             <select
               value={filterLevel}
               onChange={(e) => setFilterLevel(e.target.value as FilterLevel)}
-              className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-primary focus:outline-none focus:border-accent/50"
+              className={`rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
+                isDark 
+                  ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500" 
+                  : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500"
+              } border`}
             >
               <option value="all">All</option>
               <option value="1+">1+</option>
@@ -196,12 +213,14 @@ export default function ContributionHeatmap({
             </select>
           </div>
           
-          <ContributionLegend />
+          <ContributionLegend isDark={isDark} />
           
           {/* Export Button */}
           <button
             onClick={handleExport}
-            className="text-muted hover:text-accent transition-colors"
+            className={`transition-colors ${
+              isDark ? "text-gray-500 hover:text-violet-400" : "text-gray-500 hover:text-violet-600"
+            }`}
             title="Export contribution data"
           >
             <FiDownload className="w-4 h-4" />
@@ -211,31 +230,51 @@ export default function ContributionHeatmap({
 
       {/* Contribution Summary Panel */}
       <div className="grid grid-cols-4 gap-4">
-        <div className="card border border-white/10 rounded-lg p-3">
-          <div className="text-[10px] text-muted mb-1">Total Contributions</div>
-          <div className="text-lg font-semibold text-accent">{stats.totalContributions}</div>
+        <div className={`border rounded-lg p-3 ${
+          isDark 
+            ? "bg-gray-700 border-gray-600" 
+            : "bg-gray-50 border-gray-200"
+        }`}>
+          <div className={`text-[10px] mb-1 ${isDark ? "text-gray-500" : "text-gray-500"}`}>Total Contributions</div>
+          <div className={`text-lg font-semibold ${isDark ? "text-violet-400" : "text-violet-600"}`}>{stats.totalContributions}</div>
         </div>
-        <div className="card border border-white/10 rounded-lg p-3">
-          <div className="text-[10px] text-muted mb-1">Active Days</div>
-          <div className="text-lg font-semibold text-primary">{stats.activeDays}</div>
+        <div className={`border rounded-lg p-3 ${
+          isDark 
+            ? "bg-gray-700 border-gray-600" 
+            : "bg-gray-50 border-gray-200"
+        }`}>
+          <div className={`text-[10px] mb-1 ${isDark ? "text-gray-500" : "text-gray-500"}`}>Active Days</div>
+          <div className={`text-lg font-semibold ${isDark ? "text-gray-100" : "text-gray-900"}`}>{stats.activeDays}</div>
         </div>
-        <div className="card border border-white/10 rounded-lg p-3">
-          <div className="text-[10px] text-muted mb-1">Current Streak</div>
+        <div className={`border rounded-lg p-3 ${
+          isDark 
+            ? "bg-gray-700 border-gray-600" 
+            : "bg-gray-50 border-gray-200"
+        }`}>
+          <div className={`text-[10px] mb-1 ${isDark ? "text-gray-500" : "text-gray-500"}`}>Current Streak</div>
           <div className="text-lg font-semibold text-blue-400">{stats.currentStreak} days</div>
         </div>
-        <div className="card border border-white/10 rounded-lg p-3">
-          <div className="text-[10px] text-muted mb-1">Longest Streak</div>
+        <div className={`border rounded-lg p-3 ${
+          isDark 
+            ? "bg-gray-700 border-gray-600" 
+            : "bg-gray-50 border-gray-200"
+        }`}>
+          <div className={`text-[10px] mb-1 ${isDark ? "text-gray-500" : "text-gray-500"}`}>Longest Streak</div>
           <div className="text-lg font-semibold text-purple-400">{stats.longestStreak} days</div>
         </div>
       </div>
 
-      <div className="card border border-white/10 rounded-lg p-4 bg-white/[0.02]">
+      <div className={`border rounded-lg p-4 ${
+        isDark 
+          ? "bg-gray-700 border-gray-600" 
+          : "bg-gray-50 border-gray-200"
+      }`}>
         {/* Month Labels */}
         <div className="flex mb-2 pl-8">
           {monthLabels.map((label) => (
             <div
               key={`${label.month}-${label.weekIndex}`}
-              className="text-[10px] text-muted font-medium"
+              className={`text-[10px] font-medium ${isDark ? "text-gray-500" : "text-gray-500"}`}
               style={{ marginLeft: label.weekIndex === 0 ? 0 : `${label.weekIndex * 14}px` }}
             >
               {label.month}
@@ -246,7 +285,7 @@ export default function ContributionHeatmap({
         {/* Heatmap Grid */}
         <div className="flex gap-3 items-start">
           {/* Day Labels - GitHub style (Mon, Wed, Fri) */}
-          <div className="flex flex-col justify-between text-[10px] text-muted font-medium h-[91px] pr-2 flex-shrink-0">
+          <div className={`flex flex-col justify-between text-[10px] font-medium h-[91px] pr-2 flex-shrink-0 ${isDark ? "text-gray-500" : "text-gray-500"}`}>
             <span className="h-[11px]"></span>
             <span className="h-[11px]">Mon</span>
             <span className="h-[11px]"></span>
@@ -270,6 +309,7 @@ export default function ContributionHeatmap({
                     onLeave={() => setHoveredCell(null)}
                     onClick={() => setSelectedDay(day)}
                     onKeyDown={(e) => handleKeyDown(e, day)}
+                    isDark={isDark}
                   />
                 ))}
               </div>
@@ -279,7 +319,11 @@ export default function ContributionHeatmap({
 
         {/* Tooltip */}
         {hoveredCell && (
-          <div className="fixed bg-black/90 backdrop-blur-sm border border-white/20 rounded px-3 py-2 text-xs text-white z-50 pointer-events-none"
+          <div className={`fixed backdrop-blur-sm border rounded px-3 py-2 text-xs z-50 pointer-events-none ${
+            isDark 
+              ? "bg-gray-900/90 border-gray-600 text-gray-100" 
+              : "bg-gray-900/90 border-gray-300 text-white"
+          }`}
                style={{
                  left: `${hoveredCell.x}px`,
                  top: `${hoveredCell.y}px`,
@@ -287,7 +331,7 @@ export default function ContributionHeatmap({
                  marginTop: '-8px'
                }}>
             <div className="font-semibold">{hoveredCell.count} contributions</div>
-            <div className="text-muted">{formatDate(hoveredCell.date)}</div>
+            <div className={isDark ? "text-gray-400" : "text-gray-300"}>{formatDate(hoveredCell.date)}</div>
           </div>
         )}
       </div>
@@ -299,30 +343,46 @@ export default function ContributionHeatmap({
           onClick={() => setSelectedDay(null)}
         >
           <div 
-            className="card-elevated border border-white/10 rounded-lg p-6 w-full max-w-md"
+            className={`border rounded-lg p-6 w-full max-w-md shadow-sm ${
+              isDark 
+                ? "bg-gray-800 border-gray-700" 
+                : "bg-white border-gray-200"
+            }`}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-primary flex items-center gap-2">
-                <FiCalendar className="text-accent" />
+              <h3 className={`text-lg font-semibold flex items-center gap-2 ${
+                isDark ? "text-gray-100" : "text-gray-900"
+              }`}>
+                <FiCalendar className={isDark ? "text-violet-400" : "text-violet-600"} />
                 {formatDate(selectedDay.date)}
               </h3>
               <button 
                 onClick={() => setSelectedDay(null)}
-                className="text-muted hover:text-primary transition-colors"
+                className={`transition-colors ${
+                  isDark ? "text-gray-500 hover:text-gray-100" : "text-gray-500 hover:text-gray-900"
+                }`}
               >
                 <FiX className="w-5 h-5" />
               </button>
             </div>
             
             <div className="space-y-4">
-              <div className="card border border-white/10 rounded-lg p-4">
-                <div className="text-sm text-muted mb-2">Contributions</div>
-                <div className="text-3xl font-bold text-accent">{selectedDay.count}</div>
+              <div className={`border rounded-lg p-4 ${
+                isDark 
+                  ? "bg-gray-700 border-gray-600" 
+                  : "bg-gray-50 border-gray-200"
+              }`}>
+                <div className={`text-sm mb-2 ${isDark ? "text-gray-500" : "text-gray-500"}`}>Contributions</div>
+                <div className={`text-3xl font-bold ${isDark ? "text-violet-400" : "text-violet-600"}`}>{selectedDay.count}</div>
               </div>
               
-              <div className="card border border-white/10 rounded-lg p-4">
-                <div className="text-sm text-muted mb-2">Activity Level</div>
+              <div className={`border rounded-lg p-4 ${
+                isDark 
+                  ? "bg-gray-700 border-gray-600" 
+                  : "bg-gray-50 border-gray-200"
+              }`}>
+                <div className={`text-sm mb-2 ${isDark ? "text-gray-500" : "text-gray-500"}`}>Activity Level</div>
                 <div className="flex items-center gap-2">
                   <div 
                     className="w-6 h-6 rounded-[2px]"
@@ -333,7 +393,7 @@ export default function ContributionHeatmap({
                                      getLevel(selectedDay.count) === 3 ? '#26a641' : '#39d353'
                     }}
                   />
-                  <span className="text-sm text-primary">
+                  <span className={`text-sm ${isDark ? "text-gray-100" : "text-gray-900"}`}>
                     {getLevel(selectedDay.count) === 0 ? 'No activity' : 
                      getLevel(selectedDay.count) === 1 ? 'Low activity' : 
                      getLevel(selectedDay.count) === 2 ? 'Moderate activity' : 
@@ -342,7 +402,7 @@ export default function ContributionHeatmap({
                 </div>
               </div>
               
-              <div className="text-xs text-muted text-center">
+              <div className={`text-xs text-center ${isDark ? "text-gray-500" : "text-gray-500"}`}>
                 This day had {selectedDay.count} focus session{selectedDay.count !== 1 ? 's' : ''}
               </div>
             </div>
@@ -351,7 +411,7 @@ export default function ContributionHeatmap({
       )}
 
       {/* Stats Footer */}
-      <div className="flex items-center justify-between text-xs text-muted pt-2">
+      <div className={`flex items-center justify-between text-xs pt-2 ${isDark ? "text-gray-500" : "text-gray-500"}`}>
         <span>Average per active day: {stats.averagePerDay} contributions</span>
         <span>Year: {selectedYear}</span>
       </div>
@@ -368,9 +428,10 @@ interface ContributionCellProps {
   onLeave: () => void;
   onClick: () => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
+  isDark: boolean;
 }
 
-function ContributionCell({ date, count, level, onHover, onLeave, onClick, onKeyDown }: ContributionCellProps) {
+function ContributionCell({ date, count, level, onHover, onLeave, onClick, onKeyDown, isDark }: ContributionCellProps) {
   const handleMouseEnter = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
     onHover({
@@ -383,7 +444,9 @@ function ContributionCell({ date, count, level, onHover, onLeave, onClick, onKey
 
   return (
     <div
-      className="w-[11px] h-[11px] rounded-[2px] transition-all duration-200 hover:scale-125 hover:z-10 cursor-pointer relative group focus:outline-none focus:ring-2 focus:ring-accent/50"
+      className={`w-[11px] h-[11px] rounded-[2px] transition-all duration-200 hover:scale-125 hover:z-10 cursor-pointer relative group focus:outline-none focus:ring-2 ${
+        isDark ? "focus:ring-violet-500/50" : "focus:ring-violet-500/50"
+      }`}
       style={{
         backgroundColor: level === 0 ? '#161b22' : 
                        level === 1 ? '#0e4429' : 
@@ -398,7 +461,11 @@ function ContributionCell({ date, count, level, onHover, onLeave, onClick, onKey
       role="button"
       aria-label={`${count} contributions on ${date}`}
     >
-      <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-black/80 backdrop-blur-sm border border-white/20 rounded px-2 py-1 text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none">
+      <div className={`absolute -top-10 left-1/2 transform -translate-x-1/2 backdrop-blur-sm border rounded px-2 py-1 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none ${
+        isDark 
+          ? "bg-gray-900/80 border-gray-600 text-gray-100" 
+          : "bg-gray-900/80 border-gray-300 text-white"
+      }`}>
         {count === 0 ? 'No contributions' : `${count} contributions`}
       </div>
     </div>
@@ -406,11 +473,11 @@ function ContributionCell({ date, count, level, onHover, onLeave, onClick, onKey
 }
 
 // Legend Component
-function ContributionLegend() {
+function ContributionLegend({ isDark }: { isDark: boolean }) {
   const colors = ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'];
   
   return (
-    <div className="flex items-center gap-2 text-[10px] text-muted font-medium">
+    <div className={`flex items-center gap-2 text-[10px] font-medium ${isDark ? "text-gray-500" : "text-gray-500"}`}>
       <span>Less</span>
       <div className="flex gap-[3px]">
         {colors.map((color, idx) => (
