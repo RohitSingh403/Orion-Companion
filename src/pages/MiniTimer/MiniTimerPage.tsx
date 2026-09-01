@@ -2,10 +2,13 @@
 
 import { useEffect } from "react";
 import { useFocusStore } from "../../store/focusStore";
+import { useSettingsStore } from "../../store/settingsStore";
 import { FiPlay, FiPause, FiSkipForward } from "react-icons/fi";
 
 export default function MiniTimerPage() {
   const { running, session, remainingTime, start, pause, reset } = useFocusStore();
+  const theme = useSettingsStore((s) => s.theme);
+  const isDark = theme === "dark";
 
   const minutes = Math.floor(remainingTime / 60);
   const seconds = remainingTime % 60;
@@ -24,14 +27,22 @@ export default function MiniTimerPage() {
   }, []);
 
   return (
-    <div className="w-full h-full bg-black/70 backdrop-blur-xl flex flex-col items-center justify-center p-4 text-primary">
+    <div className={`w-full h-full backdrop-blur-xl flex flex-col items-center justify-center p-4 ${
+      isDark ? "bg-black/70 text-gray-100" : "bg-black/50 text-gray-900"
+    }`}>
       {/* Timer Display */}
-      <div className="text-5xl font-semibold mb-2 tabular-nums tracking-tight text-accent">
+      <div className={`text-5xl font-semibold mb-2 tabular-nums tracking-tight ${
+        isDark ? "text-violet-400" : "text-violet-600"
+      }`}>
         {timeStr}
       </div>
 
       {/* Session Type */}
-      <div className="text-sm font-medium text-secondary mb-4 uppercase tracking-wider badge">
+      <div className={`text-sm font-medium mb-4 uppercase tracking-wider px-3 py-1 rounded border ${
+        isDark 
+          ? "bg-violet-500/10 text-violet-400 border-violet-500/30" 
+          : "bg-violet-50 text-violet-600 border-violet-200"
+      }`}>
         {session === "focus" ? "Focus" : "Break"}
       </div>
 
@@ -40,7 +51,11 @@ export default function MiniTimerPage() {
         {running ? (
           <button
             onClick={pause}
-            className="icon-btn"
+            className={`p-2 rounded-lg transition-all ${
+              isDark 
+                ? "text-gray-400 hover:bg-gray-700 hover:text-gray-100" 
+                : "text-gray-600 hover:bg-gray-200 hover:text-gray-900"
+            }`}
           >
             <FiPause className="w-4 h-4" />
           </button>
@@ -55,7 +70,11 @@ export default function MiniTimerPage() {
 
         <button
           onClick={reset}
-          className="icon-btn"
+          className={`p-2 rounded-lg transition-all ${
+            isDark 
+              ? "text-gray-400 hover:bg-gray-700 hover:text-gray-100" 
+              : "text-gray-600 hover:bg-gray-200 hover:text-gray-900"
+          }`}
         >
           <FiSkipForward className="w-4 h-4" />
         </button>
