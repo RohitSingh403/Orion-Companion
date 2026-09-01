@@ -18,6 +18,8 @@ import {
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("general");
   const [autoLaunchEnabled, setAutoLaunchEnabled] = useState(false);
+  const theme = useSettingsStore((s) => s.theme);
+  const isDark = theme === "dark";
 
   const {
     focusMinutes,
@@ -30,7 +32,6 @@ export default function SettingsPage() {
     focusSound,
     desktopNotifications,
     breakReminder,
-    theme,
     setFocusMinutes,
     setBreakMinutes,
     setDailyGoal,
@@ -80,14 +81,14 @@ export default function SettingsPage() {
 
   const renderFocusSettings = () => (
     <div className="space-y-6">
-      <h3 className="text-base font-semibold text-accent pb-3 border-b border-white/6">
+      <h3 className={`text-base font-semibold pb-3 border-b ${isDark ? "text-violet-400 border-gray-700" : "text-violet-600 border-gray-200"}`}>
         Focus & Timer Configuration
       </h3>
 
       <div className="grid grid-cols-2 gap-6">
         {/* Focus Duration */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-secondary">Focus Duration (minutes)</label>
+          <label className={`text-sm font-medium ${isDark ? "text-gray-500" : "text-gray-600"}`}>Focus Duration (minutes)</label>
           <select
             value={focusMinutes}
             onChange={(e) => {
@@ -95,7 +96,11 @@ export default function SettingsPage() {
               setFocusMinutes(minutes);
               setFocusDuration(minutes);
             }}
-            className="w-full h-10 px-3 input rounded-lg text-sm text-primary"
+            className={`w-full h-10 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
+              isDark 
+                ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500" 
+                : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500"
+            } border`}
           >
             <option value={15}>15 minutes</option>
             <option value={25}>25 minutes (Standard)</option>
@@ -107,7 +112,7 @@ export default function SettingsPage() {
 
         {/* Break Duration */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-secondary">Short Break (minutes)</label>
+          <label className={`text-sm font-medium ${isDark ? "text-gray-500" : "text-gray-600"}`}>Short Break (minutes)</label>
           <select
             value={breakMinutes}
             onChange={(e) => {
@@ -115,7 +120,11 @@ export default function SettingsPage() {
               setBreakMinutes(minutes);
               setBreakDuration(minutes);
             }}
-            className="w-full h-10 px-3 input rounded-lg text-sm text-primary"
+            className={`w-full h-10 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
+              isDark 
+                ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500" 
+                : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500"
+            } border`}
           >
             <option value={3}>3 minutes</option>
             <option value={5}>5 minutes (Standard)</option>
@@ -126,7 +135,7 @@ export default function SettingsPage() {
 
         {/* Daily Goal */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-secondary">Daily Session Goal</label>
+          <label className={`text-sm font-medium ${isDark ? "text-gray-500" : "text-gray-600"}`}>Daily Session Goal</label>
           <select
             value={dailyGoal}
             onChange={(e) => {
@@ -134,7 +143,11 @@ export default function SettingsPage() {
               setDailyGoal(goal);
               setFocusDailyGoal(goal);
             }}
-            className="w-full h-10 px-3 input rounded-lg text-sm text-primary"
+            className={`w-full h-10 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
+              isDark 
+                ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500" 
+                : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500"
+            } border`}
           >
             <option value={4}>4 sessions</option>
             <option value={6}>6 sessions</option>
@@ -145,12 +158,12 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="space-y-4 pt-4 border-t border-white/6">
+      <div className={`space-y-4 pt-4 border-t ${isDark ? "border-gray-700" : "border-gray-200"}`}>
         {/* Auto Start Break Toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-medium text-primary">Auto-start Breaks</h4>
-            <p className="text-xs text-muted">Automatically start break timer when focus ends</p>
+            <h4 className={`text-sm font-medium ${isDark ? "text-gray-100" : "text-gray-900"}`}>Auto-start Breaks</h4>
+            <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Automatically start break timer when focus ends</p>
           </div>
           <button
             onClick={() => setAutoStartBreak(!autoStartBreak)}
@@ -162,8 +175,8 @@ export default function SettingsPage() {
         {/* Auto Start Focus Toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-medium text-primary">Auto-start Focus</h4>
-            <p className="text-xs text-muted">Automatically start next focus session when break ends</p>
+            <h4 className={`text-sm font-medium ${isDark ? "text-gray-100" : "text-gray-900"}`}>Auto-start Focus</h4>
+            <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Automatically start next focus session when break ends</p>
           </div>
           <button
             onClick={() => setAutoStartFocus(!autoStartFocus)}
@@ -177,7 +190,7 @@ export default function SettingsPage() {
 
   const renderSoundSettings = () => (
     <div className="space-y-6">
-      <h3 className="text-base font-semibold text-accent pb-3 border-b border-white/6">
+      <h3 className={`text-base font-semibold pb-3 border-b ${isDark ? "text-violet-400 border-gray-700" : "text-violet-600 border-gray-200"}`}>
         Sound Configuration
       </h3>
 
@@ -185,8 +198,8 @@ export default function SettingsPage() {
         {/* Sound Enabled Toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-medium text-primary">Enable Sounds</h4>
-            <p className="text-xs text-muted">Play audio cues on timer transitions</p>
+            <h4 className={`text-sm font-medium ${isDark ? "text-gray-100" : "text-gray-900"}`}>Enable Sounds</h4>
+            <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Play audio cues on timer transitions</p>
           </div>
           <button
             onClick={toggleSound}
@@ -197,12 +210,16 @@ export default function SettingsPage() {
 
         {/* Break Sound Select */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-secondary">Break Start Sound</label>
+          <label className={`text-sm font-medium ${isDark ? "text-gray-500" : "text-gray-600"}`}>Break Start Sound</label>
           <select
             value={breakSound}
             onChange={(e) => setBreakSound(e.target.value)}
             disabled={!soundEnabled}
-            className="w-full h-10 px-3 input rounded-lg text-sm text-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`w-full h-10 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+              isDark 
+                ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500" 
+                : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500"
+            } border`}
           >
             <option value="break.mp3">Default Chime</option>
             <option value="bell.mp3">Bell</option>
@@ -213,12 +230,16 @@ export default function SettingsPage() {
 
         {/* Focus Sound Select */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-secondary">Focus Start Sound</label>
+          <label className={`text-sm font-medium ${isDark ? "text-gray-500" : "text-gray-600"}`}>Focus Start Sound</label>
           <select
             value={focusSound}
             onChange={(e) => setFocusSound(e.target.value)}
             disabled={!soundEnabled}
-            className="w-full h-10 px-3 input rounded-lg text-sm text-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`w-full h-10 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+              isDark 
+                ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500" 
+                : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500"
+            } border`}
           >
             <option value="complete.mp3">Complete Chime</option>
             <option value="motivation.mp3">Motivation</option>
@@ -232,7 +253,7 @@ export default function SettingsPage() {
 
   const renderNotificationSettings = () => (
     <div className="space-y-6">
-      <h3 className="text-base font-semibold text-accent pb-3 border-b border-white/6">
+      <h3 className={`text-base font-semibold pb-3 border-b ${isDark ? "text-violet-400 border-gray-700" : "text-violet-600 border-gray-200"}`}>
         Notification Settings
       </h3>
 
@@ -240,8 +261,8 @@ export default function SettingsPage() {
         {/* Desktop Notifications Toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-medium text-primary">Desktop Notifications</h4>
-            <p className="text-xs text-muted">Show system notifications on timer events</p>
+            <h4 className={`text-sm font-medium ${isDark ? "text-gray-100" : "text-gray-900"}`}>Desktop Notifications</h4>
+            <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Show system notifications on timer events</p>
           </div>
           <button
             onClick={() => setDesktopNotifications(!desktopNotifications)}
@@ -253,8 +274,8 @@ export default function SettingsPage() {
         {/* Break Reminder Toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-medium text-primary">Break Reminder</h4>
-            <p className="text-xs text-muted">Remind you to take breaks during long sessions</p>
+            <h4 className={`text-sm font-medium ${isDark ? "text-gray-100" : "text-gray-900"}`}>Break Reminder</h4>
+            <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Remind you to take breaks during long sessions</p>
           </div>
           <button
             onClick={() => setBreakReminder(!breakReminder)}
@@ -268,23 +289,27 @@ export default function SettingsPage() {
 
   const renderAppearanceSettings = () => (
     <div className="space-y-6">
-      <h3 className="text-base font-semibold text-accent pb-3 border-b border-white/6">
+      <h3 className={`text-base font-semibold pb-3 border-b ${isDark ? "text-violet-400 border-gray-700" : "text-violet-600 border-gray-200"}`}>
         Appearance Settings
       </h3>
 
       <div className="space-y-4">
         {/* Theme Select */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-secondary">Theme</label>
+          <label className={`text-sm font-medium ${isDark ? "text-gray-500" : "text-gray-600"}`}>Theme</label>
           <select
             value={theme}
             onChange={(e) => setTheme(e.target.value as "dark" | "light")}
-            className="w-full h-10 px-3 input rounded-lg text-sm text-primary"
+            className={`w-full h-10 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
+              isDark 
+                ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500" 
+                : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500"
+            } border`}
           >
             <option value="dark">Dark Mode</option>
             <option value="light">Light Mode</option>
           </select>
-          <p className="text-xs text-muted">Light mode coming soon</p>
+          <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Light mode coming soon</p>
         </div>
       </div>
     </div>
@@ -292,7 +317,7 @@ export default function SettingsPage() {
 
   const renderGeneralSettings = () => (
     <div className="space-y-6">
-      <h3 className="text-base font-semibold text-accent pb-3 border-b border-white/6">
+      <h3 className={`text-base font-semibold pb-3 border-b ${isDark ? "text-violet-400 border-gray-700" : "text-violet-600 border-gray-200"}`}>
         General Settings
       </h3>
 
@@ -300,8 +325,8 @@ export default function SettingsPage() {
         {/* Auto Launch Toggle */}
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-medium text-primary">Auto Launch on Startup</h4>
-            <p className="text-xs text-muted">Start Focus Companion automatically when your computer starts</p>
+            <h4 className={`text-sm font-medium ${isDark ? "text-gray-100" : "text-gray-900"}`}>Auto Launch on Startup</h4>
+            <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Start Focus Companion automatically when your computer starts</p>
           </div>
           <button
             onClick={handleToggleAutoLaunch}
@@ -315,16 +340,20 @@ export default function SettingsPage() {
 
   const renderDataSettings = () => (
     <div className="space-y-6">
-      <h3 className="text-base font-semibold text-accent pb-3 border-b border-white/6">
+      <h3 className={`text-base font-semibold pb-3 border-b ${isDark ? "text-violet-400 border-gray-700" : "text-violet-600 border-gray-200"}`}>
         Data & Backup
       </h3>
 
       <div className="space-y-4">
         {/* Reset Stats */}
-        <div className="flex items-center justify-between p-4 rounded-lg border border-red-500/20 bg-red-500/5">
+        <div className={`flex items-center justify-between p-4 rounded-lg border ${
+          isDark 
+            ? "bg-red-500/5 border-red-500/20" 
+            : "bg-red-50 border-red-200"
+        }`}>
           <div>
-            <h4 className="text-sm font-medium text-primary">Reset All Stats</h4>
-            <p className="text-xs text-muted">Clear all focus sessions, history, streaks, and daily statistics</p>
+            <h4 className={`text-sm font-medium ${isDark ? "text-gray-100" : "text-gray-900"}`}>Reset All Stats</h4>
+            <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Clear all focus sessions, history, streaks, and daily statistics</p>
           </div>
           <button
             onClick={() => {
@@ -332,14 +361,22 @@ export default function SettingsPage() {
                 resetAllData();
               }
             }}
-            className="px-3 py-1.5 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-sm font-medium hover:bg-red-500/30 transition-colors"
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              isDark 
+                ? "bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30" 
+                : "bg-red-100 text-red-600 border border-red-200 hover:bg-red-200"
+            }`}
           >
             Reset Stats
           </button>
         </div>
 
-        <div className="text-center py-8 border border-dashed border-white/10 rounded-lg card">
-          <p className="text-sm text-muted">Backup and export features coming soon.</p>
+        <div className={`text-center py-8 border border-dashed rounded-lg ${
+          isDark 
+            ? "border-gray-700 bg-gray-800" 
+            : "border-gray-300 bg-white"
+        }`}>
+          <p className={`text-sm ${isDark ? "text-gray-500" : "text-gray-500"}`}>Backup and export features coming soon.</p>
         </div>
       </div>
     </div>
@@ -347,11 +384,15 @@ export default function SettingsPage() {
 
   const renderPlaceholder = (title: string) => (
     <div className="space-y-6">
-      <h3 className="text-base font-semibold text-accent pb-3 border-b border-white/6">
+      <h3 className={`text-base font-semibold pb-3 border-b ${isDark ? "text-violet-400 border-gray-700" : "text-violet-600 border-gray-200"}`}>
         {title}
       </h3>
-      <div className="text-center py-12 border border-dashed border-white/10 rounded-lg card">
-        <p className="text-sm text-muted">This section is coming soon.</p>
+      <div className={`text-center py-12 border border-dashed rounded-lg ${
+        isDark 
+          ? "border-gray-700 bg-gray-800" 
+          : "border-gray-300 bg-white"
+      }`}>
+        <p className={`text-sm ${isDark ? "text-gray-500" : "text-gray-500"}`}>This section is coming soon.</p>
       </div>
     </div>
   );
@@ -361,7 +402,11 @@ export default function SettingsPage() {
       <Topbar subtitle="Configure focus timer, sound cues & app preferences" />
       <div className="flex-1 p-8 flex gap-6 overflow-auto">
         {/* Left Sub-Sidebar */}
-        <div className="w-64 card-elevated rounded-lg p-4 flex flex-col gap-1 flex-shrink-0">
+        <div className={`w-64 rounded-lg p-4 flex flex-col gap-1 flex-shrink-0 border shadow-sm ${
+          isDark 
+            ? "bg-gray-800 border-gray-700" 
+            : "bg-white border-gray-200"
+        }`}>
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -371,8 +416,12 @@ export default function SettingsPage() {
                 onClick={() => setActiveTab(item.id)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-white/10 text-white"
-                    : "text-secondary hover:text-white hover:bg-white/5"
+                    ? isDark 
+                      ? "bg-violet-500/10 text-violet-400 border border-violet-500/30" 
+                      : "bg-violet-50 text-violet-600 border border-violet-200"
+                    : isDark 
+                      ? "text-gray-400 hover:text-gray-100 hover:bg-gray-700" 
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -383,7 +432,11 @@ export default function SettingsPage() {
         </div>
 
         {/* Right Settings Panel */}
-        <div className="flex-1 card-elevated rounded-lg p-6 overflow-y-auto no-scrollbar">
+        <div className={`flex-1 rounded-lg p-6 overflow-y-auto no-scrollbar border shadow-sm ${
+          isDark 
+            ? "bg-gray-800 border-gray-700" 
+            : "bg-white border-gray-200"
+        }`}>
           {activeTab === "focus" && renderFocusSettings()}
           {activeTab === "sounds" && renderSoundSettings()}
           {activeTab === "notifications" && renderNotificationSettings()}
