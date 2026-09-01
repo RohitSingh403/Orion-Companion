@@ -5,6 +5,7 @@ import AppLayout from "../../layouts/AppLayout";
 import Topbar from "../../components/topbar/Topbar";
 import { useNotesStore } from "../../store/notesStore";
 import { useTaskStore } from "../../store/taskStore";
+import { useSettingsStore } from "../../store/settingsStore";
 import ReactMarkdown from "react-markdown";
 import {
   FiSearch,
@@ -25,6 +26,8 @@ import {
 export default function NotesPage() {
   const { notes, activeNoteId, addNote, updateNote, deleteNote, setActiveNote, searchNotes, addAttachment, removeAttachment } = useNotesStore();
   const { tasks } = useTaskStore();
+  const theme = useSettingsStore((s) => s.theme);
+  const isDark = theme === "dark";
   const [searchQuery, setSearchQuery] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
@@ -133,20 +136,34 @@ export default function NotesPage() {
       <div className="flex-1 p-8 flex gap-6 relative overflow-auto">
         {/* Quick Note Toast */}
         {showQuickNoteToast && (
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 card border border-accent/40 text-accent px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-lg z-50">
+          <div className={`absolute top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-lg z-50 border ${
+            isDark 
+              ? "bg-gray-800 border-violet-500/40 text-violet-400" 
+              : "bg-white border-violet-200 text-violet-600"
+          }`}>
             <FiZap className="w-4 h-4" />
             <span>Quick note created!</span>
           </div>
         )}
 
         {/* Left Note List Panel */}
-        <div className="w-80 card-elevated rounded-xl p-4 flex flex-col gap-4 flex-shrink-0">
+        <div className={`w-80 rounded-xl p-4 flex flex-col gap-4 flex-shrink-0 border shadow-sm ${
+          isDark 
+            ? "bg-gray-800 border-gray-700" 
+            : "bg-white border-gray-200"
+        }`}>
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-accent">Notes</h3>
+            <h3 className={`text-sm font-semibold ${
+              isDark ? "text-violet-400" : "text-violet-600"
+            }`}>Notes</h3>
             <div className="flex items-center gap-2">
               <button 
                 onClick={handleQuickNote} 
-                className="icon-btn"
+                className={`p-1.5 rounded-lg transition-all ${
+                  isDark 
+                    ? "text-gray-500 hover:text-gray-100 hover:bg-gray-700" 
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                }`}
                 title="Quick note (Cmd/Ctrl + N)"
               >
                 <FiZap className="w-3.5 h-3.5" />
@@ -159,19 +176,27 @@ export default function NotesPage() {
           </div>
 
           <div className="relative">
-            <FiSearch className="absolute left-3 top-2.5 w-3.5 h-3.5 text-muted" />
+            <FiSearch className={`absolute left-3 top-2.5 w-3.5 h-3.5 ${
+              isDark ? "text-gray-500" : "text-gray-500"
+            }`} />
             <input
               type="text"
               placeholder="Search notes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-8 pl-8 pr-3 input rounded-lg text-sm text-primary placeholder-muted"
+              className={`w-full h-8 pl-8 pr-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
+                isDark 
+                  ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500 placeholder-gray-500" 
+                  : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500 placeholder-gray-400"
+              } border`}
             />
           </div>
 
           <div className="flex-1 overflow-y-auto space-y-2 no-scrollbar">
             {filteredNotes.length === 0 ? (
-              <p className="text-sm text-muted text-center py-6">No notes found.</p>
+              <p className={`text-sm text-center py-6 ${
+                isDark ? "text-gray-500" : "text-gray-500"
+              }`}>No notes found.</p>
             ) : (
               filteredNotes.map((note) => (
                 <div
@@ -179,12 +204,20 @@ export default function NotesPage() {
                   onClick={() => setActiveNote(note.id)}
                   className={`p-3 rounded-lg cursor-pointer transition-all ${
                     activeNoteId === note.id
-                      ? "bg-accent/15 border border-accent/40 text-primary"
-                      : "card hover:bg-white/5 text-secondary"
+                      ? isDark 
+                        ? "bg-violet-500/15 border border-violet-500/40 text-gray-100" 
+                        : "bg-violet-50 border border-violet-200 text-gray-900"
+                      : isDark 
+                        ? "bg-gray-700 hover:bg-gray-600 text-gray-400" 
+                        : "bg-gray-50 hover:bg-gray-100 text-gray-600"
                   }`}
                 >
-                  <h4 className="text-sm font-medium text-primary">{note.title}</h4>
-                  <p className="text-[10px] text-muted mt-1">
+                  <h4 className={`text-sm font-medium ${
+                    isDark ? "text-gray-100" : "text-gray-900"
+                  }`}>{note.title}</h4>
+                  <p className={`text-[10px] mt-1 ${
+                    isDark ? "text-gray-500" : "text-gray-500"
+                  }`}>
                     {new Date(note.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                   </p>
                 </div>
@@ -194,18 +227,30 @@ export default function NotesPage() {
         </div>
 
         {/* Right Note Markdown Editor Panel */}
-        <div className="flex-1 card-elevated rounded-xl p-6 flex flex-col gap-4 overflow-auto">
+        <div className={`flex-1 rounded-xl p-6 flex flex-col gap-4 overflow-auto border shadow-sm ${
+          isDark 
+            ? "bg-gray-800 border-gray-700" 
+            : "bg-white border-gray-200"
+        }`}>
           {activeNote ? (
             <>
               {/* Editor Header Toolbar */}
-              <div className="flex items-center justify-between border-b border-white/6 pb-3">
-                <span className="text-sm font-medium text-secondary">
+              <div className={`flex items-center justify-between border-b pb-3 ${
+                isDark 
+                  ? "border-gray-700" 
+                  : "border-gray-200"
+              }`}>
+                <span className={`text-sm font-medium ${
+                  isDark ? "text-gray-500" : "text-gray-500"
+                }`}>
                   {new Date(activeNote.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                 </span>
                 <div className="flex items-center gap-2">
                   {isEditing ? (
                     <div className="flex items-center gap-1">
-                      <button onClick={handleCancelEdit} className="px-2 py-1 text-sm text-secondary hover:text-primary transition-colors">
+                      <button onClick={handleCancelEdit} className={`px-2 py-1 text-sm transition-colors ${
+                        isDark ? "text-gray-500 hover:text-gray-100" : "text-gray-600 hover:text-gray-900"
+                      }`}>
                         Cancel
                       </button>
                       <button onClick={handleSaveNote} className="px-2 py-1 btn-primary text-sm font-medium rounded">
@@ -213,22 +258,50 @@ export default function NotesPage() {
                       </button>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-1 card p-1 rounded-lg text-secondary">
+                    <div className={`flex items-center gap-1 p-1 rounded-lg ${
+                      isDark 
+                        ? "bg-gray-700 text-gray-400" 
+                        : "bg-gray-100 text-gray-600"
+                    }`}>
                       <button 
                         onClick={() => setViewMode("preview")}
-                        className={`icon-btn ${viewMode === "preview" ? "active" : ""}`}
+                        className={`p-1.5 rounded-lg transition-all ${
+                          viewMode === "preview"
+                            ? isDark 
+                              ? "bg-violet-500/10 text-violet-400" 
+                              : "bg-violet-50 text-violet-600"
+                            : isDark 
+                              ? "hover:text-gray-100 hover:bg-gray-600" 
+                              : "hover:text-gray-900 hover:bg-gray-200"
+                        }`}
                       >
                         <FiEye className="w-3.5 h-3.5" />
                       </button>
                       <button 
                         onClick={() => setViewMode("edit")}
-                        className={`icon-btn ${viewMode === "edit" ? "active" : ""}`}
+                        className={`p-1.5 rounded-lg transition-all ${
+                          viewMode === "edit"
+                            ? isDark 
+                              ? "bg-violet-500/10 text-violet-400" 
+                              : "bg-violet-50 text-violet-600"
+                            : isDark 
+                              ? "hover:text-gray-100 hover:bg-gray-600" 
+                              : "hover:text-gray-900 hover:bg-gray-200"
+                        }`}
                       >
                         <FiEdit3 className="w-3.5 h-3.5" />
                       </button>
                       <button 
                         onClick={() => setShowTaskPicker(!showTaskPicker)}
-                        className={`icon-btn ${activeNote?.linkedTaskId ? "active" : ""}`}
+                        className={`p-1.5 rounded-lg transition-all ${
+                          activeNote?.linkedTaskId
+                            ? isDark 
+                              ? "bg-violet-500/10 text-violet-400" 
+                              : "bg-violet-50 text-violet-600"
+                            : isDark 
+                              ? "hover:text-gray-100 hover:bg-gray-600" 
+                              : "hover:text-gray-900 hover:bg-gray-200"
+                        }`}
                         title={activeNote?.linkedTaskId ? "Linked task" : "Link task"}
                       >
                         <FiTarget className="w-3.5 h-3.5" />
@@ -236,7 +309,9 @@ export default function NotesPage() {
                       {activeNote?.linkedTaskId && (
                         <button 
                           onClick={handleUnlinkTask}
-                          className="icon-btn hover:text-red-400"
+                          className={`p-1.5 rounded-lg transition-colors ${
+                            isDark ? "hover:text-red-400" : "hover:text-red-600"
+                          }`}
                           title="Unlink task"
                         >
                           <FiTrash2 className="w-3.5 h-3.5" />
@@ -244,30 +319,48 @@ export default function NotesPage() {
                       )}
                       <button 
                         onClick={handleDeleteNote} 
-                        className="icon-btn hover:text-red-400"
+                        className={`p-1.5 rounded-lg transition-colors ${
+                          isDark ? "hover:text-red-400" : "hover:text-red-600"
+                        }`}
                         title="Delete note"
                       >
                         <FiTrash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   )}
-                  <div className="flex items-center gap-1 card p-1 rounded-lg text-secondary">
-                    <button className="icon-btn">
+                  <div className={`flex items-center gap-1 p-1 rounded-lg ${
+                    isDark 
+                      ? "bg-gray-700 text-gray-400" 
+                      : "bg-gray-100 text-gray-600"
+                  }`}>
+                    <button className={`p-1.5 rounded-lg transition-all ${
+                      isDark ? "hover:text-gray-100 hover:bg-gray-600" : "hover:text-gray-900 hover:bg-gray-200"
+                    }`}>
                       <FiBold className="w-3.5 h-3.5" />
                     </button>
-                    <button className="icon-btn">
+                    <button className={`p-1.5 rounded-lg transition-all ${
+                      isDark ? "hover:text-gray-100 hover:bg-gray-600" : "hover:text-gray-900 hover:bg-gray-200"
+                    }`}>
                       <FiItalic className="w-3.5 h-3.5" />
                     </button>
-                    <button className="icon-btn">
+                    <button className={`p-1.5 rounded-lg transition-all ${
+                      isDark ? "hover:text-gray-100 hover:bg-gray-600" : "hover:text-gray-900 hover:bg-gray-200"
+                    }`}>
                       <FiList className="w-3.5 h-3.5" />
                     </button>
-                    <button className="icon-btn">
+                    <button className={`p-1.5 rounded-lg transition-all ${
+                      isDark ? "hover:text-gray-100 hover:bg-gray-600" : "hover:text-gray-900 hover:bg-gray-200"
+                    }`}>
                       <FiCheckSquare className="w-3.5 h-3.5" />
                     </button>
-                    <button className="icon-btn">
+                    <button className={`p-1.5 rounded-lg transition-all ${
+                      isDark ? "hover:text-gray-100 hover:bg-gray-600" : "hover:text-gray-900 hover:bg-gray-200"
+                    }`}>
                       <FiPaperclip className="w-3.5 h-3.5" />
                     </button>
-                    <button className="icon-btn">
+                    <button className={`p-1.5 rounded-lg transition-all ${
+                      isDark ? "hover:text-gray-100 hover:bg-gray-600" : "hover:text-gray-900 hover:bg-gray-200"
+                    }`}>
                       <FiLink className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -276,26 +369,44 @@ export default function NotesPage() {
 
               {/* Task Picker Modal */}
               {showTaskPicker && (
-                <div className="absolute inset-0 bg-black/70 backdrop-blur-sm rounded-xl p-4 z-10 card-elevated">
+                <div className={`absolute inset-0 bg-black/70 backdrop-blur-sm rounded-xl p-4 z-10 border shadow-sm ${
+                  isDark 
+                    ? "bg-gray-800 border-gray-700" 
+                    : "bg-white border-gray-200"
+                }`}>
                   <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-sm font-semibold text-accent">Link a Task</h4>
-                    <button onClick={() => setShowTaskPicker(false)} className="text-secondary hover:text-primary transition-colors">
+                    <h4 className={`text-sm font-semibold ${
+                      isDark ? "text-violet-400" : "text-violet-600"
+                    }`}>Link a Task</h4>
+                    <button onClick={() => setShowTaskPicker(false)} className={`transition-colors ${
+                      isDark ? "text-gray-500 hover:text-gray-100" : "text-gray-500 hover:text-gray-900"
+                    }`}>
                       <FiTrash2 className="w-4 h-4" />
                     </button>
                   </div>
                   <div className="space-y-2 max-h-60 overflow-y-auto no-scrollbar">
                     {tasks.length === 0 ? (
-                      <p className="text-sm text-muted text-center py-4">No tasks available</p>
+                      <p className={`text-sm text-center py-4 ${
+                        isDark ? "text-gray-500" : "text-gray-500"
+                      }`}>No tasks available</p>
                     ) : (
                       tasks.map((task) => (
                         <button
                           key={task.id}
                           onClick={() => handleLinkTask(task.id)}
-                          className="w-full p-3 card rounded-lg text-left hover:bg-white/5 transition-all"
+                          className={`w-full p-3 rounded-lg text-left transition-all ${
+                            isDark 
+                              ? "bg-gray-700 hover:bg-gray-600" 
+                              : "bg-gray-50 hover:bg-gray-100"
+                          }`}
                         >
                           <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-primary">{task.title}</span>
-                            <span className="text-[10px] text-muted">
+                            <span className={`text-sm font-medium ${
+                              isDark ? "text-gray-100" : "text-gray-900"
+                            }`}>{task.title}</span>
+                            <span className={`text-[10px] ${
+                              isDark ? "text-gray-500" : "text-gray-500"
+                            }`}>
                               {task.completedFocusSessions}/{task.estimatedFocusSessions}
                             </span>
                           </div>
@@ -317,27 +428,45 @@ export default function NotesPage() {
                         updateNote(activeNoteId, { content: e.target.value });
                       }
                     }}
-                    className="w-full h-full card border border-white/10 rounded-lg p-3 text-sm text-primary leading-relaxed outline-none resize-none font-mono no-scrollbar hover:border-white/20 transition-all"
+                    className={`w-full h-full rounded-lg p-3 text-sm leading-relaxed outline-none resize-none font-mono no-scrollbar transition-all border ${
+                      isDark 
+                        ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500 hover:border-gray-500" 
+                        : "bg-gray-50 border-gray-200 text-gray-900 focus:border-violet-500 hover:border-gray-300"
+                    }`}
                     placeholder="Write your note here..."
                   />
                 ) : (
-                  <div className="w-full h-full card border border-white/10 rounded-lg p-4 text-sm text-primary leading-relaxed overflow-y-auto no-scrollbar prose prose-invert prose-sm max-w-none prose-headings:text-primary prose-p:text-secondary prose-strong:text-primary prose-code:text-accent prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10 hover:border-white/20 transition-all">
+                  <div className={`w-full h-full rounded-lg p-4 text-sm leading-relaxed overflow-y-auto no-scrollbar prose prose-invert prose-sm max-w-none border transition-all ${
+                    isDark 
+                      ? "bg-gray-700 border-gray-600 text-gray-100 hover:border-gray-500 prose-headings:text-gray-100 prose-p:text-gray-400 prose-strong:text-gray-100 prose-code:text-violet-400 prose-pre:bg-gray-800 prose-pre:border-gray-600" 
+                      : "bg-gray-50 border-gray-200 text-gray-900 hover:border-gray-300 prose-headings:text-gray-900 prose-p:text-gray-600 prose-strong:text-gray-900 prose-code:text-violet-600 prose-pre:bg-white prose-pre:border-gray-200"
+                  }`}>
                     <ReactMarkdown>{activeNote?.content || ""}</ReactMarkdown>
                   </div>
                 )}
 
                 {/* Linked Task Display */}
                 {activeNote?.linkedTaskId && (
-                  <div className="absolute bottom-4 left-4 right-4 card border border-accent/30 rounded-lg p-2 flex items-center justify-between">
+                  <div className={`absolute bottom-4 left-4 right-4 rounded-lg p-2 flex items-center justify-between border ${
+                    isDark 
+                      ? "bg-gray-700 border-violet-500/30" 
+                      : "bg-gray-50 border-violet-200"
+                  }`}>
                     <div className="flex items-center gap-2">
-                      <FiTarget className="w-3.5 h-3.5 text-accent" />
-                      <span className="text-sm text-accent font-medium">
+                      <FiTarget className={`w-3.5 h-3.5 ${
+                        isDark ? "text-violet-400" : "text-violet-600"
+                      }`} />
+                      <span className={`text-sm font-medium ${
+                        isDark ? "text-violet-400" : "text-violet-600"
+                      }`}>
                         {tasks.find((t) => t.id === activeNote.linkedTaskId)?.title || "Linked Task"}
                       </span>
                     </div>
                     <button 
                       onClick={handleUnlinkTask}
-                      className="text-secondary hover:text-red-400 transition-colors"
+                      className={`transition-colors ${
+                        isDark ? "text-gray-500 hover:text-red-400" : "text-gray-500 hover:text-red-600"
+                      }`}
                     >
                       <FiTrash2 className="w-3 h-3" />
                     </button>
@@ -346,12 +475,22 @@ export default function NotesPage() {
               </div>
 
               {/* Tags Footer */}
-              <div className="flex items-center gap-2 pt-2 border-t border-white/6">
+              <div className={`flex items-center gap-2 pt-2 border-t ${
+                isDark 
+                  ? "border-gray-700" 
+                  : "border-gray-200"
+              }`}>
                 {activeNote.tags.length === 0 ? (
-                  <span className="text-[10px] text-muted">No tags</span>
+                  <span className={`text-[10px] ${
+                    isDark ? "text-gray-500" : "text-gray-500"
+                  }`}>No tags</span>
                 ) : (
                   activeNote.tags.map((t) => (
-                    <span key={t} className="px-2 py-0.5 rounded badge-success text-accent text-[10px] font-medium">
+                    <span key={t} className={`px-2 py-0.5 rounded text-[10px] font-medium ${
+                      isDark 
+                        ? "bg-violet-500/10 text-violet-400 border border-violet-500/30" 
+                        : "bg-violet-50 text-violet-600 border border-violet-200"
+                    }`}>
                       #{t}
                     </span>
                   ))
@@ -359,10 +498,18 @@ export default function NotesPage() {
               </div>
 
               {/* Attachments Section */}
-              <div className="flex flex-col gap-2 pt-2 border-t border-white/6">
+              <div className={`flex flex-col gap-2 pt-2 border-t ${
+                isDark 
+                  ? "border-gray-700" 
+                  : "border-gray-200"
+              }`}>
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-muted">Attachments</span>
-                  <label className="flex items-center gap-1 text-[10px] text-accent hover:text-accent/80 cursor-pointer">
+                  <span className={`text-[10px] ${
+                    isDark ? "text-gray-500" : "text-gray-500"
+                  }`}>Attachments</span>
+                  <label className={`flex items-center gap-1 text-[10px] cursor-pointer ${
+                    isDark ? "text-violet-400 hover:text-violet-300" : "text-violet-600 hover:text-violet-500"
+                  }`}>
                     <FiPaperclip className="w-3 h-3" />
                     <span>Add</span>
                     <input
@@ -374,24 +521,38 @@ export default function NotesPage() {
                   </label>
                 </div>
                 {activeNote.attachments?.length === 0 ? (
-                  <span className="text-[10px] text-muted">No attachments</span>
+                  <span className={`text-[10px] ${
+                    isDark ? "text-gray-500" : "text-gray-500"
+                  }`}>No attachments</span>
                 ) : (
                   <div className="space-y-1">
                     {(activeNote.attachments || []).map((attachment) => (
                       <div
                         key={attachment.id}
-                        className="flex items-center justify-between p-2 card border border-white/10 rounded-lg hover:bg-white/5 transition-all"
+                        className={`flex items-center justify-between p-2 rounded-lg border transition-all ${
+                          isDark 
+                            ? "bg-gray-700 border-gray-600 hover:bg-gray-600" 
+                            : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                        }`}
                       >
                         <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <FiPaperclip className="w-3 h-3 text-muted flex-shrink-0" />
-                          <span className="text-[10px] text-secondary truncate">{attachment.name}</span>
-                          <span className="text-[10px] text-muted flex-shrink-0">
+                          <FiPaperclip className={`w-3 h-3 flex-shrink-0 ${
+                            isDark ? "text-gray-500" : "text-gray-500"
+                          }`} />
+                          <span className={`text-[10px] truncate ${
+                            isDark ? "text-gray-400" : "text-gray-600"
+                          }`}>{attachment.name}</span>
+                          <span className={`text-[10px] flex-shrink-0 ${
+                            isDark ? "text-gray-500" : "text-gray-500"
+                          }`}>
                             {formatFileSize(attachment.size)}
                           </span>
                         </div>
                         <button
                           onClick={() => handleRemoveAttachment(attachment.id)}
-                          className="text-muted hover:text-red-400 transition flex-shrink-0"
+                          className={`transition flex-shrink-0 ${
+                            isDark ? "text-gray-500 hover:text-red-400" : "text-gray-500 hover:text-red-600"
+                          }`}
                         >
                           <FiTrash2 className="w-3 h-3" />
                         </button>
@@ -404,7 +565,9 @@ export default function NotesPage() {
           ) : (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
-                <p className="text-sm text-secondary mb-4">No note selected</p>
+                <p className={`text-sm mb-4 ${
+                  isDark ? "text-gray-500" : "text-gray-500"
+                }`}>No note selected</p>
                 <button onClick={handleCreateNote} className="px-4 py-2 btn-primary text-sm font-medium rounded-lg">
                   Create your first note
                 </button>
