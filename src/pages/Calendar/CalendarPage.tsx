@@ -287,8 +287,16 @@ export default function CalendarPage() {
       <Topbar subtitle="Plan your focus sessions & meetings" />
       <div className="flex-1 p-8 space-y-6 overflow-auto no-scrollbar">
         {/* Header Controls */}
-        <div className="flex items-center justify-between card-elevated p-4">
-          <div className="flex items-center gap-2 card p-1 rounded-lg">
+        <div className={`flex items-center justify-between p-4 rounded-xl border shadow-sm ${
+          isDark 
+            ? "bg-gray-800 border-gray-700" 
+            : "bg-white border-gray-200"
+        }`}>
+          <div className={`flex items-center gap-2 p-1 rounded-lg ${
+            isDark 
+              ? "bg-gray-700 border border-gray-600" 
+              : "bg-gray-100 border border-gray-200"
+          }`}>
             {(["month", "week", "day"] as const).map((mode) => (
               <button
                 key={mode}
@@ -296,7 +304,9 @@ export default function CalendarPage() {
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium capitalize transition-all ${
                   viewMode === mode
                     ? "btn-primary"
-                    : "text-secondary hover:text-white"
+                    : isDark 
+                      ? "text-gray-400 hover:text-gray-100" 
+                      : "text-gray-600 hover:text-gray-900"
                 }`}
               >
                 {mode}
@@ -315,7 +325,9 @@ export default function CalendarPage() {
             >
               <FiChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-sm font-semibold text-accent">
+            <span className={`text-sm font-semibold ${
+              isDark ? "text-violet-400" : "text-violet-600"
+            }`}>
               {formatDateRange()}
             </span>
             <button 
@@ -352,21 +364,33 @@ export default function CalendarPage() {
                   key={d.date}
                   className={`p-3 rounded-lg border transition cursor-pointer ${
                     d.active
-                      ? "bg-accent/15 border-accent/40 text-accent"
-                      : "card text-secondary border-white/6 hover:border-white/10"
+                      ? isDark 
+                        ? "bg-violet-500/15 border-violet-500/40 text-violet-400" 
+                        : "bg-violet-50 border-violet-200 text-violet-600"
+                      : isDark 
+                        ? "bg-gray-700 text-gray-400 border-gray-600 hover:border-gray-500" 
+                        : "bg-gray-50 text-gray-600 border-gray-200 hover:border-gray-300"
                   }`}
                 >
                   <p className="text-sm font-medium">{d.day}</p>
-                  <p className="text-lg font-semibold text-primary mt-0.5">{d.date}</p>
+                  <p className={`text-lg font-semibold mt-0.5 ${
+                    isDark ? "text-gray-100" : "text-gray-900"
+                  }`}>{d.date}</p>
                 </div>
               ))}
             </div>
 
             {/* Interactive Timeline Grid */}
-            <div className="card-elevated p-6 space-y-4 overflow-auto">
+            <div className={`p-6 space-y-4 overflow-auto rounded-xl border shadow-sm ${
+              isDark 
+                ? "bg-gray-800 border-gray-700" 
+                : "bg-white border-gray-200"
+            }`}>
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
-                  <FiClock className="text-accent" /> Hourly Schedule
+                <h3 className={`text-sm font-semibold flex items-center gap-2 ${
+                  isDark ? "text-gray-100" : "text-gray-900"
+                }`}>
+                  <FiClock className={isDark ? "text-violet-400" : "text-violet-600"} /> Hourly Schedule
                 </h3>
                 <button 
                   onClick={() => setShowEventModal(true)}
@@ -378,9 +402,19 @@ export default function CalendarPage() {
               </div>
               <div className="space-y-3">
                 {timeSlots.map((time, timeIdx) => (
-                  <div key={time} className="flex items-start gap-4 pt-2 border-t border-white/6">
-                    <span className="w-16 text-sm text-muted font-medium">{time}</span>
-                    <div className="flex-1 min-h-[48px] rounded-lg card border border-dashed border-white/10 p-2 relative hover:border-white/20 transition-all cursor-pointer group">
+                  <div key={time} className={`flex items-start gap-4 pt-2 border-t ${
+                    isDark 
+                      ? "border-gray-700" 
+                      : "border-gray-200"
+                  }`}>
+                    <span className={`w-16 text-sm font-medium ${
+                      isDark ? "text-gray-500" : "text-gray-500"
+                    }`}>{time}</span>
+                    <div className={`flex-1 min-h-[48px] rounded-lg border border-dashed p-2 relative transition-all cursor-pointer group ${
+                      isDark 
+                        ? "bg-gray-700 border-gray-600 hover:border-gray-500" 
+                        : "bg-gray-50 border-gray-200 hover:border-gray-300"
+                    }`}>
                       {weekDates.map((_, dayIdx) => (
                         <div
                           key={`${dayIdx}-${timeIdx}`}
@@ -416,22 +450,36 @@ export default function CalendarPage() {
                           </div>
                         ))}
                       {timeIdx === 2 && (
-                        <div className="mb-1 p-2.5 rounded-lg text-sm font-medium shadow-sm badge bg-accent/20 border-accent/40 text-accent">
+                        <div className={`mb-1 p-2.5 rounded-lg text-sm font-medium shadow-sm ${
+                          isDark 
+                            ? "bg-violet-500/20 border-violet-500/40 text-violet-400" 
+                            : "bg-violet-50 border-violet-200 text-violet-600"
+                        }`}>
                           🎯 Deep Focus Session — Build Workspace UI (9:00 AM - 11:00 AM)
                         </div>
                       )}
                       {timeIdx === 4 && (
-                        <div className="mb-1 p-2.5 rounded-lg text-sm font-medium shadow-sm badge bg-purple-500/20 border-purple-500/40 text-purple-300">
+                        <div className={`mb-1 p-2.5 rounded-lg text-sm font-medium shadow-sm ${
+                          isDark 
+                            ? "bg-purple-500/20 border-purple-500/40 text-purple-400" 
+                            : "bg-purple-50 border-purple-200 text-purple-600"
+                        }`}>
                           🎨 Design Review Meeting (11:00 AM - 12:00 PM)
                         </div>
                       )}
                       {timeIdx === 5 && (
-                        <div className="mb-1 p-2 rounded-lg text-sm font-medium shadow-sm badge bg-blue-500/20 border-blue-500/40 text-blue-300">
+                        <div className={`mb-1 p-2 rounded-lg text-sm font-medium shadow-sm ${
+                          isDark 
+                            ? "bg-blue-500/20 border-blue-500/40 text-blue-400" 
+                            : "bg-blue-50 border-blue-200 text-blue-600"
+                        }`}>
                           ☕ Scheduled Rest Break (1:00 PM - 1:15 PM)
                         </div>
                       )}
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                        <span className="text-[10px] text-muted">+ Add</span>
+                      <div className={`absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition ${
+                        isDark ? "text-gray-500" : "text-gray-500"
+                      }`}>
+                        <span className="text-[10px]">+ Add</span>
                       </div>
                     </div>
                   </div>
@@ -443,10 +491,16 @@ export default function CalendarPage() {
 
         {/* Month View */}
         {viewMode === "month" && (
-          <div className="card-elevated p-6 space-y-4">
+          <div className={`p-6 space-y-4 rounded-xl border shadow-sm ${
+            isDark 
+              ? "bg-gray-800 border-gray-700" 
+              : "bg-white border-gray-200"
+          }`}>
             <div className="grid grid-cols-7 gap-2 text-center mb-4">
               {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-                <div key={day} className="text-sm font-semibold text-muted uppercase">
+                <div key={day} className={`text-sm font-semibold uppercase ${
+                  isDark ? "text-gray-500" : "text-gray-500"
+                }`}>
                   {day}
                 </div>
               ))}
@@ -460,14 +514,20 @@ export default function CalendarPage() {
                       className={`p-2 rounded-lg border transition cursor-pointer min-h-[60px] ${
                         day
                           ? day.isToday
-                            ? "bg-accent/15 border-accent/40 text-accent"
-                            : "card text-secondary border-white/6 hover:border-white/10"
+                            ? isDark 
+                              ? "bg-violet-500/15 border-violet-500/40 text-violet-400" 
+                              : "bg-violet-50 border-violet-200 text-violet-600"
+                            : isDark 
+                              ? "bg-gray-700 text-gray-400 border-gray-600 hover:border-gray-500" 
+                              : "bg-gray-50 text-gray-600 border-gray-200 hover:border-gray-300"
                           : "border-transparent"
                       }`}
                     >
                       {day && (
                         <>
-                          <p className="text-sm font-semibold text-primary">{day.day}</p>
+                          <p className={`text-sm font-semibold ${
+                            isDark ? "text-gray-100" : "text-gray-900"
+                          }`}>{day.day}</p>
                           <div className="mt-1 space-y-1">
                             {filteredTasks
                               .filter((task) => {
@@ -479,7 +539,11 @@ export default function CalendarPage() {
                               .map((task) => (
                                 <div
                                   key={task.id}
-                                  className="text-[9px] truncate card px-1 py-0.5 rounded text-secondary"
+                                  className={`text-[9px] truncate px-1 py-0.5 rounded ${
+                                    isDark 
+                                      ? "bg-gray-600 text-gray-400" 
+                                      : "bg-gray-100 text-gray-600"
+                                  }`}
                                 >
                                   {task.title}
                                 </div>
@@ -515,10 +579,16 @@ export default function CalendarPage() {
 
         {/* Day View */}
         {viewMode === "day" && (
-          <div className="card-elevated p-6 space-y-4">
+          <div className={`p-6 space-y-4 rounded-xl border shadow-sm ${
+            isDark 
+              ? "bg-gray-800 border-gray-700" 
+              : "bg-white border-gray-200"
+          }`}>
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
-                <FiClock className="text-accent" /> Daily Schedule
+              <h3 className={`text-sm font-semibold flex items-center gap-2 ${
+                isDark ? "text-gray-100" : "text-gray-900"
+              }`}>
+                <FiClock className={isDark ? "text-violet-400" : "text-violet-600"} /> Daily Schedule
               </h3>
               <button 
                 onClick={() => setShowEventModal(true)}
@@ -530,9 +600,19 @@ export default function CalendarPage() {
             </div>
             <div className="space-y-3">
               {timeSlots.map((time, timeIdx) => (
-                <div key={time} className="flex items-start gap-4 pt-2 border-t border-white/6">
-                  <span className="w-16 text-sm text-muted font-medium">{time}</span>
-                  <div className="flex-1 min-h-[48px] rounded-lg card border border-dashed border-white/10 p-2 relative hover:border-white/20 transition-all cursor-pointer group">
+                <div key={time} className={`flex items-start gap-4 pt-2 border-t ${
+                  isDark 
+                    ? "border-gray-700" 
+                    : "border-gray-200"
+                }`}>
+                  <span className={`w-16 text-sm font-medium ${
+                    isDark ? "text-gray-500" : "text-gray-500"
+                  }`}>{time}</span>
+                  <div className={`flex-1 min-h-[48px] rounded-lg border border-dashed p-2 relative transition-all cursor-pointer group ${
+                    isDark 
+                      ? "bg-gray-700 border-gray-600 hover:border-gray-500" 
+                      : "bg-gray-50 border-gray-200 hover:border-gray-300"
+                  }`}>
                     {/* Render events for this time slot */}
                     {filteredEvents
                       .filter((event) => {
@@ -568,13 +648,19 @@ export default function CalendarPage() {
                       .map((task) => (
                         <div
                           key={task.id}
-                          className="mb-1 p-2.5 rounded-lg text-sm font-medium shadow-sm badge bg-accent/20 border-accent/40 text-accent"
+                          className={`mb-1 p-2.5 rounded-lg text-sm font-medium shadow-sm ${
+                            isDark 
+                              ? "bg-violet-500/20 border-violet-500/40 text-violet-400" 
+                              : "bg-violet-50 border-violet-200 text-violet-600"
+                          }`}
                         >
                           {task.title}
                         </div>
                       ))}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                      <span className="text-[10px] text-muted">+ Add</span>
+                    <div className={`absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition ${
+                      isDark ? "text-gray-500" : "text-gray-500"
+                    }`}>
+                      <span className="text-[10px]">+ Add</span>
                     </div>
                   </div>
                 </div>
@@ -584,12 +670,20 @@ export default function CalendarPage() {
         )}
 
         {/* Tasks for Current View */}
-        <div className="card-elevated p-6 space-y-4">
-          <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
-            <FiClock className="text-accent" /> Tasks {viewMode === "week" ? "This Week" : viewMode === "day" ? "Today" : "This Month"}
+        <div className={`p-6 space-y-4 rounded-xl border shadow-sm ${
+          isDark 
+            ? "bg-gray-800 border-gray-700" 
+            : "bg-white border-gray-200"
+        }`}>
+          <h3 className={`text-sm font-semibold flex items-center gap-2 ${
+            isDark ? "text-gray-100" : "text-gray-900"
+          }`}>
+            <FiClock className={isDark ? "text-violet-400" : "text-violet-600"} /> Tasks {viewMode === "week" ? "This Week" : viewMode === "day" ? "Today" : "This Month"}
           </h3>
           {filteredTasks.length === 0 ? (
-            <p className="text-sm text-muted text-center py-6">No tasks scheduled for this period.</p>
+            <p className={`text-sm text-center py-6 ${
+              isDark ? "text-gray-500" : "text-gray-500"
+            }`}>No tasks scheduled for this period.</p>
           ) : (
             <div className="space-y-2">
               {filteredTasks.map((task) => (
@@ -597,23 +691,37 @@ export default function CalendarPage() {
                   key={task.id}
                   draggable
                   onDragStart={(e) => e.dataTransfer.setData("taskId", task.id)}
-                  className="flex items-center justify-between p-3 card hover:bg-white/5 transition-all cursor-move"
+                  className={`flex items-center justify-between p-3 transition-all cursor-move ${
+                    isDark 
+                      ? "bg-gray-700 hover:bg-gray-600" 
+                      : "bg-gray-50 hover:bg-gray-100"
+                  }`}
                 >
                   <div className="flex items-center gap-3">
-                    <FiMoreVertical className="w-4 h-4 text-muted" />
+                    <FiMoreVertical className={`w-4 h-4 ${
+                      isDark ? "text-gray-500" : "text-gray-500"
+                    }`} />
                     <div className={`w-2 h-2 rounded-full ${
                       task.priority === "high" ? "bg-red-500" : 
                       task.priority === "medium" ? "bg-amber-500" : "bg-emerald-500"
                     }`} />
-                    <span className="text-sm font-medium text-primary">{task.title}</span>
+                    <span className={`text-sm font-medium ${
+                      isDark ? "text-gray-100" : "text-gray-900"
+                    }`}>{task.title}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {task.dueDate && (
-                      <span className="text-[10px] text-muted">
+                      <span className={`text-[10px] ${
+                        isDark ? "text-gray-500" : "text-gray-500"
+                      }`}>
                         {new Date(task.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                       </span>
                     )}
-                    <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded badge text-secondary">
+                    <span className={`text-[10px] font-mono font-medium px-2 py-0.5 rounded ${
+                      isDark 
+                        ? "bg-gray-600 text-gray-400" 
+                        : "bg-gray-100 text-gray-600"
+                    }`}>
                       {task.completedFocusSessions}/{task.estimatedFocusSessions}
                     </span>
                   </div>
@@ -626,12 +734,20 @@ export default function CalendarPage() {
         {/* Event Creation Modal */}
         {showEventModal && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="card-elevated p-6 w-full max-w-md space-y-4">
+            <div className={`p-6 w-full max-w-md space-y-4 rounded-xl border shadow-sm ${
+              isDark 
+                ? "bg-gray-800 border-gray-700" 
+                : "bg-white border-gray-200"
+            }`}>
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-accent">Create Event</h3>
+                <h3 className={`text-sm font-semibold ${
+                  isDark ? "text-violet-400" : "text-violet-600"
+                }`}>Create Event</h3>
                 <button 
                   onClick={handleCancelEvent}
-                  className="text-secondary hover:text-primary transition-colors"
+                  className={`transition-colors ${
+                    isDark ? "text-gray-500 hover:text-gray-100" : "text-gray-500 hover:text-gray-900"
+                  }`}
                 >
                   <FiX className="w-4 h-4" />
                 </button>
@@ -639,64 +755,100 @@ export default function CalendarPage() {
 
               <div className="space-y-3">
                 <div>
-                  <label className="text-sm font-medium text-secondary mb-1 block">Title</label>
+                  <label className={`text-sm font-medium mb-1 block ${
+                    isDark ? "text-gray-500" : "text-gray-500"
+                  }`}>Title</label>
                   <input
                     type="text"
                     value={eventTitle}
                     onChange={(e) => setEventTitle(e.target.value)}
                     placeholder="Event title"
-                    className="w-full h-9 px-3 input rounded-lg text-sm text-primary placeholder-muted"
+                    className={`w-full h-9 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
+                      isDark 
+                        ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500 placeholder-gray-500" 
+                        : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500 placeholder-gray-400"
+                    } border`}
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-secondary mb-1 block">Description</label>
+                  <label className={`text-sm font-medium mb-1 block ${
+                    isDark ? "text-gray-500" : "text-gray-500"
+                  }`}>Description</label>
                   <textarea
                     value={eventDescription}
                     onChange={(e) => setEventDescription(e.target.value)}
                     placeholder="Event description (optional)"
                     rows={3}
-                    className="w-full px-3 input rounded-lg text-sm text-primary placeholder-muted resize-none"
+                    className={`w-full px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all resize-none ${
+                      isDark 
+                        ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500 placeholder-gray-500" 
+                        : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500 placeholder-gray-400"
+                    } border`}
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-secondary mb-1 block">Date</label>
+                  <label className={`text-sm font-medium mb-1 block ${
+                    isDark ? "text-gray-500" : "text-gray-500"
+                  }`}>Date</label>
                   <input
                     type="date"
                     value={eventDate}
                     onChange={(e) => setEventDate(e.target.value)}
-                    className="w-full h-9 px-3 input rounded-lg text-sm text-primary"
+                    className={`w-full h-9 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
+                      isDark 
+                        ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500" 
+                        : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500"
+                    } border`}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-sm font-medium text-secondary mb-1 block">Start Time</label>
+                    <label className={`text-sm font-medium mb-1 block ${
+                      isDark ? "text-gray-500" : "text-gray-500"
+                    }`}>Start Time</label>
                     <input
                       type="time"
                       value={eventStartTime}
                       onChange={(e) => setEventStartTime(e.target.value)}
-                      className="w-full h-9 px-3 input rounded-lg text-sm text-primary"
+                      className={`w-full h-9 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
+                        isDark 
+                          ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500" 
+                          : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500"
+                      } border`}
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-secondary mb-1 block">End Time</label>
+                    <label className={`text-sm font-medium mb-1 block ${
+                      isDark ? "text-gray-500" : "text-gray-500"
+                    }`}>End Time</label>
                     <input
                       type="time"
                       value={eventEndTime}
                       onChange={(e) => setEventEndTime(e.target.value)}
-                      className="w-full h-9 px-3 input rounded-lg text-sm text-primary"
+                      className={`w-full h-9 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
+                        isDark 
+                          ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500" 
+                          : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500"
+                      } border`}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-secondary mb-1 block">Event Type</label>
+                  <label className={`text-sm font-medium mb-1 block ${
+                    isDark ? "text-gray-500" : "text-gray-500"
+                  }`}>Event Type</label>
                   <select
                     value={eventType}
                     onChange={(e) => setEventType(e.target.value as EventType)}
-                    className="w-full h-9 px-3 input rounded-lg text-sm text-primary"
+                    className={`w-full h-9 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
+                      isDark 
+                        ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500" 
+                        : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500"
+                    } border`}
                   >
                     <option value="meeting">Meeting</option>
                     <option value="focus">Focus Session</option>
