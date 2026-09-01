@@ -5,6 +5,7 @@ import AppLayout from "../../layouts/AppLayout";
 import Topbar from "../../components/topbar/Topbar";
 import { useTaskStore } from "../../store/taskStore";
 import { useEventStore } from "../../store/eventStore";
+import { useSettingsStore } from "../../store/settingsStore";
 import type { EventType } from "../../types/event";
 import { FiChevronLeft, FiChevronRight, FiClock, FiPlus, FiMoreVertical, FiX, FiDownload } from "react-icons/fi";
 
@@ -29,6 +30,8 @@ export default function CalendarPage() {
     now.setHours(0, 0, 0, 0);
     return now;
   });
+  const theme = useSettingsStore((s) => s.theme);
+  const isDark = theme === "dark";
 
   const { tasks, updateTask } = useTaskStore();
   const { events, addEvent, getEventsForDate, getEventsForRange, exportToICS } = useEventStore();
