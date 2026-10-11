@@ -1,306 +1,365 @@
-// src/components/dashboard/DashboardContent.tsx
-
-import { useState } from "react";
-import AppLayout from "../../layouts/AppLayout";
-import Topbar from "../topbar/Topbar";
-import { useFocusStore } from "../../store/focusStore";
-import { useTaskStore } from "../../store/taskStore";
-import { useSettingsStore } from "../../store/settingsStore";
-import FocusTimer from "../timer/FocusTimer";
-import SessionHistory from "../history/SessionHistory";
-import BreakOverlay from "../overlay/BreakOverlay";
-import AchievementToast from "../ui/AchievementToast";
-import { FiTrendingUp, FiZap, FiPlus, FiCheckCircle } from "react-icons/fi";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { FiCalendar, FiChevronLeft, FiChevronRight, FiEdit2 } from "react-icons/fi";
+import AppLayout from "../../layouts/AppLayout";
+import { useEventStore } from "../../store/eventStore";
+import { useFocusStore } from "../../store/focusStore";
+import { useProjectStore } from "../../store/projectStore";
+import { useTaskStore } from "../../store/taskStore";
+import {
+  HOUR_LABELS,
+  buildActivity,
+  formatDuration,
+  shiftAnchor,
+  splitDuration,
+  toDateKey,
+  type ActivityKind,
+  type DashboardRange,
+  type ShareRow,
+} from "../../utils/activity";
+
+const RANGES: DashboardRange[] = ["day", "week", "month", "year"];
+
+const KIND_COLOR: Record<ActivityKind, string> = {
+  focus: "#7AF0FF",
+  meeting: "#60A5FA",
+  break: "#34D399",
+};
+
+function greetingFor(date: Date): string {
+  const hour = date.getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+}
+
+function MiniRing({ percent, color }: { percent: number; color: string }) {
+  const radius = 8;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (Math.min(100, percent) / 100) * circumference;
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
+      <circle cx="11" cy="11" r={radius} stroke="#2a3140" strokeWidth="2.4" fill="none" />
+      <circle
+        cx="11"
+        cy="11"
+        r={radius}
+        stroke={color}
+        strokeWidth="2.4"
+        fill="none"
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+        transform="rotate(-90 11 11)"
+      />
+    </svg>
+  );
+}
+
+function ShareList({
+  rows,
+  empty,
+  variant,
+}: {
+  rows: ShareRow[];
+  empty: string;
+  variant: "ring" | "bar";
+}) {
+  if (rows.length === 0) {
+    return <p className="px-1 py-6 text-sm text-zinc-500">{empty}</p>;
+  }
+
+  return (
+    <ul className="space-y-3">
+      {rows.map((row) => (
+        <li key={row.id} className="flex items-center gap-3">
+          <span className="w-10 text-xs font-medium text-zinc-300">{row.percent}%</span>
+          {variant === "ring" ? <MiniRing percent={row.percent} color={row.color} /> : null}
+          <span className="min-w-0 flex-1 truncate text-sm text-zinc-100">{row.label}</span>
+          {variant === "bar" ? (
+            <span className="h-1.5 w-16 overflow-hidden rounded-full bg-white/10">
+              <span className="block h-full rounded-full" style={{ width: `${row.percent}%`, background: row.color }} />
+            </span>
+          ) : null}
+          <span className="w-16 text-right text-xs text-zinc-400">{formatDuration(row.seconds)}</span>
+          <Link to="/tasks" className="text-zinc-500 hover:text-white" aria-label={`Edit ${row.label}`}>
+            <FiEdit2 className="h-3.5 w-3.5" />
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function DailySummary({
+  focus,
+  meeting,
+  breaks,
+}: {
+  focus: number;
+  meeting: number;
+  breaks: number;
+}) {
+  const total = focus + meeting + breaks;
+  const radius = 68;
+  const circumference = 2 * Math.PI * radius;
+  const segments = [
+    { label: "Focus on work", value: focus, color: "#7AF0FF" },
+    { label: "Meeting time", value: meeting, color: "#60A5FA" },
+    { label: "Breaks", value: breaks, color: "#34D399" },
+  ];
+  let consumed = 0;
+
+  return (
+    <section className="rounded-[24px] border border-white/5 bg-[#1a1e27] p-5" aria-label="Daily summary">
+      <h2 className="text-sm font-medium text-zinc-100">Daily Summary</h2>
+      <div className="relative mx-auto my-4 h-52 w-52">
+        <svg viewBox="0 0 200 200" className="h-full w-full" role="img" aria-label="Focus, meetings, and breaks">
+          <circle cx="100" cy="100" r={radius} fill="none" stroke="#2a3140" strokeWidth="16" strokeDasharray="4 8" />
+          {total > 0
+            ? segments.map((segment) => {
+                const length = (segment.value / total) * circumference;
+                const dashOffset = -consumed;
+                consumed += length;
+                return (
+                  <circle
+                    key={segment.label}
+                    cx="100"
+                    cy="100"
+                    r={radius}
+                    fill="none"
+                    stroke={segment.color}
+                    strokeWidth="16"
+                    strokeLinecap="round"
+                    strokeDasharray={`${length} ${circumference - length}`}
+                    strokeDashoffset={dashOffset}
+                    transform="rotate(-90 100 100)"
+                  />
+                );
+              })
+            : null}
+        </svg>
+        {total === 0 ? (
+          <p className="absolute inset-0 flex items-center justify-center px-8 text-center text-xs text-zinc-500">
+            No activity in this range
+          </p>
+        ) : null}
+      </div>
+      <ul className="space-y-2">
+        {segments.map((segment) => (
+          <li key={segment.label} className="flex items-center justify-between text-sm">
+            <span className="flex items-center gap-2 text-zinc-300">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ background: segment.color }} />
+              {segment.label}
+            </span>
+            <span className="text-zinc-400">{formatDuration(segment.value)}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
 
 export default function DashboardContent() {
-  const {
-    session,
-    remainingTime,
-    completedSessions,
-    focusDuration,
-    dailyGoal,
-    currentStreak,
-  } = useFocusStore();
+  const history = useFocusStore((state) => state.history);
+  const focusDuration = useFocusStore((state) => state.focusDuration);
+  const breakDuration = useFocusStore((state) => state.breakDuration);
+  const dailyGoal = useFocusStore((state) => state.dailyGoal);
+  const tasks = useTaskStore((state) => state.tasks);
+  const projects = useProjectStore((state) => state.projects);
+  const events = useEventStore((state) => state.events);
+  const [range, setRange] = useState<DashboardRange>("day");
+  const [anchor, setAnchor] = useState(() => new Date());
 
-  const { tasks, toggleTask, addTask } = useTaskStore();
-  const [newTaskTitle, setNewTaskTitle] = useState("");
-  const theme = useSettingsStore((s) => s.theme);
+  const snapshot = useMemo(
+    () =>
+      buildActivity({
+        anchor,
+        range,
+        history,
+        events,
+        tasks,
+        projects,
+        focusDuration,
+        breakDuration,
+        dailyGoal,
+      }),
+    [anchor, range, history, events, tasks, projects, focusDuration, breakDuration, dailyGoal]
+  );
 
-  const completedHours = ((completedSessions * focusDuration) / 3600).toFixed(1);
-  const goalProgress = Math.min(Math.round((completedSessions / dailyGoal) * 100), 100);
-  const targetHours = (dailyGoal * focusDuration) / 3600;
-  const focusScore = dailyGoal > 0 ? Math.min(Math.round((completedSessions / dailyGoal) * 100), 100) : 0;
-
-  const handleAddTask = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTaskTitle.trim()) return;
-    addTask({ title: newTaskTitle });
-    setNewTaskTitle("");
-  };
-
-  const isDark = theme === "dark";
+  const work = splitDuration(snapshot.workSeconds);
+  const viewingToday = toDateKey(anchor) === toDateKey(new Date());
+  const heading = anchor.toLocaleDateString("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  const columnMax = Math.max(
+    1,
+    ...snapshot.columns.map((column) => column.focus + column.meeting + column.break)
+  );
 
   return (
     <AppLayout>
-      <Topbar greeting="Good Morning, Rohit 👋" subtitle="Let's make today productive!" />
-
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-4 md:space-y-6 no-scrollbar">
-        {/* Top 3 Metric Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {/* Card 1: Today's Goal */}
-          <div className={`p-6 rounded-xl border shadow-sm ${
-            isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-          }`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className={`text-xs font-semibold ${
-                  isDark ? "text-gray-400" : "text-gray-600"
-                }`}>Today's Goal</h3>
-                <p className={`text-xs mt-1 ${
-                  isDark ? "text-gray-500" : "text-gray-500"
-                }`}>Focus for {targetHours.toFixed(1)} hours</p>
-              </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gradient-to-r from-violet-100 to-pink-100 text-violet-700">
-                {goalProgress}%
-              </span>
-            </div>
-
-            <div className="space-y-2 mt-4">
-              <div className="flex items-baseline gap-2">
-                <span className={`text-2xl font-bold ${
-                  isDark ? "text-gray-100" : "text-gray-900"
-                }`}>{completedHours}h</span>
-                <span className={`text-xs font-medium ${
-                  isDark ? "text-gray-400" : "text-gray-600"
-                }`}>/ {targetHours.toFixed(1)}h</span>
-              </div>
-
-              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  style={{ width: `${goalProgress}%` }}
-                  className="h-full bg-gradient-to-r from-violet-500 to-pink-500 rounded-full transition-all duration-500"
-                />
-              </div>
-            </div>
+      <div className="space-y-4 px-4 pb-6 md:px-6">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-xs text-zinc-400">
+              {viewingToday ? `${greetingFor(new Date())} ✦` : "Reviewing an earlier range"}
+            </p>
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">{heading}</h1>
           </div>
-
-          {/* Card 2: Focus Score */}
-          <div className={`p-6 rounded-xl border shadow-sm ${
-            isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-          }`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className={`text-xs font-semibold ${
-                  isDark ? "text-gray-400" : "text-gray-600"
-                }`}>Focus Score</h3>
-                <p className={`text-xs font-semibold mt-1 ${
-                  focusScore >= 80 ? "text-green-600" : focusScore >= 50 ? "text-violet-600" : "text-amber-600"
-                }`}>
-                  {focusScore >= 80 ? "Great Focus!" : focusScore >= 50 ? "Good Progress!" : "Keep Going!"}
-                </p>
-              </div>
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                isDark ? "bg-violet-500/10 text-violet-400" : "bg-violet-50 text-violet-600"
-              }`}>
-                <FiTrendingUp className="w-4 h-4" />
-              </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex rounded-full bg-[#1c212b] p-1" role="tablist" aria-label="Time range">
+              {RANGES.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  role="tab"
+                  aria-selected={range === item}
+                  onClick={() => setRange(item)}
+                  className={`rounded-full px-3 py-1.5 text-xs capitalize focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5DFFC2] ${
+                    range === item ? "bg-white text-[#14161c]" : "text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
             </div>
-
-            <div className="flex items-end justify-between mt-4">
-              <div>
-                <span className={`text-3xl font-bold ${
-                  isDark ? "text-gray-100" : "text-gray-900"
-                }`}>{focusScore}</span>
-                <p className={`text-[10px] font-medium mt-1 ${
-                  isDark ? "text-violet-400" : "text-violet-600"
-                }`}>Daily goal progress</p>
-              </div>
-
-              {/* Sparkline Visual */}
-              <div className="flex items-end gap-1.5 h-8">
-                {[40, 60, 50, 75, 90, 85].map((h, i) => (
-                  <div
-                    key={i}
-                    style={{ height: `${h}%` }}
-                    className={`w-1.5 rounded-t-sm transition-all duration-300 ${
-                      isDark ? "bg-violet-400/60 hover:bg-violet-400" : "bg-violet-500/60 hover:bg-violet-500"
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Card 3: Current Streak */}
-          <div className={`p-6 rounded-xl border shadow-sm ${
-            isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-          }`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className={`text-xs font-semibold ${
-                  isDark ? "text-gray-400" : "text-gray-600"
-                }`}>Current Streak</h3>
-                <p className={`text-xs font-semibold mt-1 text-amber-600`}>Keep it up!</p>
-              </div>
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-amber-600 ${
-                isDark ? "bg-gray-700" : "bg-gray-100"
-              }`}>
-                <FiZap className="w-4 h-4" />
-              </div>
-            </div>
-
-            <div className="space-y-3 mt-4">
-              <span className={`text-3xl font-bold ${
-                isDark ? "text-gray-100" : "text-gray-900"
-              }`}>{currentStreak || 12} Days</span>
-              <div className="flex items-center gap-1.5 pt-1">
-                {[1, 2, 3, 4, 5].map((day) => (
-                  <span
-                    key={day}
-                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${
-                      isDark 
-                        ? "bg-violet-500/10 border border-violet-500/20 text-violet-400" 
-                        : "bg-violet-50 border border-violet-200 text-violet-600"
-                    }`}
-                  >
-                    <FiCheckCircle className="w-3 h-3" />
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Middle Row: Focus Timer & Today's Tasks */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
-          {/* Main Focus Timer Container (Col 6) */}
-          <div className={`lg:col-span-6 p-4 md:p-6 rounded-xl border shadow-sm flex flex-col items-center justify-center relative ${
-            isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-          }`}>
-            <div className="w-full flex justify-between items-center mb-4">
-              <h3 className={`text-xs font-bold tracking-wide uppercase ${
-                isDark ? "text-gray-400" : "text-gray-600"
-              }`}>
-                Focus Timer
-              </h3>
-              <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                isDark ? "bg-violet-500/10 text-violet-400" : "bg-violet-50 text-violet-600"
-              }`}>Deep Work Session</span>
-            </div>
-            <FocusTimer />
-          </div>
-
-          {/* Today's Tasks Container (Col 6) */}
-          <div className={`lg:col-span-6 p-4 md:p-6 rounded-xl border shadow-sm flex flex-col justify-between space-y-4 ${
-            isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-          }`}>
-            <div className={`flex items-center justify-between pb-3 ${
-              isDark ? "border-gray-700" : "border-gray-200"
-            } border-b`}>
-              <div>
-                <h3 className={`text-sm font-bold ${
-                  isDark ? "text-gray-100" : "text-gray-900"
-                }`}>Today's Tasks</h3>
-                <p className={`text-xs mt-0.5 ${
-                  isDark ? "text-gray-500" : "text-gray-500"
-                }`}>
-                  {tasks.filter((t) => t.completed).length} of {tasks.length} completed
-                </p>
-              </div>
-              <Link
-                to="/tasks"
-                className={`text-xs hover:underline font-semibold transition-colors ${
-                  isDark ? "text-violet-400" : "text-violet-600"
-                }`}
-              >
-                View all
-              </Link>
-            </div>
-
-            {/* Task List Items */}
-            <div className="flex-1 space-y-2 overflow-y-auto max-h-48 no-scrollbar pr-1">
-              {tasks.length === 0 ? (
-                <p className={`text-xs text-center py-6 ${
-                  isDark ? "text-gray-500" : "text-gray-500"
-                }`}>
-                  No tasks for today. Add one below!
-                </p>
-              ) : (
-                tasks.slice(0, 4).map((task) => (
-                  <div
-                    key={task.id}
-                    className={`flex items-center justify-between p-3 rounded-lg transition-all ${
-                      isDark 
-                        ? "hover:bg-gray-700" 
-                        : "hover:bg-gray-50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="checkbox"
-                        checked={task.completed}
-                        onChange={() => toggleTask(task.id)}
-                        className="w-4 h-4 rounded cursor-pointer accent-violet-600"
-                      />
-                      <span
-                        className={`text-sm font-semibold ${
-                          task.completed
-                            ? isDark ? "line-through text-gray-500" : "line-through text-gray-400"
-                            : isDark ? "text-gray-100" : "text-gray-900"
-                        }`}
-                      >
-                        {task.title}
-                      </span>
-                    </div>
-
-                    <span className={`text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full ${
-                      isDark 
-                        ? "bg-gray-700 text-gray-400" 
-                        : "bg-gray-100 text-gray-600"
-                    }`}>
-                      {task.completedFocusSessions}/{task.estimatedFocusSessions}
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
-
-            {/* Add New Task Quick Input */}
-            <form onSubmit={handleAddTask} className={`flex gap-2 pt-2 ${
-              isDark ? "border-gray-700" : "border-gray-200"
-            } border-t`}>
-              <input
-                type="text"
-                value={newTaskTitle}
-                onChange={(e) => setNewTaskTitle(e.target.value)}
-                placeholder="+ Add New Task"
-                className={`flex-1 h-9 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
-                  isDark 
-                    ? "bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-500 focus:border-violet-500" 
-                    : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400 focus:border-violet-500"
-                } border`}
-              />
+            <div className="flex items-center gap-1">
               <button
-                type="submit"
-                className="h-9 px-3 rounded-lg text-sm font-semibold bg-gradient-to-r from-violet-600 to-pink-600 text-white hover:from-violet-700 hover:to-pink-700 transition-all focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                type="button"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1c212b] text-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5DFFC2]"
+                aria-label="Previous range"
+                onClick={() => setAnchor((current) => shiftAnchor(current, range, -1))}
               >
-                <FiPlus className="w-4 h-4" />
+                <FiChevronLeft />
               </button>
-            </form>
+              <button
+                type="button"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1c212b] text-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5DFFC2]"
+                aria-label="Jump to today"
+                onClick={() => setAnchor(new Date())}
+              >
+                <FiCalendar />
+              </button>
+              <button
+                type="button"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1c212b] text-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5DFFC2]"
+                aria-label="Next range"
+                onClick={() => setAnchor((current) => shiftAnchor(current, range, 1))}
+              >
+                <FiChevronRight />
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Bottom Row: Session History */}
-        <div className={`p-4 md:p-6 rounded-xl border shadow-sm ${
-          isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-        }`}>
-          <SessionHistory />
+        <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(280px,0.8fr)]">
+          <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-3">
+              <section className="rounded-[24px] border border-white/5 bg-[#1a1e27] p-5">
+                <h2 className="text-sm text-zinc-400">Work Hours</h2>
+                <p className="mt-6 text-4xl font-semibold tracking-tight text-white">
+                  {work.hours}
+                  <span className="ml-1 text-2xl font-medium text-zinc-300">hr</span>
+                  <span className="ml-3 text-2xl font-medium text-zinc-400">{work.minutes} min</span>
+                </p>
+              </section>
+              <section className="rounded-[24px] bg-[#5DFFC2] p-5 text-[#10231c]">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-sm font-medium">Percent of Target</h2>
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#10231c] text-[10px] text-[#5DFFC2]">%</span>
+                </div>
+                <p className="mt-5 text-5xl font-semibold tracking-tight">
+                  {snapshot.percentOfTarget}%
+                  <span className="ml-2 text-base font-medium">of {formatDuration(snapshot.targetSeconds)}</span>
+                </p>
+              </section>
+              <section className="rounded-[24px] border border-white/5 bg-[#1a1e27] p-5">
+                <h2 className="text-sm text-zinc-400">Focus Percent</h2>
+                <p className="mt-6 text-5xl font-semibold tracking-tight text-white">{snapshot.focusPercent}%</p>
+              </section>
+            </div>
+
+            <section className="rounded-[24px] border border-white/5 bg-[#1a1e27] p-5" aria-label="Timeline">
+              <h2 className="text-sm font-medium text-zinc-100">Timeline</h2>
+              {snapshot.timelineMode === "hours" ? (
+                <div className="mt-4">
+                  <div className="relative h-28 overflow-hidden rounded-2xl bg-[#141820]">
+                    <div className="absolute inset-0 grid grid-cols-12">
+                      {HOUR_LABELS.slice(0, 12).map((label) => (
+                        <div key={label} className="border-r border-white/5" />
+                      ))}
+                    </div>
+                    {snapshot.bars.map((bar) => (
+                      <div
+                        key={bar.id}
+                        className="absolute bottom-3 top-3 rounded-md"
+                        style={{
+                          left: `${bar.left}%`,
+                          width: `${bar.width}%`,
+                          background:
+                            bar.kind === "focus"
+                              ? "linear-gradient(180deg, #8AF6FF 0%, #5DFFC2 100%)"
+                              : KIND_COLOR[bar.kind],
+                        }}
+                        title={bar.kind}
+                      />
+                    ))}
+                    {snapshot.bars.length === 0 ? (
+                      <p className="absolute inset-0 flex items-center justify-center text-sm text-zinc-500">
+                        Sessions and meetings land here from 6 am to 6 pm.
+                      </p>
+                    ) : null}
+                  </div>
+                  <div className="mt-2 grid grid-cols-7 text-[10px] text-zinc-500">
+                    {["6 am", "8 am", "10 am", "12 pm", "2 pm", "4 pm", "6 pm"].map((label) => (
+                      <span key={label}>{label}</span>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-4 flex h-28 items-end gap-1">
+                  {snapshot.columns.map((column, index) => {
+                    const total = column.focus + column.meeting + column.break;
+                    const height = Math.max(4, (total / columnMax) * 96);
+                    return (
+                      <div key={`${column.label}-${index}`} className="flex min-w-0 flex-1 flex-col items-center gap-1">
+                        <div className="flex w-full items-end justify-center" style={{ height: 96 }} title={formatDuration(total)}>
+                          <div className="flex w-full max-w-3 flex-col justify-end overflow-hidden rounded-sm" style={{ height }}>
+                            <div style={{ flex: column.break, background: KIND_COLOR.break }} />
+                            <div style={{ flex: column.meeting, background: KIND_COLOR.meeting }} />
+                            <div style={{ flex: column.focus, background: KIND_COLOR.focus }} />
+                          </div>
+                        </div>
+                        <span className="text-[9px] text-zinc-500">{column.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+          </div>
+          <DailySummary focus={snapshot.focusSeconds} meeting={snapshot.meetingSeconds} breaks={snapshot.breakSeconds} />
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-3">
+          <section className="rounded-[24px] border border-white/5 bg-[#1a1e27] p-5">
+            <h2 className="mb-4 text-sm font-medium text-zinc-100">Categories</h2>
+            <ShareList rows={snapshot.categories} empty="Tag a task to see where your focus collects." variant="ring" />
+          </section>
+          <section className="rounded-[24px] border border-white/5 bg-[#1a1e27] p-5">
+            <h2 className="mb-4 text-sm font-medium text-zinc-100">Tasks</h2>
+            <ShareList rows={snapshot.tasks} empty="Finish a session on a task and it will show up here." variant="ring" />
+          </section>
+          <section className="rounded-[24px] border border-white/5 bg-[#1a1e27] p-5">
+            <h2 className="mb-4 text-sm font-medium text-zinc-100">Projects</h2>
+            <ShareList rows={snapshot.projects} empty="Assign tasks to a project to compare them." variant="bar" />
+          </section>
         </div>
       </div>
-
-      <AchievementToast />
-      <BreakOverlay visible={session === "break"} remainingTime={remainingTime} />
     </AppLayout>
   );
 }

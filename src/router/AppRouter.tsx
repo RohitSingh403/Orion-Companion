@@ -1,7 +1,8 @@
 // src/router/AppRouter.tsx
 
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { BrowserRouter, Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { lazy, Suspense, useEffect } from "react";
+import SitePage from "../pages/Site/SitePage";
 
 // Lazy load all pages for code splitting
 const DashboardContent = lazy(() => import("../components/dashboard/DashboardContent").then(m => ({ default: m.default })));
@@ -28,12 +29,25 @@ function LoadingFallback() {
   );
 }
 
+function RootRoute() {
+  const navigate = useNavigate();
+  const desktop = typeof window !== "undefined" && Boolean(window.focusAPI);
+
+  useEffect(() => {
+    if (desktop) navigate("/app", { replace: true });
+  }, [desktop, navigate]);
+
+  if (desktop) return null;
+  return <SitePage />;
+}
+
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
-          <Route path="/" element={<DashboardContent />} />
+          <Route path="/" element={<RootRoute />} />
+          <Route path="/app" element={<DashboardContent />} />
           <Route path="/focus" element={<FocusPage />} />
           <Route path="/tasks" element={<TasksPage />} />
           <Route path="/calendar" element={<CalendarPage />} />

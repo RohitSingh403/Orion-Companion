@@ -14,7 +14,8 @@ function createWindow() {
     height: 820,
     minWidth: 1100,
     minHeight: 700,
-    title: "Focus Companion",
+    title: "Orion Companion",
+    backgroundColor: "#121418",
     autoHideMenuBar: true,
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     webPreferences: {
@@ -28,7 +29,8 @@ function createWindow() {
     );
   });
   if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL);
+    const appUrl = new URL("app", VITE_DEV_SERVER_URL.endsWith("/") ? VITE_DEV_SERVER_URL : `${VITE_DEV_SERVER_URL}/`);
+    win.loadURL(appUrl.toString());
   } else {
     win.loadFile(path.join(RENDERER_DIST, "index.html"));
   }

@@ -1,49 +1,28 @@
-// src/layouts/AppLayout.tsx
-
 import type { ReactNode } from "react";
 import { useEffect } from "react";
-import { AnimatePresence } from "framer-motion";
 import Sidebar from "./Sidebar";
-import { useSettingsStore } from "../store/settingsStore";
-import SlideIn from "../components/animations/SlideIn";
+import CommandBar from "../components/shell/CommandBar";
 
 interface AppLayoutProps {
   children: ReactNode;
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  const theme = useSettingsStore((s) => s.theme);
-
   useEffect(() => {
-    // Apply theme to document
-    if (theme === "light") {
-      document.documentElement.classList.add("light");
-      document.documentElement.classList.remove("dark");
-      document.body.style.background = "#f9fafb";
-      document.body.style.color = "#111827";
-    } else {
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-      document.body.style.background = "#111827";
-      document.body.style.color = "#f9fafb";
-    }
-  }, [theme]);
+    document.body.style.background = "#2c2f36";
+    document.body.style.color = "#f4f4f5";
+    document.body.style.overflow = "hidden";
+  }, []);
 
   return (
-    <div className={`flex h-screen w-screen font-sans select-none ${theme === "light" ? "bg-gray-50" : "bg-gray-900"}`} role="application" aria-label="Focus Companion Application">
-      {/* Permanent Fixed Left Sidebar */}
-      <Sidebar />
-
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col h-screen relative overflow-auto" role="main" aria-label="Main content">
-        <AnimatePresence mode="wait">
-          <SlideIn direction="right" duration={0.3}>
-            <div className="flex-1 flex flex-col h-full overflow-auto" id="main-content">
-              {children}
-            </div>
-          </SlideIn>
-        </AnimatePresence>
-      </main>
+    <div className="h-screen w-screen bg-[#2c2f36] p-2 font-sans text-zinc-100 md:p-3">
+      <div className="flex h-full w-full overflow-hidden rounded-[28px] border border-white/10 bg-[#14161c] shadow-[0_30px_80px_rgba(0,0,0,0.35)]">
+        <Sidebar />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <CommandBar />
+          <div className="min-h-0 flex-1 overflow-auto">{children}</div>
+        </div>
+      </div>
     </div>
   );
 }
