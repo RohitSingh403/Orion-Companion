@@ -67,7 +67,7 @@
   "main": "dist-electron/main.js",
   "build": {
     "appId": "com.focuscompanion.app",
-    "productName": "Focus Companion",
+    "productName": "Orion Companion",
     "directories": {
       "output": "release"
     },
