@@ -24,26 +24,14 @@ export default function ProgressRing() {
   const progress = Math.max(0, remainingTime / duration);
   const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
 
-  // Dynamic ring color: violet → pink → red for focus; blue for break
-  let ringColor = "#8b5cf6";
-  let labelBg = "bg-violet-500/15";
-  let labelText = "text-violet-600";
+  let ringColor = "#7AD7F5";
+  const labelBg = "bg-white/5";
+  const labelText = isDark ? "text-zinc-300" : "text-zinc-600";
 
   if (session === "break") {
-    ringColor = "#3b82f6";
-    labelBg = "bg-blue-500/15";
-    labelText = "text-blue-600";
-  } else {
-    if (progress < 0.5) {
-      ringColor = "#ec4899";
-      labelBg = "bg-pink-500/15";
-      labelText = "text-pink-600";
-    }
-    if (progress < 0.2) {
-      ringColor = "#ef4444";
-      labelBg = "bg-red-500/15";
-      labelText = "text-red-600";
-    }
+    ringColor = "#60A5FA";
+  } else if (progress < 0.2) {
+    ringColor = "#FBBF24";
   }
 
   // Track color based on theme
@@ -103,9 +91,7 @@ export default function ProgressRing() {
             }}
             transition={{ duration: 0.6, ease: "easeInOut" }}
             transform={`rotate(-90 ${CENTER} ${CENTER})`}
-            style={{
-              filter: `drop-shadow(0 0 14px ${ringColor}99)`,
-            }}
+            style={{ filter: "none" }}
           />
         </svg>
 
@@ -144,7 +130,7 @@ export default function ProgressRing() {
               top: CENTER - NORMALIZED_RADIUS - STROKE / 2,
               left: CENTER - 5,
               backgroundColor: ringColor,
-              boxShadow: `0 0 12px ${ringColor}`,
+              boxShadow: "none",
             }}
             animate={{ scale: [1, 1.8, 1], opacity: [1, 0.3, 1] }}
             transition={{ repeat: Infinity, duration: 1.4 }}

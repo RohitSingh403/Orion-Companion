@@ -68,9 +68,9 @@ export default function Topbar({
   const isDark = theme === "dark";
 
   return (
-    <header className={`w-full flex items-center justify-between px-8 py-4 border-b sticky top-0 z-30 select-none ${
+    <header className={`w-full flex items-center justify-between px-6 py-4 border-b sticky top-0 z-30 select-none ${
     isDark 
-      ? "bg-gray-900 border-gray-800" 
+      ? "bg-[#121418] border-white/5" 
       : "bg-white border-gray-200"
   }`}>
       {/* Title & Subtitle */}
@@ -99,9 +99,9 @@ export default function Topbar({
             placeholder="Search anything..."
             className={`w-56 h-9 pl-9 pr-8 rounded-lg text-sm ${
               isDark 
-                ? "bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-500 focus:border-violet-500" 
-                : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-violet-500"
-            } border px-3 focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all`}
+                ? "bg-[#1c212b] border-white/10 text-gray-100 placeholder-gray-500 focus:border-white/20" 
+                : "bg-white border-gray-300 text-gray-900 placeholder-gray-400 focus:border-gray-400"
+            } border px-3 focus:outline-none focus:ring-2 focus:ring-white/10 transition-all`}
           />
           <kbd className={`absolute right-2.5 px-1.5 py-0.5 text-[10px] font-medium rounded border ${
             isDark 
@@ -116,7 +116,9 @@ export default function Topbar({
         <div className="relative">
           <button
             onClick={() => setQuickAddOpen(!quickAddOpen)}
-            className="h-9 px-3.5 font-semibold text-sm rounded-lg flex items-center gap-1.5 bg-gradient-to-r from-violet-600 to-pink-600 text-white hover:from-violet-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+            className={`h-9 px-3.5 font-semibold text-sm rounded-full flex items-center gap-1.5 border transition-all focus:outline-none focus:ring-2 focus:ring-white/30 ${
+              isDark ? "border-white/10 bg-[#1c212b] text-zinc-100 hover:bg-[#262b36]" : "border-gray-200 bg-gray-50 text-gray-900"
+            }`}
           >
             <FiPlus className="w-4 h-4 stroke-[2.5]" />
             <span>Quick Add</span>
@@ -140,10 +142,10 @@ export default function Topbar({
                   onChange={(e) => setTaskTitle(e.target.value)}
                   placeholder="Task title..."
                   autoFocus
-                  className={`w-full h-8 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
+                  className={`w-full h-8 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-white/20 transition-all ${
                     isDark 
-                      ? "bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-500 focus:border-violet-500" 
-                      : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400 focus:border-violet-500"
+                      ? "bg-[#121418] border-white/10 text-gray-100 placeholder-gray-500 focus:border-white/20" 
+                      : "bg-gray-50 border-gray-300 text-gray-900 placeholder-gray-400 focus:border-gray-400"
                   } border`}
                 />
                 <div className="flex justify-end gap-2 pt-1">
@@ -158,7 +160,7 @@ export default function Topbar({
                   </button>
                   <button
                     type="submit"
-                    className="px-3 py-1 text-sm font-semibold rounded-md bg-gradient-to-r from-violet-600 to-pink-600 text-white hover:from-violet-700 hover:to-pink-700 transition-all focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                    className="px-3 py-1 text-sm font-semibold rounded-full bg-white text-[#14161c] focus:outline-none focus:ring-2 focus:ring-white/40"
                   >
                     Save
                   </button>
@@ -169,22 +171,20 @@ export default function Topbar({
         </div>
 
         {/* Notification Bell */}
-        <button className={`w-9 h-9 flex items-center justify-center rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
+        <button className={`relative w-9 h-9 flex items-center justify-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white/30 ${
           isDark 
-            ? "text-gray-400 hover:bg-gray-800 hover:text-gray-100" 
+            ? "text-zinc-400 hover:bg-white/5 hover:text-zinc-100" 
             : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-        }`}>
+        }`} aria-label="Notifications">
           <FiBell className="w-4 h-4" />
-          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-gradient-to-r from-violet-500 to-pink-500"></span>
         </button>
 
-        {/* User Avatar */}
-        <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shadow-lg ${
+        <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold ${
           isDark 
-            ? "bg-gradient-to-tr from-violet-500 to-pink-500 text-white" 
-            : "bg-gradient-to-tr from-violet-600 to-pink-600 text-white"
+            ? "bg-[#2a303c] text-zinc-200" 
+            : "bg-gray-200 text-gray-800"
         }`}>
-          RS
+          OC
         </div>
       </div>
     </header>

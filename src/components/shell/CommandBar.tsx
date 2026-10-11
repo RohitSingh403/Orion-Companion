@@ -42,7 +42,7 @@ export default function CommandBar() {
         <button
           type="button"
           onClick={running ? pause : start}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-[#1c212b] text-zinc-200 transition hover:border-white/20 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5DFFC2]"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-[#1c212b] text-zinc-200 transition hover:border-white/20 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
           aria-label={running ? "Pause session" : "Start session"}
         >
           <FiPower className="h-4 w-4" />
@@ -58,7 +58,7 @@ export default function CommandBar() {
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
-            className="flex h-10 items-center gap-2 rounded-full border border-white/10 bg-[#1c212b] px-4 text-xs font-medium text-zinc-200 transition hover:border-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5DFFC2]"
+            className="flex h-10 items-center gap-2 rounded-full border border-white/10 bg-[#1c212b] px-4 text-xs font-medium text-zinc-200 transition hover:border-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
             aria-expanded={menuOpen}
             aria-haspopup="menu"
           >
@@ -115,7 +115,7 @@ export default function CommandBar() {
           type="button"
           onClick={() => ambient.setPlaying(!ambient.playing)}
           disabled={!ambient.soundEnabled}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#14161c] disabled:cursor-not-allowed disabled:opacity-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5DFFC2]"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#14161c] disabled:cursor-not-allowed disabled:opacity-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
           aria-label={ambient.playing ? "Pause ambient sound" : "Play ambient sound"}
         >
           {ambient.playing ? <FiSquare className="h-3 w-3" /> : <FiPlay className="ml-0.5 h-3 w-3" />}
@@ -132,7 +132,7 @@ export default function CommandBar() {
           step={0.05}
           value={ambient.volume}
           onChange={(event) => ambient.setVolume(Number(event.target.value))}
-          className="h-1 w-16 accent-[#5DFFC2]"
+          className="h-1 w-16 accent-zinc-300"
         />
       </div>
     </header>
