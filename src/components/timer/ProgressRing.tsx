@@ -44,8 +44,8 @@ export default function ProgressRing() {
   return (
     <div className="flex items-center justify-center">
       <motion.div
-        animate={isEnding ? { scale: [1, 1.025, 1] } : {}}
-        transition={{ repeat: Infinity, duration: 0.8 }}
+        animate={isEnding ? { scale: [1, 1.025, 1] } : { scale: 1 }}
+        transition={isEnding ? { repeat: Infinity, duration: 0.8 } : { duration: 0 }}
         className="relative"
         style={{ width: SIZE, height: SIZE }}
       >
@@ -111,13 +111,9 @@ export default function ProgressRing() {
           </motion.span>
 
           {/* Session label pill */}
-          <motion.div
-            animate={{ opacity: [0.75, 1, 0.75] }}
-            transition={{ repeat: Infinity, duration: 2.5 }}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold border border-current/20 ${labelBg} ${labelText}`}
-          >
+          <div className={`px-3.5 py-1.5 rounded-full text-xs font-bold border border-current/20 ${labelBg} ${labelText}`}>
             {sessionLabel}
-          </motion.div>
+          </div>
         </div>
 
         {/* Live activity dot at top of ring */}
