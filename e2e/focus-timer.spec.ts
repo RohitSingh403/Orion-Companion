@@ -87,4 +87,19 @@ test.describe("Site", () => {
     await expect(page).toHaveURL("/app");
     await expect(page.getByRole("heading", { name: "Work Hours" })).toBeVisible();
   });
+
+  test("should let a visitor try the preview without opening the app", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("tab", { name: "Timer" }).click();
+    await page.getByRole("button", { name: "Start preview" }).click();
+    await expect(page.getByRole("button", { name: "Pause preview" })).toBeVisible();
+
+    await page.getByRole("tab", { name: "Tasks" }).click();
+    await page.getByLabel("Add a sample task").fill("Ship the site");
+    await page.getByRole("button", { name: "Add", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Ship the site" })).toBeVisible();
+
+    await page.getByRole("button", { name: "Will the timer stop if I change pages?" }).click();
+    await expect(page.getByText("opening tasks, notes, or the calendar does not reset the clock.")).toBeVisible();
+  });
 });
