@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import AppLayout from "../../layouts/AppLayout";
-import Topbar from "../../components/topbar/Topbar";
+import PageHeading from "../../components/shell/PageHeading";
 import { useFocusStore } from "../../store/focusStore";
 import { useSettingsStore } from "../../store/settingsStore";
 import { exportBackup, importBackup } from "../../utils/backup";
@@ -44,6 +44,8 @@ export default function SettingsPage() {
     setDesktopNotifications,
     setBreakReminder,
     setTheme,
+    displayName,
+    setDisplayName,
   } = useSettingsStore();
 
   const { setFocusDuration, setBreakDuration, setDailyGoal: setFocusDailyGoal, resetAllData } = useFocusStore();
@@ -323,6 +325,24 @@ export default function SettingsPage() {
       </h3>
 
       <div className="space-y-4">
+        <div className="space-y-2">
+          <label className={`text-sm font-medium ${isDark ? "text-gray-100" : "text-gray-900"}`} htmlFor="display-name">
+            Name on this computer
+          </label>
+          <input
+            id="display-name"
+            type="text"
+            value={displayName}
+            onChange={(event) => setDisplayName(event.target.value)}
+            placeholder="Your name"
+            className={`h-10 w-full rounded-lg border px-3 text-sm focus:outline-none focus:ring-2 focus:ring-white/20 ${
+              isDark ? "border-white/10 bg-[#1b1f27] text-gray-100" : "border-gray-300 bg-white text-gray-900"
+            }`}
+          />
+          <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>
+            Shown on the dashboard and the sidebar. Orion does not create an account.
+          </p>
+        </div>
         {/* Auto Launch Toggle */}
         <div className="flex items-center justify-between">
           <div>
@@ -426,8 +446,8 @@ export default function SettingsPage() {
 
   return (
     <AppLayout>
-      <Topbar subtitle="Configure focus timer, sound cues & app preferences" />
-      <div className="flex-1 p-8 flex gap-6 overflow-auto">
+      <PageHeading title="Settings" subtitle="Timer, sound, backup, and this computer" />
+      <div className="flex gap-6 px-4 pb-6 md:px-6">
         {/* Left Sub-Sidebar */}
         <div className={`w-64 rounded-lg p-4 flex flex-col gap-1 flex-shrink-0 border shadow-sm ${
           isDark 

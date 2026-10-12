@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "../../layouts/AppLayout";
-import Topbar from "../../components/topbar/Topbar";
+import PageHeading from "../../components/shell/PageHeading";
 import FocusTimer from "../../components/timer/FocusTimer";
 import { useTaskStore } from "../../store/taskStore";
 import { useFocusStore } from "../../store/focusStore";
@@ -91,29 +91,11 @@ export default function FocusPage() {
 
   return (
     <AppLayout>
-      <Topbar subtitle="Distraction-free focus environment" />
-      
-      {/* Ambient Background Effect */}
-      <div className={`fixed inset-0 pointer-events-none transition-all duration-1000 bg-gradient-to-br ${getAmbientGradient()}`} />
+      <div className={`pointer-events-none fixed inset-0 bg-gradient-to-br transition-all duration-1000 ${getAmbientGradient()}`} />
 
-      <div className="flex-1 p-6 md:p-8 space-y-6 overflow-auto no-scrollbar relative">
-        {/* Top Header Banner & Mode Toggle */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className={`flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 gap-4 rounded-xl border shadow-sm ${
-            isDark 
-              ? "bg-gray-800 border-gray-700" 
-              : "bg-white border-gray-200"
-          }`}
-        >
-          <div>
-            <h2 className={`text-lg font-semibold ${isDark ? "text-violet-400" : "text-violet-600"}`}>Deep Work</h2>
-            <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Build amazing things with focused attention</p>
-          </div>
-
-          <div className="flex items-center gap-4">
+      <div className="relative space-y-4 px-4 pb-6 md:px-6">
+        <PageHeading title="Focus" subtitle="Today's sessions stay with the timer">
+          <div className="flex items-center gap-3">
             {/* Ambient Effect Selector */}
             <div className="flex items-center gap-2">
               <FiWind className={`w-4 h-4 ${isDark ? "text-gray-500" : "text-gray-500"}`} />
@@ -150,7 +132,7 @@ export default function FocusPage() {
               {focusMode ? <FiMinimize className="w-4 h-4" /> : <FiMaximize className="w-4 h-4" />}
             </button>
           </div>
-        </motion.div>
+        </PageHeading>
 
         {/* Main Grid: Timer on Left (Col 8), Context Panel on Right (Col 4) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -159,7 +141,7 @@ export default function FocusPage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className={`lg:col-span-8 p-8 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden rounded-xl border shadow-sm ${
+            className={`lg:col-span-8 relative flex flex-col items-center justify-center overflow-hidden rounded-[24px] border p-6 shadow-sm ${
               isDark 
                 ? "bg-gray-800 border-gray-700" 
                 : "bg-white border-gray-200"
@@ -181,23 +163,19 @@ export default function FocusPage() {
 
             <div className="relative z-10 w-full max-w-lg">
               <FocusTimer />
-              
-              {/* Session Progress Ring */}
-              <div className="mt-8 flex items-center justify-center gap-8">
-                <div className="text-center">
-                  <div className={`text-3xl font-bold ${isDark ? "text-zinc-100" : "text-gray-900"}`}>{sessionsToday}</div>
-                  <div className={`text-xs mt-1 ${isDark ? "text-gray-500" : "text-gray-500"}`}>Sessions Today</div>
-                </div>
-                <div className={`w-px h-12 ${isDark ? "bg-gray-700" : "bg-gray-200"}`}></div>
-                <div className="text-center">
-                  <div className={`text-3xl font-bold ${isDark ? "text-gray-100" : "text-gray-900"}`}>{productivityScore}%</div>
-                  <div className={`text-xs mt-1 ${isDark ? "text-gray-500" : "text-gray-500"}`}>Daily Goal</div>
-                </div>
-                <div className={`w-px h-12 ${isDark ? "bg-gray-700" : "bg-gray-200"}`}></div>
-                <div className="text-center">
-                  <div className={`text-3xl font-bold ${isDark ? "text-gray-400" : "text-gray-600"}`}>{focusTimeDisplay}</div>
-                  <div className={`text-xs mt-1 ${isDark ? "text-gray-500" : "text-gray-500"}`}>Focus Time</div>
-                </div>
+            </div>
+            <div className="relative z-10 mt-6 grid w-full grid-cols-3 gap-3">
+              <div className="rounded-2xl bg-white/5 px-3 py-3 text-center">
+                <div className="text-2xl font-semibold text-white">{sessionsToday}</div>
+                <div className="mt-1 text-xs text-zinc-400">Sessions Today</div>
+              </div>
+              <div className="rounded-2xl bg-white/5 px-3 py-3 text-center">
+                <div className="text-2xl font-semibold text-white">{productivityScore}%</div>
+                <div className="mt-1 text-xs text-zinc-400">Daily Goal</div>
+              </div>
+              <div className="rounded-2xl bg-white/5 px-3 py-3 text-center">
+                <div className="text-2xl font-semibold text-white">{focusTimeDisplay}</div>
+                <div className="mt-1 text-xs text-zinc-400">Focus Time</div>
               </div>
             </div>
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import AppLayout from "../../layouts/AppLayout";
-import Topbar from "../../components/topbar/Topbar";
+import PageHeading from "../../components/shell/PageHeading";
 import { useReminderStore } from "../../store/reminderStore";
 import { useSettingsStore } from "../../store/settingsStore";
 import { FiPlus, FiBell, FiClock, FiCheck, FiX, FiRepeat } from "react-icons/fi";
@@ -78,8 +78,8 @@ export default function RemindersPage() {
 
   return (
     <AppLayout>
-      <Topbar subtitle="Never forget important tasks and events" />
-      <div className="flex-1 p-8 overflow-auto">
+      <PageHeading title="Reminders" subtitle="Snooze, complete, or dismiss what is due" />
+      <div className="px-4 pb-6 md:px-6">
         <div className={`rounded-lg p-6 h-full flex flex-col border shadow-sm ${
           isDark 
             ? "bg-gray-800 border-gray-700" 

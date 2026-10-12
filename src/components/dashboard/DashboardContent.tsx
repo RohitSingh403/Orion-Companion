@@ -5,6 +5,7 @@ import AppLayout from "../../layouts/AppLayout";
 import { useEventStore } from "../../store/eventStore";
 import { useFocusStore } from "../../store/focusStore";
 import { useProjectStore } from "../../store/projectStore";
+import { useSettingsStore } from "../../store/settingsStore";
 import { useTaskStore } from "../../store/taskStore";
 import {
   HOUR_LABELS,
@@ -26,11 +27,10 @@ const KIND_COLOR: Record<ActivityKind, string> = {
   break: "#34D399",
 };
 
-function greetingFor(date: Date): string {
+function greetingFor(date: Date, name: string): string {
   const hour = date.getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 17) return "Good afternoon";
-  return "Good evening";
+  const hello = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  return name.trim() ? `${hello}, ${name.trim()}` : hello;
 }
 
 function MiniRing({ percent, color }: { percent: number; color: string }) {
@@ -166,6 +166,7 @@ export default function DashboardContent() {
   const breakDuration = useFocusStore((state) => state.breakDuration);
   const dailyGoal = useFocusStore((state) => state.dailyGoal);
   const activityLog = useFocusStore((state) => state.activityLog);
+  const displayName = useSettingsStore((state) => state.displayName);
   const tasks = useTaskStore((state) => state.tasks);
   const projects = useProjectStore((state) => state.projects);
   const events = useEventStore((state) => state.events);
@@ -208,7 +209,7 @@ export default function DashboardContent() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs text-zinc-400">
-              {viewingToday ? `${greetingFor(new Date())} ✦` : "Reviewing an earlier range"}
+              {viewingToday ? `${greetingFor(new Date(), displayName)} ✦` : "Reviewing an earlier range"}
             </p>
             <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">{heading}</h1>
           </div>

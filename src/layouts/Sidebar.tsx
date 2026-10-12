@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   FiAward,
   FiBarChart2,
+  FiBell,
   FiCalendar,
   FiClock,
   FiFileText,
@@ -10,6 +11,7 @@ import {
   FiSquare,
 } from "react-icons/fi";
 import OrionMark from "../components/brand/OrionMark";
+import { useSettingsStore } from "../store/settingsStore";
 
 const NAV_ITEMS = [
   { label: "Dashboard", path: "/app", icon: FiGrid },
@@ -19,10 +21,19 @@ const NAV_ITEMS = [
   { label: "Notes", path: "/notes", icon: FiFileText },
   { label: "Analytics", path: "/analytics", icon: FiBarChart2 },
   { label: "Achievements", path: "/achievements", icon: FiAward },
+  { label: "Reminders", path: "/reminders", icon: FiBell },
 ];
+
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "OC";
+  return parts.slice(0, 2).map((part) => part[0]?.toUpperCase() ?? "").join("");
+}
 
 export default function Sidebar() {
   const location = useLocation();
+  const displayName = useSettingsStore((state) => state.displayName);
+  const mark = initials(displayName);
 
   return (
     <aside className="flex w-[76px] shrink-0 flex-col items-center justify-between border-r border-white/5 bg-[#10131a] py-4">
@@ -63,8 +74,8 @@ export default function Sidebar() {
           <FiSettings className="h-4 w-4" aria-hidden="true" />
           <span className="sr-only">Settings</span>
         </Link>
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2a303c] text-[11px] font-semibold text-zinc-300" title="Personal companion">
-          OC
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2a303c] text-[11px] font-semibold text-zinc-300" title={displayName || "Personal companion"}>
+          {mark}
         </div>
       </div>
     </aside>

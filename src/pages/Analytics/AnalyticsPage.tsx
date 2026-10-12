@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import AppLayout from "../../layouts/AppLayout";
-import Topbar from "../../components/topbar/Topbar";
+import PageHeading from "../../components/shell/PageHeading";
 import { useFocusStore } from "../../store/focusStore";
 import { useSettingsStore } from "../../store/settingsStore";
 import { FiClock, FiTrendingUp, FiActivity, FiDownload, FiCalendar } from "react-icons/fi";
@@ -169,8 +169,8 @@ export default function AnalyticsPage() {
 
   return (
     <AppLayout>
-      <Topbar subtitle="Visualize focus trends & GitHub-style heatmap" />
-      <div className="flex-1 p-8 space-y-6 overflow-auto no-scrollbar">
+      <PageHeading title="Analytics" subtitle="Trends from the sessions on this computer" />
+      <div className="space-y-4 px-4 pb-6 md:px-6">
         {/* Navigation Tabs */}
         <div className={`flex items-center justify-between border-b pb-3 ${
           isDark 
