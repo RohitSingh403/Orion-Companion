@@ -27,13 +27,15 @@ export default function AnalyticsPage() {
   const theme = useSettingsStore((s) => s.theme);
   const isDark = theme === "dark";
 
-  const { history, dailyGoal, bestStreak, getProductivityComparison, getFocusInsights, dailyStats } = useFocusStore();
+  const history = useFocusStore((s) => s.history);
+  const dailyGoal = useFocusStore((s) => s.dailyGoal);
+  const bestStreak = useFocusStore((s) => s.bestStreak);
+  const dailyStats = useFocusStore((s) => s.dailyStats);
+  const getProductivityComparison = useFocusStore((s) => s.getProductivityComparison);
+  const getFocusInsights = useFocusStore((s) => s.getFocusInsights);
 
-  // Get productivity comparison
-  const productivityComparison = useMemo(() => getProductivityComparison(), [getProductivityComparison]);
-
-  // Get focus insights
-  const focusInsights = useMemo(() => getFocusInsights(), [getFocusInsights]);
+  const productivityComparison = getProductivityComparison();
+  const focusInsights = getFocusInsights();
 
   // Generate contribution data for heatmap from dailyStats
   const contributionData = useMemo(() => {
