@@ -5,6 +5,10 @@ import path from "node:path";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+// Chromium otherwise trusts a tiny GPU-memory reading, then logs
+// "tile memory limits exceeded, some content may not draw" and skips pixels.
+app.commandLine.appendSwitch("force-gpu-mem-available-mb", "1024");
+
 process.env.APP_ROOT = path.join(__dirname, "..");
 
 export const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];

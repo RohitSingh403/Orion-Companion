@@ -85,7 +85,7 @@ function PreviewBoard() {
 export default function SitePage() {
   return (
     <div className="fixed inset-0 overflow-x-hidden overflow-y-auto bg-[#07080c] text-zinc-100">
-      <header className="sticky top-0 z-10 border-b border-white/5 bg-[#07080c]/80 backdrop-blur">
+      <header className="sticky top-0 z-10 border-b border-white/5 bg-[#07080c]">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
           <a href="#top" className="flex items-center gap-2">
             <OrionMark className="h-9 w-9" />
@@ -107,7 +107,10 @@ export default function SitePage() {
 
       <main id="top">
         <section className="relative mx-auto grid max-w-6xl items-center gap-10 overflow-hidden px-5 py-16 lg:grid-cols-2 lg:gap-16 lg:py-20">
-          <div className="pointer-events-none absolute -right-16 -top-24 h-[420px] w-[420px] rounded-full bg-[#5DFFC2]/10 blur-3xl" />
+          <div
+            className="pointer-events-none absolute -right-16 -top-24 h-[420px] w-[420px] rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(93,255,194,0.16) 0%, rgba(93,255,194,0) 70%)" }}
+          />
           <div className="relative">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#5DFFC2]">Personal focus system</p>
             <h1 className="mt-4 max-w-xl text-5xl font-semibold leading-[1.05] tracking-tight text-white md:text-6xl">

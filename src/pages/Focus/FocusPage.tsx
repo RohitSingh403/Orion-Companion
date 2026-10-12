@@ -91,7 +91,9 @@ export default function FocusPage() {
 
   return (
     <AppLayout>
-      <div className={`pointer-events-none fixed inset-0 bg-gradient-to-br transition-all duration-1000 ${getAmbientGradient()}`} />
+      {focusMode ? (
+        <div className={`pointer-events-none fixed inset-0 bg-gradient-to-br ${getAmbientGradient()}`} />
+      ) : null}
 
       <div className="relative space-y-4 px-4 pb-6 md:px-6">
         <PageHeading title="Focus" subtitle="Today's sessions stay with the timer">
