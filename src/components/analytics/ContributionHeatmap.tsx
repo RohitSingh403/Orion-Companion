@@ -1,6 +1,7 @@
 // src/components/analytics/ContributionHeatmap.tsx
 
-import { useState, useMemo } from "react";
+import { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useSettingsStore } from "../../store/settingsStore";
 import { FiActivity, FiDownload, FiX, FiCalendar, FiFilter } from "react-icons/fi";
 
@@ -22,7 +23,6 @@ export default function ContributionHeatmap({
 }: ContributionHeatmapProps) {
   const theme = useSettingsStore((s) => s.theme);
   const isDark = theme === "dark";
-  const [hoveredCell, setHoveredCell] = useState<{ date: string; count: number; x: number; y: number } | null>(null);
   const [selectedDay, setSelectedDay] = useState<ContributionDay | null>(null);
   const [filterLevel, setFilterLevel] = useState<FilterLevel>("all");
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -53,27 +53,21 @@ export default function ContributionHeatmap({
     current.setHours(0, 0, 0, 0);
 
     let weekIndex = 0;
-    let lastMonth = -1;
 
-    // Generate weeks for the entire year
-    while (current <= endDate) {
+    // One column per week. Cap the loop so a bad date cannot spin forever.
+    while (current <= endDate && weeks.length < 54) {
       const week: ContributionDay[] = [];
-      const currentMonth = current.getMonth();
 
-      // Add month label if this is the first day of a new month
-      if (currentMonth !== lastMonth) {
-        monthLabels.push({
-          month: current.toLocaleDateString("en-US", { month: "short" }),
-          weekIndex,
-        });
-        lastMonth = currentMonth;
-      }
-
-      // Create 7 days for this week (Sunday-Saturday)
       for (let i = 0; i < 7; i++) {
-        const dateStr = current.toISOString().split("T")[0];
+        if (current.getDate() === 1 && current.getFullYear() === selectedYear) {
+          monthLabels.push({
+            month: current.toLocaleDateString("en-US", { month: "short" }),
+            weekIndex,
+          });
+        }
+        const dateStr = localKey(current);
         const count = contributionMap.get(dateStr) || 0;
-        
+
         week.push({
           date: dateStr,
           count,
@@ -130,8 +124,8 @@ export default function ContributionHeatmap({
 
   // Format date for tooltip
   const formatDate = (dateStr: string): string => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    const [year, month, day] = dateStr.split("-").map(Number);
+    return new Date(year, (month || 1) - 1, day || 1).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   };
 
   // Export contribution data
@@ -154,16 +148,12 @@ export default function ContributionHeatmap({
     URL.revokeObjectURL(url);
   };
 
-  // Handle keyboard navigation
-  const handleKeyDown = (e: React.KeyboardEvent, day: ContributionDay) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      setSelectedDay(day);
-    }
-  };
+  const selectDay = useCallback((day: ContributionDay) => {
+    setSelectedDay(day);
+  }, []);
 
   return (
-    <div className={`p-6 space-y-4 rounded-xl border shadow-sm ${
+    <div className={`analytics-defer p-6 space-y-4 rounded-xl border ${
       isDark 
         ? "bg-gray-800 border-gray-700" 
         : "bg-white border-gray-200"
@@ -264,28 +254,29 @@ export default function ContributionHeatmap({
         </div>
       </div>
 
-      <div className={`border rounded-lg p-4 ${
+      <div className={`overflow-x-auto border rounded-lg p-4 ${
         isDark 
           ? "bg-gray-700 border-gray-600" 
           : "bg-gray-50 border-gray-200"
       }`}>
-        {/* Month Labels */}
-        <div className="flex mb-2 pl-8">
-          {monthLabels.map((label) => (
-            <div
-              key={`${label.month}-${label.weekIndex}`}
-              className={`text-[10px] font-medium ${isDark ? "text-gray-500" : "text-gray-500"}`}
-              style={{ marginLeft: label.weekIndex === 0 ? 0 : `${label.weekIndex * 14}px` }}
-            >
-              {label.month}
-            </div>
-          ))}
+        {/* Month labels sit on the week columns. A left margin per label would add up to thousands of pixels. */}
+        <div className="relative mb-2 h-4" style={{ marginLeft: 32, width: filteredWeeks.length * 14 }}>
+          {monthLabels.map((label) => {
+            return (
+              <div
+                key={`${label.month}-${label.weekIndex}`}
+                className={`absolute top-0 text-[10px] font-medium ${isDark ? "text-gray-500" : "text-gray-500"}`}
+                style={{ left: label.weekIndex * 14 }}
+              >
+                {label.month}
+              </div>
+            );
+          })}
         </div>
 
         {/* Heatmap Grid */}
-        <div className="flex gap-3 items-start">
-          {/* Day Labels - GitHub style (Mon, Wed, Fri) */}
-          <div className={`flex flex-col justify-between text-[10px] font-medium h-[91px] pr-2 flex-shrink-0 ${isDark ? "text-gray-500" : "text-gray-500"}`}>
+        <div className="flex items-start gap-3">
+          <div className={`flex h-[91px] flex-shrink-0 flex-col justify-between pr-2 text-[10px] font-medium ${isDark ? "text-gray-500" : "text-gray-500"}`}>
             <span className="h-[11px]"></span>
             <span className="h-[11px]">Mon</span>
             <span className="h-[11px]"></span>
@@ -294,52 +285,15 @@ export default function ContributionHeatmap({
             <span className="h-[11px]">Fri</span>
             <span className="h-[11px]"></span>
           </div>
-
-          {/* Weeks */}
-          <div className="flex gap-[3px]">
-            {filteredWeeks.map((week, weekIdx) => (
-              <div key={weekIdx} className="grid grid-rows-7 gap-[3px] flex-shrink-0">
-                {week.map((day) => (
-                  <ContributionCell
-                    key={day.date}
-                    date={day.date}
-                    count={day.count}
-                    level={getLevel(day.count)}
-                    onHover={setHoveredCell}
-                    onLeave={() => setHoveredCell(null)}
-                    onClick={() => setSelectedDay(day)}
-                    onKeyDown={(e) => handleKeyDown(e, day)}
-                    isDark={isDark}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
+          <HeatmapCanvas weeks={filteredWeeks} onSelect={selectDay} />
         </div>
 
-        {/* Tooltip */}
-        {hoveredCell && (
-          <div className={`fixed backdrop-blur-sm border rounded px-3 py-2 text-xs z-50 pointer-events-none ${
-            isDark 
-              ? "bg-gray-900/90 border-gray-600 text-gray-100" 
-              : "bg-gray-900/90 border-gray-300 text-white"
-          }`}
-               style={{
-                 left: `${hoveredCell.x}px`,
-                 top: `${hoveredCell.y}px`,
-                 transform: 'translate(-50%, -100%)',
-                 marginTop: '-8px'
-               }}>
-            <div className="font-semibold">{hoveredCell.count} contributions</div>
-            <div className={isDark ? "text-gray-400" : "text-gray-300"}>{formatDate(hoveredCell.date)}</div>
-          </div>
-        )}
       </div>
 
       {/* Day Detail Modal */}
-      {selectedDay && (
+      {selectedDay && createPortal(
         <div 
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
           onClick={() => setSelectedDay(null)}
         >
           <div 
@@ -407,7 +361,8 @@ export default function ContributionHeatmap({
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
       {/* Stats Footer */}
@@ -419,57 +374,111 @@ export default function ContributionHeatmap({
   );
 }
 
-// Contribution Cell Component
-interface ContributionCellProps {
-  date: string;
-  count: number;
-  level: number;
-  onHover: (data: { date: string; count: number; x: number; y: number }) => void;
-  onLeave: () => void;
-  onClick: () => void;
-  onKeyDown: (e: React.KeyboardEvent) => void;
-  isDark: boolean;
-}
+const LEVEL_COLORS = ["#1c212b", "#164e63", "#0e7490", "#22d3ee", "#7AF0FF"];
+const CELL = 11;
+const STEP = 14;
 
-function ContributionCell({ date, count, level, onHover, onLeave, onClick, onKeyDown, isDark }: ContributionCellProps) {
-  const handleMouseEnter = (e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    onHover({
-      date,
-      count,
-      x: rect.left + rect.width / 2,
-      y: rect.top,
+function HeatmapCanvas({
+  weeks,
+  onSelect,
+}: {
+  weeks: ContributionDay[][];
+  onSelect: (day: ContributionDay) => void;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const weeksRef = useRef(weeks);
+  const hovered = useRef<string | null>(null);
+  const [tip, setTip] = useState<{ text: string; x: number; y: number } | null>(null);
+  weeksRef.current = weeks;
+
+  const width = Math.max(weeks.length, 1) * STEP;
+  const height = 7 * STEP;
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    const context = canvas.getContext("2d", { alpha: true });
+    if (!context) return;
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    context.clearRect(0, 0, width, height);
+    weeks.forEach((week, column) => {
+      week.forEach((day, row) => {
+        context.fillStyle = LEVEL_COLORS[levelFor(day.count)] ?? LEVEL_COLORS[0];
+        context.fillRect(column * STEP, row * STEP, CELL, CELL);
+      });
     });
-  };
+  }, [weeks, width, height]);
+
+  function dayAt(event: MouseEvent<HTMLCanvasElement>) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const column = Math.floor(x / STEP);
+    const row = Math.floor(y / STEP);
+    if (x - column * STEP > CELL || y - row * STEP > CELL) return null;
+    return weeksRef.current[column]?.[row] ?? null;
+  }
 
   return (
-    <div
-      className={`w-[11px] h-[11px] rounded-[2px] transition-all duration-200 hover:scale-125 hover:z-10 cursor-pointer relative group focus:outline-none focus:ring-2 ${
-        isDark ? "focus:ring-violet-500/50" : "focus:ring-violet-500/50"
-      }`}
-      style={{
-        backgroundColor: level === 0 ? '#161b22' : 
-                       level === 1 ? '#0e4429' : 
-                       level === 2 ? '#006d32' : 
-                       level === 3 ? '#26a641' : '#39d353'
-      }}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={onLeave}
-      onClick={onClick}
-      onKeyDown={onKeyDown}
-      tabIndex={0}
-      role="button"
-      aria-label={`${count} contributions on ${date}`}
-    >
-      <div className={`absolute -top-10 left-1/2 transform -translate-x-1/2 backdrop-blur-sm border rounded px-2 py-1 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none ${
-        isDark 
-          ? "bg-gray-900/80 border-gray-600 text-gray-100" 
-          : "bg-gray-900/80 border-gray-300 text-white"
-      }`}>
-        {count === 0 ? 'No contributions' : `${count} contributions`}
-      </div>
+    <div className="relative" style={{ width, height }}>
+      <canvas
+        ref={canvasRef}
+        style={{ width, height }}
+        className="block"
+        role="img"
+        aria-label={`Contribution activity for ${weeks.length} weeks`}
+        onMouseMove={(event) => {
+          const day = dayAt(event);
+          const key = day?.date ?? null;
+          if (key === hovered.current) return;
+          hovered.current = key;
+          if (!day) {
+            setTip(null);
+            return;
+          }
+          const rect = event.currentTarget.getBoundingClientRect();
+          setTip({
+            text: `${day.count} session${day.count === 1 ? "" : "s"} on ${day.date}`,
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top,
+          });
+        }}
+        onMouseLeave={() => {
+          hovered.current = null;
+          setTip(null);
+        }}
+        onClick={(event) => {
+          const day = dayAt(event);
+          if (day) onSelect(day);
+        }}
+      />
+      {tip && (
+        <div
+          className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded border border-white/10 bg-[#121418] px-2 py-1 text-[10px] text-zinc-100"
+          style={{ left: tip.x, top: Math.max(tip.y - 8, 0) }}
+        >
+          {tip.text}
+        </div>
+      )}
     </div>
   );
+}
+
+function levelFor(count: number) {
+  if (count <= 0) return 0;
+  if (count <= 2) return 1;
+  if (count <= 5) return 2;
+  if (count <= 9) return 3;
+  return 4;
+}
+
+function localKey(date: Date) {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
 }
 
 // Legend Component

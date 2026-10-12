@@ -46,6 +46,8 @@ export default function SettingsPage() {
     setTheme,
     displayName,
     setDisplayName,
+    companionEnabled,
+    setCompanionEnabled,
   } = useSettingsStore();
 
   const { setFocusDuration, setBreakDuration, setDailyGoal: setFocusDailyGoal, resetAllData } = useFocusStore();
@@ -439,6 +441,18 @@ export default function SettingsPage() {
         <p>Closing the window keeps Orion in the tray. Quit from the tray menu.</p>
         <p>Press Ctrl+Shift+Space, or Cmd+Shift+Space on Mac, to open quick add.</p>
         <p>The tray menu can open a small always-on-top timer. That window follows the main timer.</p>
+        <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-[#1b1f27] px-4 py-3">
+          <div>
+            <h4 className="text-sm font-medium text-zinc-100">Screen companion</h4>
+            <p className="mt-1 text-xs text-zinc-500">The character stays on the desktop with timer messages, even when this window is closed. Hide it from the character or the tray.</p>
+          </div>
+          <button
+            type="button"
+            aria-pressed={companionEnabled}
+            onClick={() => setCompanionEnabled(!companionEnabled)}
+            className={`toggle ${companionEnabled ? "active" : ""}`}
+          />
+        </div>
         <p>While a desktop focus session is running, the app in front is recorded every 15 seconds and shown on the dashboard. The browser does not record apps.</p>
       </div>
     </div>

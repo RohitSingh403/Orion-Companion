@@ -104,6 +104,24 @@ contextBridge.exposeInMainWorld("focusAPI", {
     ipcRenderer.send("mini-command", command);
   },
 
+  nudgeCompanion(dx: number, dy: number) {
+    ipcRenderer.send("companion-nudge", dx, dy);
+  },
+
+  showMainWindow() {
+    ipcRenderer.send("companion-show-main");
+  },
+
+  setCompanionVisible(visible: boolean) {
+    ipcRenderer.send("companion-visibility", visible);
+  },
+
+  onCompanionVisibility(callback: (visible: boolean) => void) {
+    const listener = (_event: IpcRendererEvent, visible: boolean) => callback(visible);
+    ipcRenderer.on("companion-visibility", listener);
+    return () => ipcRenderer.removeListener("companion-visibility", listener);
+  },
+
   getAutoLaunchStatus() {
     return ipcRenderer.invoke("get-auto-launch-status");
   },
