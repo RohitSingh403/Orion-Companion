@@ -1,23 +1,22 @@
-// electron/main.ts
-import { app, BrowserWindow, Menu, Notification, Tray, autoUpdater, globalShortcut, ipcMain, nativeImage } from "electron";
+import { app, globalShortcut, ipcMain, Notification, autoUpdater, BrowserWindow, Tray, nativeImage, Menu } from "electron";
 import { execFile } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-var __dirname = path.dirname(fileURLToPath(import.meta.url));
-process.env.APP_ROOT = path.join(__dirname, "..");
-var VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
-var MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
-var RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
+const __dirname$1 = path.dirname(fileURLToPath(import.meta.url));
+process.env.APP_ROOT = path.join(__dirname$1, "..");
+const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
+const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
+const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
-var win = null;
-var mini = null;
-var tray = null;
-var quitting = false;
-var trayReady = false;
-var trayLabel = "Ready";
-var watchingActivity = false;
-var activityTimer = null;
-var latestTimer = null;
+let win = null;
+let mini = null;
+let tray = null;
+let quitting = false;
+let trayReady = false;
+let trayLabel = "Ready";
+let watchingActivity = false;
+let activityTimer = null;
+let latestTimer = null;
 function trayIcon() {
   const size = 16;
   const buffer = Buffer.alloc(size * size * 4);
@@ -56,19 +55,19 @@ function showMain() {
 }
 function rebuildTray() {
   if (!tray) return;
-  tray.setToolTip(`Orion Companion \u2014 ${trayLabel}`);
+  tray.setToolTip(`Orion Companion — ${trayLabel}`);
   tray.setContextMenu(
     Menu.buildFromTemplate([
       { label: trayLabel, enabled: false },
       { label: "Show Orion", click: () => showMain() },
-      { label: "Start focus", click: () => win?.webContents.send("tray-start-focus") },
-      { label: "Pause", click: () => win?.webContents.send("tray-pause-focus") },
+      { label: "Start focus", click: () => win == null ? void 0 : win.webContents.send("tray-start-focus") },
+      { label: "Pause", click: () => win == null ? void 0 : win.webContents.send("tray-pause-focus") },
       { label: "Mini timer", click: () => createMiniWindow() },
       {
         label: "Quick add",
         click: () => {
           showMain();
-          win?.webContents.send("tray-quick-add-task");
+          win == null ? void 0 : win.webContents.send("tray-quick-add-task");
         }
       },
       { type: "separator" },
@@ -109,7 +108,7 @@ function createMiniWindow() {
     title: "Orion Mini Timer",
     backgroundColor: "#121418",
     webPreferences: {
-      preload: path.join(__dirname, "preload.mjs")
+      preload: path.join(__dirname$1, "preload.mjs")
     }
   });
   loadSurface(mini, "mini-timer", { surface: "mini" });
@@ -192,16 +191,16 @@ function createWindow() {
     autoHideMenuBar: true,
     icon: path.join(process.env.VITE_PUBLIC, "orion.svg"),
     webPreferences: {
-      preload: path.join(__dirname, "preload.mjs")
+      preload: path.join(__dirname$1, "preload.mjs")
     }
   });
   win.webContents.on("did-finish-load", () => {
-    win?.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
+    win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
   });
   win.on("close", (event) => {
     if (quitting || !trayReady) return;
     event.preventDefault();
-    win?.hide();
+    win == null ? void 0 : win.hide();
   });
   loadSurface(win, "app");
 }
@@ -228,7 +227,7 @@ app.whenReady().then(() => {
   try {
     globalShortcut.register("CommandOrControl+Shift+Space", () => {
       showMain();
-      win?.webContents.send("global-shortcut-quick-capture");
+      win == null ? void 0 : win.webContents.send("global-shortcut-quick-capture");
     });
   } catch (error) {
     console.error("Shortcut unavailable:", error);
@@ -248,32 +247,32 @@ app.whenReady().then(() => {
     if (mini && !mini.isDestroyed()) mini.webContents.send("timer-state", snapshot);
   });
   ipcMain.on("mini-command", (_event, command) => {
-    win?.webContents.send("mini-command", command);
+    win == null ? void 0 : win.webContents.send("mini-command", command);
   });
   ipcMain.on("watch-activity", (_event, enabled) => {
     setActivityWatch(Boolean(enabled));
   });
   ipcMain.on("show-break-notification", () => {
     new Notification({
-      title: "\u2615 Break Time!",
+      title: "☕ Break Time!",
       body: "Great work! Stand up, stretch, and drink some water."
     }).show();
   });
   ipcMain.on("show-focus-notification", () => {
     new Notification({
-      title: "\u{1F9E0} Focus Time!",
+      title: "🧠 Focus Time!",
       body: "Your break is over. Ready for another deep focus session?"
     }).show();
   });
   ipcMain.on("show-reminder-notification", (_event, title, body) => {
     new Notification({
-      title: `\u{1F514} ${title}`,
+      title: `🔔 ${title}`,
       body
     }).show();
   });
   ipcMain.handle("get-auto-launch-status", async () => {
     try {
-      const AutoLaunch = (await import("electron-auto-launch")).default;
+      const AutoLaunch = (await import("./index-By-8j1zb.js").then((n) => n.i)).default;
       const autoLaunch = new AutoLaunch({
         name: "Orion Companion",
         path: process.execPath
@@ -287,7 +286,7 @@ app.whenReady().then(() => {
   });
   ipcMain.handle("toggle-auto-launch", async (_event, enable) => {
     try {
-      const AutoLaunch = (await import("electron-auto-launch")).default;
+      const AutoLaunch = (await import("./index-By-8j1zb.js").then((n) => n.i)).default;
       const autoLaunch = new AutoLaunch({
         name: "Orion Companion",
         path: process.execPath
