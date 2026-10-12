@@ -22,6 +22,7 @@ interface SettingsState {
 
   // Appearance Settings
   theme: "dark" | "light";
+  displayName: string;
 
   // Actions
   setFocusMinutes: (minutes: number) => void;
@@ -35,6 +36,7 @@ interface SettingsState {
   setDesktopNotifications: (enabled: boolean) => void;
   setBreakReminder: (enabled: boolean) => void;
   setTheme: (theme: "dark" | "light") => void;
+  setDisplayName: (name: string) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -60,6 +62,7 @@ export const useSettingsStore = create<SettingsState>()(
 
       // Appearance Settings
       theme: "dark",
+      displayName: "",
 
       // Actions
       setFocusMinutes: (minutes) =>
@@ -115,6 +118,11 @@ export const useSettingsStore = create<SettingsState>()(
       setTheme: (theme) =>
         set({
           theme,
+        }),
+
+      setDisplayName: (name) =>
+        set({
+          displayName: name,
         }),
     }),
     {

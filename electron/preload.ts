@@ -1,4 +1,4 @@
-import { ipcRenderer, contextBridge } from "electron";
+import { ipcRenderer, contextBridge, type IpcRendererEvent } from "electron";
 
 // -----------------------------
 // Existing Electron IPC API
@@ -69,6 +69,39 @@ contextBridge.exposeInMainWorld("focusAPI", {
 
   onGlobalShortcutQuickCapture(callback: () => void) {
     ipcRenderer.on("global-shortcut-quick-capture", callback);
+  },
+
+  reportTimer(snapshot: { remainingTime: number; running: boolean; session: "focus" | "break" }) {
+    ipcRenderer.send("report-timer", snapshot);
+  },
+
+  watchActivity(enabled: boolean) {
+    ipcRenderer.send("watch-activity", enabled);
+  },
+
+  onMiniCommand(callback: (command: "start" | "pause" | "reset") => void) {
+    const listener = (_event: IpcRendererEvent, command: "start" | "pause" | "reset") => callback(command);
+    ipcRenderer.on("mini-command", listener);
+    return () => ipcRenderer.removeListener("mini-command", listener);
+  },
+
+  onActivitySample(callback: (name: string) => void) {
+    const listener = (_event: IpcRendererEvent, name: string) => callback(name);
+    ipcRenderer.on("activity-sample", listener);
+    return () => ipcRenderer.removeListener("activity-sample", listener);
+  },
+
+  onTimerState(callback: (snapshot: { remainingTime: number; running: boolean; session: "focus" | "break" }) => void) {
+    const listener = (
+      _event: IpcRendererEvent,
+      snapshot: { remainingTime: number; running: boolean; session: "focus" | "break" }
+    ) => callback(snapshot);
+    ipcRenderer.on("timer-state", listener);
+    return () => ipcRenderer.removeListener("timer-state", listener);
+  },
+
+  sendMiniCommand(command: "start" | "pause" | "reset") {
+    ipcRenderer.send("mini-command", command);
   },
 
   getAutoLaunchStatus() {

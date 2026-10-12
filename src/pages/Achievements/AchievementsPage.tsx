@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "../../layouts/AppLayout";
-import Topbar from "../../components/topbar/Topbar";
+import PageHeading from "../../components/shell/PageHeading";
 import { FiLock, FiCheck, FiRefreshCw, FiFilter } from "react-icons/fi";
 import { useAchievementStore } from "../../store/achievementStore";
 import { useSettingsStore } from "../../store/settingsStore";
@@ -113,8 +113,8 @@ export default function AchievementsPage() {
   if (!Array.isArray(achievements) || achievements.length === 0) {
     return (
       <AppLayout>
-        <Topbar subtitle="Unlock badges and level up your focus habit" />
-        <div className="flex-1 p-8 space-y-6 overflow-auto no-scrollbar">
+        <PageHeading title="Achievements" subtitle="Badges from sessions, streaks, and tasks" />
+        <div className="space-y-4 px-4 pb-6 md:px-6">
           <div className={`p-8 text-center rounded-xl border shadow-sm ${
             isDark 
               ? "bg-gray-800 border-gray-700" 
@@ -135,8 +135,8 @@ export default function AchievementsPage() {
 
   return (
     <AppLayout>
-      <Topbar subtitle="Unlock badges and level up your focus habit" />
-      <div className="flex-1 p-8 space-y-6 overflow-auto no-scrollbar">
+      <PageHeading title="Achievements" subtitle="Badges from sessions, streaks, and tasks" />
+      <div className="space-y-4 px-4 pb-6 md:px-6">
         {/* Level Banner Card */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}

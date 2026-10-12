@@ -5,6 +5,7 @@ import AppLayout from "../../layouts/AppLayout";
 import { useEventStore } from "../../store/eventStore";
 import { useFocusStore } from "../../store/focusStore";
 import { useProjectStore } from "../../store/projectStore";
+import { useSettingsStore } from "../../store/settingsStore";
 import { useTaskStore } from "../../store/taskStore";
 import {
   HOUR_LABELS,
@@ -26,11 +27,10 @@ const KIND_COLOR: Record<ActivityKind, string> = {
   break: "#34D399",
 };
 
-function greetingFor(date: Date): string {
+function greetingFor(date: Date, name: string): string {
   const hour = date.getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 17) return "Good afternoon";
-  return "Good evening";
+  const hello = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  return name.trim() ? `${hello}, ${name.trim()}` : hello;
 }
 
 function MiniRing({ percent, color }: { percent: number; color: string }) {
@@ -111,7 +111,7 @@ function DailySummary({
   let consumed = 0;
 
   return (
-    <section className="rounded-[24px] border border-white/5 bg-[#1a1e27] p-5" aria-label="Daily summary">
+    <section className="rounded-[24px] border border-white/5 bg-[#1b1f27] p-5" aria-label="Daily summary">
       <h2 className="text-sm font-medium text-zinc-100">Daily Summary</h2>
       <div className="relative mx-auto my-4 h-52 w-52">
         <svg viewBox="0 0 200 200" className="h-full w-full" role="img" aria-label="Focus, meetings, and breaks">
@@ -165,6 +165,8 @@ export default function DashboardContent() {
   const focusDuration = useFocusStore((state) => state.focusDuration);
   const breakDuration = useFocusStore((state) => state.breakDuration);
   const dailyGoal = useFocusStore((state) => state.dailyGoal);
+  const activityLog = useFocusStore((state) => state.activityLog);
+  const displayName = useSettingsStore((state) => state.displayName);
   const tasks = useTaskStore((state) => state.tasks);
   const projects = useProjectStore((state) => state.projects);
   const events = useEventStore((state) => state.events);
@@ -183,8 +185,9 @@ export default function DashboardContent() {
         focusDuration,
         breakDuration,
         dailyGoal,
+        activity: activityLog,
       }),
-    [anchor, range, history, events, tasks, projects, focusDuration, breakDuration, dailyGoal]
+    [anchor, range, history, events, tasks, projects, focusDuration, breakDuration, dailyGoal, activityLog]
   );
 
   const work = splitDuration(snapshot.workSeconds);
@@ -206,7 +209,7 @@ export default function DashboardContent() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs text-zinc-400">
-              {viewingToday ? `${greetingFor(new Date())} ✦` : "Reviewing an earlier range"}
+              {viewingToday ? `${greetingFor(new Date(), displayName)} ✦` : "Reviewing an earlier range"}
             </p>
             <h1 className="mt-1 text-3xl font-semibold tracking-tight text-white">{heading}</h1>
           </div>
@@ -219,7 +222,7 @@ export default function DashboardContent() {
                   role="tab"
                   aria-selected={range === item}
                   onClick={() => setRange(item)}
-                  className={`rounded-full px-3 py-1.5 text-xs capitalize focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5DFFC2] ${
+                  className={`rounded-full px-3 py-1.5 text-xs capitalize focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
                     range === item ? "bg-white text-[#14161c]" : "text-zinc-400 hover:text-white"
                   }`}
                 >
@@ -230,7 +233,7 @@ export default function DashboardContent() {
             <div className="flex items-center gap-1">
               <button
                 type="button"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1c212b] text-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5DFFC2]"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1c212b] text-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                 aria-label="Previous range"
                 onClick={() => setAnchor((current) => shiftAnchor(current, range, -1))}
               >
@@ -238,7 +241,7 @@ export default function DashboardContent() {
               </button>
               <button
                 type="button"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1c212b] text-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5DFFC2]"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1c212b] text-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                 aria-label="Jump to today"
                 onClick={() => setAnchor(new Date())}
               >
@@ -246,7 +249,7 @@ export default function DashboardContent() {
               </button>
               <button
                 type="button"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1c212b] text-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5DFFC2]"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1c212b] text-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
                 aria-label="Next range"
                 onClick={() => setAnchor((current) => shiftAnchor(current, range, 1))}
               >
@@ -259,7 +262,7 @@ export default function DashboardContent() {
         <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(280px,0.8fr)]">
           <div className="space-y-4">
             <div className="grid gap-4 md:grid-cols-3">
-              <section className="rounded-[24px] border border-white/5 bg-[#1a1e27] p-5">
+              <section className="rounded-[24px] border border-white/5 bg-[#1b1f27] p-5">
                 <h2 className="text-sm text-zinc-400">Work Hours</h2>
                 <p className="mt-6 text-4xl font-semibold tracking-tight text-white">
                   {work.hours}
@@ -267,23 +270,23 @@ export default function DashboardContent() {
                   <span className="ml-3 text-2xl font-medium text-zinc-400">{work.minutes} min</span>
                 </p>
               </section>
-              <section className="rounded-[24px] bg-[#5DFFC2] p-5 text-[#10231c]">
+              <section className="rounded-[24px] bg-[#7CFFD4] p-5 text-[#10231c]">
                 <div className="flex items-center justify-between">
                   <h2 className="text-sm font-medium">Percent of Target</h2>
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#10231c] text-[10px] text-[#5DFFC2]">%</span>
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#10231c]/90 text-[10px] text-[#7CFFD4]">%</span>
                 </div>
                 <p className="mt-5 text-5xl font-semibold tracking-tight">
                   {snapshot.percentOfTarget}%
                   <span className="ml-2 text-base font-medium">of {formatDuration(snapshot.targetSeconds)}</span>
                 </p>
               </section>
-              <section className="rounded-[24px] border border-white/5 bg-[#1a1e27] p-5">
+              <section className="rounded-[24px] border border-white/5 bg-[#1b1f27] p-5">
                 <h2 className="text-sm text-zinc-400">Focus Percent</h2>
                 <p className="mt-6 text-5xl font-semibold tracking-tight text-white">{snapshot.focusPercent}%</p>
               </section>
             </div>
 
-            <section className="rounded-[24px] border border-white/5 bg-[#1a1e27] p-5" aria-label="Timeline">
+            <section className="rounded-[24px] border border-white/5 bg-[#1b1f27] p-5" aria-label="Timeline">
               <h2 className="text-sm font-medium text-zinc-100">Timeline</h2>
               {snapshot.timelineMode === "hours" ? (
                 <div className="mt-4">
@@ -302,7 +305,7 @@ export default function DashboardContent() {
                           width: `${bar.width}%`,
                           background:
                             bar.kind === "focus"
-                              ? "linear-gradient(180deg, #8AF6FF 0%, #5DFFC2 100%)"
+                              ? "linear-gradient(180deg, #9AF4FF 0%, #7AD7F5 100%)"
                               : KIND_COLOR[bar.kind],
                         }}
                         title={bar.kind}
@@ -346,15 +349,19 @@ export default function DashboardContent() {
         </div>
 
         <div className="grid gap-4 lg:grid-cols-3">
-          <section className="rounded-[24px] border border-white/5 bg-[#1a1e27] p-5">
+          <section className="rounded-[24px] border border-white/5 bg-[#1b1f27] p-5">
             <h2 className="mb-4 text-sm font-medium text-zinc-100">Categories</h2>
             <ShareList rows={snapshot.categories} empty="Tag a task to see where your focus collects." variant="ring" />
           </section>
-          <section className="rounded-[24px] border border-white/5 bg-[#1a1e27] p-5">
-            <h2 className="mb-4 text-sm font-medium text-zinc-100">Tasks</h2>
-            <ShareList rows={snapshot.tasks} empty="Finish a session on a task and it will show up here." variant="ring" />
+          <section className="rounded-[24px] border border-white/5 bg-[#1b1f27] p-5">
+            <h2 className="mb-4 text-sm font-medium text-zinc-100">Apps</h2>
+            <ShareList
+              rows={snapshot.apps}
+              empty="While a desktop focus session runs, the app in front is recorded here. Nothing is recorded in the browser."
+              variant="ring"
+            />
           </section>
-          <section className="rounded-[24px] border border-white/5 bg-[#1a1e27] p-5">
+          <section className="rounded-[24px] border border-white/5 bg-[#1b1f27] p-5">
             <h2 className="mb-4 text-sm font-medium text-zinc-100">Projects</h2>
             <ShareList rows={snapshot.projects} empty="Assign tasks to a project to compare them." variant="bar" />
           </section>

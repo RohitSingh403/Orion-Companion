@@ -30,9 +30,9 @@ const FEATURES = [
 
 function PreviewBoard() {
   return (
-    <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#14161c] shadow-[0_40px_120px_rgba(0,0,0,0.45)]">
-      <div className="flex">
-        <div className="flex w-14 flex-col items-center gap-3 border-r border-white/5 bg-[#10131a] py-4">
+    <div className="w-full min-w-0 overflow-hidden rounded-[28px] border border-white/10 bg-[#14161c] shadow-[0_40px_120px_rgba(0,0,0,0.45)]">
+      <div className="flex items-stretch">
+        <div className="flex w-14 shrink-0 flex-col items-center gap-3 border-r border-white/5 bg-[#10131a] py-4">
           <OrionMark className="h-8 w-8" />
           <span className="h-8 w-8 rounded-2xl bg-white" />
           <span className="h-8 w-8 rounded-2xl bg-white/10" />
@@ -40,24 +40,24 @@ function PreviewBoard() {
           <span className="h-8 w-8 rounded-2xl bg-white/10" />
         </div>
         <div className="min-w-0 flex-1 p-4 sm:p-5">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <div className="rounded-full border border-white/10 bg-[#1c212b] px-3 py-1.5 text-[11px] text-zinc-300">48:00 Focus Time Remaining</div>
-            <div className="rounded-full border border-white/10 bg-[#1c212b] px-3 py-1.5 text-[11px] text-zinc-300">Coffee Shop</div>
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <div className="min-w-0 truncate rounded-full border border-white/10 bg-[#1c212b] px-3 py-1.5 text-[11px] text-zinc-300">48:00 Focus Time Remaining</div>
+            <div className="shrink-0 rounded-full border border-white/10 bg-[#1c212b] px-3 py-1.5 text-[11px] text-zinc-300">Coffee Shop</div>
           </div>
           <p className="text-[11px] text-zinc-500">A clear day to focus</p>
           <p className="mt-1 text-lg font-semibold text-white sm:text-xl">Thursday, 22 May</p>
           <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
-            <div className="rounded-2xl bg-[#1a1e27] p-3">
-              <p className="text-[10px] text-zinc-500">Work Hours</p>
-              <p className="mt-2 text-sm font-semibold text-white sm:text-lg">7 hr 30 min</p>
+            <div className="min-w-0 rounded-2xl bg-[#1a1e27] p-3">
+              <p className="truncate text-[10px] text-zinc-500">Work Hours</p>
+              <p className="mt-2 truncate text-sm font-semibold text-white">7 hr 30 min</p>
             </div>
-            <div className="rounded-2xl bg-[#5DFFC2] p-3 text-[#10231c]">
-              <p className="text-[10px] font-medium">Percent of Target</p>
-              <p className="mt-2 text-sm font-semibold sm:text-lg">90%</p>
+            <div className="min-w-0 rounded-2xl bg-[#5DFFC2] p-3 text-[#10231c]">
+              <p className="truncate text-[10px] font-medium">Percent of Target</p>
+              <p className="mt-2 text-sm font-semibold">90%</p>
             </div>
-            <div className="rounded-2xl bg-[#1a1e27] p-3">
-              <p className="text-[10px] text-zinc-500">Focus Percent</p>
-              <p className="mt-2 text-sm font-semibold text-white sm:text-lg">80%</p>
+            <div className="min-w-0 rounded-2xl bg-[#1a1e27] p-3">
+              <p className="truncate text-[10px] text-zinc-500">Focus Percent</p>
+              <p className="mt-2 text-sm font-semibold text-white">80%</p>
             </div>
           </div>
           <div className="mt-3 rounded-2xl bg-[#1a1e27] p-3">
@@ -84,8 +84,7 @@ function PreviewBoard() {
 
 export default function SitePage() {
   return (
-    <div className="fixed inset-0 overflow-y-auto bg-[#07080c] text-zinc-100">
-      <div className="pointer-events-none absolute right-[-10%] top-[-20%] h-[520px] w-[520px] rounded-full bg-[#5DFFC2]/10 blur-3xl" />
+    <div className="fixed inset-0 overflow-x-hidden overflow-y-auto bg-[#07080c] text-zinc-100">
       <header className="sticky top-0 z-10 border-b border-white/5 bg-[#07080c]/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
           <a href="#top" className="flex items-center gap-2">
@@ -107,8 +106,9 @@ export default function SitePage() {
       </header>
 
       <main id="top">
-        <section className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
-          <div>
+        <section className="relative mx-auto grid max-w-6xl items-center gap-10 overflow-hidden px-5 py-16 lg:grid-cols-2 lg:gap-16 lg:py-20">
+          <div className="pointer-events-none absolute -right-16 -top-24 h-[420px] w-[420px] rounded-full bg-[#5DFFC2]/10 blur-3xl" />
+          <div className="relative">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#5DFFC2]">Personal focus system</p>
             <h1 className="mt-4 max-w-xl text-5xl font-semibold leading-[1.05] tracking-tight text-white md:text-6xl">
               Your work, your focus, on your computer.

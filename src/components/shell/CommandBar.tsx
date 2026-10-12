@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { FiChevronDown, FiPlay, FiPower, FiSquare, FiVolume2 } from "react-icons/fi";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { FiChevronDown, FiPlay, FiPlus, FiPower, FiSquare, FiVolume2 } from "react-icons/fi";
 import { useFocusStore } from "../../store/focusStore";
+import { useTaskStore } from "../../store/taskStore";
 import { formatClock } from "../../utils/activity";
 import { useAmbient, type AmbientScene } from "./useAmbient";
 
@@ -14,8 +15,12 @@ export default function CommandBar() {
   const pause = useFocusStore((state) => state.pause);
   const reset = useFocusStore((state) => state.reset);
   const ambient = useAmbient();
+  const addTask = useTaskStore((state) => state.addTask);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [taskTitle, setTaskTitle] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
+  const quickAddRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -33,6 +38,29 @@ export default function CommandBar() {
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    const openQuickAdd = () => setQuickAddOpen(true);
+    window.addEventListener("orion-quick-add", openQuickAdd);
+    return () => window.removeEventListener("orion-quick-add", openQuickAdd);
+  }, []);
+
+  useEffect(() => {
+    if (!quickAddOpen) return;
+    const onPointerDown = (event: MouseEvent) => {
+      if (!quickAddRef.current?.contains(event.target as Node)) setQuickAddOpen(false);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [quickAddOpen]);
+
+  const saveQuickAdd = (event: FormEvent) => {
+    event.preventDefault();
+    if (!taskTitle.trim()) return;
+    addTask({ title: taskTitle });
+    setTaskTitle("");
+    setQuickAddOpen(false);
+  };
+
   const status = session === "focus" ? "Focus Time Remaining" : "Break Time Remaining";
   const accent = session === "focus" ? "text-[#8AF6FF]" : "text-[#60A5FA]";
 
@@ -42,7 +70,7 @@ export default function CommandBar() {
         <button
           type="button"
           onClick={running ? pause : start}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-[#1c212b] text-zinc-200 transition hover:border-white/20 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5DFFC2]"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-[#1c212b] text-zinc-200 transition hover:border-white/20 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
           aria-label={running ? "Pause session" : "Start session"}
         >
           <FiPower className="h-4 w-4" />
@@ -58,7 +86,7 @@ export default function CommandBar() {
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
-            className="flex h-10 items-center gap-2 rounded-full border border-white/10 bg-[#1c212b] px-4 text-xs font-medium text-zinc-200 transition hover:border-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5DFFC2]"
+            className="flex h-10 items-center gap-2 rounded-full border border-white/10 bg-[#1c212b] px-4 text-xs font-medium text-zinc-200 transition hover:border-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
             aria-expanded={menuOpen}
             aria-haspopup="menu"
           >
@@ -95,6 +123,38 @@ export default function CommandBar() {
         </div>
       </div>
 
+      <div className="flex items-center gap-2">
+        <div className="relative" ref={quickAddRef}>
+          <button
+            type="button"
+            onClick={() => setQuickAddOpen((open) => !open)}
+            className="flex h-10 items-center gap-1.5 rounded-full border border-white/10 bg-[#1c212b] px-3.5 text-sm font-semibold text-zinc-100 hover:bg-[#262b36] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+          >
+            <FiPlus className="h-4 w-4" />
+            Quick Add
+          </button>
+          {quickAddOpen ? (
+            <form onSubmit={saveQuickAdd} className="absolute right-0 z-30 mt-2 w-72 rounded-2xl border border-white/10 bg-[#20242d] p-3 shadow-2xl">
+              <h2 className="text-xs font-semibold text-zinc-100">Quick add task</h2>
+              <input
+                type="text"
+                value={taskTitle}
+                onChange={(event) => setTaskTitle(event.target.value)}
+                placeholder="Task title"
+                autoFocus
+                className="mt-2 h-9 w-full rounded-xl border border-white/10 bg-[#121418] px-3 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20"
+              />
+              <div className="mt-2 flex justify-end gap-2">
+                <button type="button" onClick={() => setQuickAddOpen(false)} className="px-2 py-1 text-sm text-zinc-400">
+                  Cancel
+                </button>
+                <button type="submit" className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-[#14161c]">
+                  Save
+                </button>
+              </div>
+            </form>
+          ) : null}
+        </div>
       <div className="flex items-center gap-2 rounded-full border border-white/10 bg-[#1c212b] px-2 py-1.5">
         <label className="sr-only" htmlFor="ambient-scene">
           Ambient scene
@@ -115,7 +175,7 @@ export default function CommandBar() {
           type="button"
           onClick={() => ambient.setPlaying(!ambient.playing)}
           disabled={!ambient.soundEnabled}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#14161c] disabled:cursor-not-allowed disabled:opacity-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5DFFC2]"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#14161c] disabled:cursor-not-allowed disabled:opacity-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
           aria-label={ambient.playing ? "Pause ambient sound" : "Play ambient sound"}
         >
           {ambient.playing ? <FiSquare className="h-3 w-3" /> : <FiPlay className="ml-0.5 h-3 w-3" />}
@@ -132,8 +192,9 @@ export default function CommandBar() {
           step={0.05}
           value={ambient.volume}
           onChange={(event) => ambient.setVolume(Number(event.target.value))}
-          className="h-1 w-16 accent-[#5DFFC2]"
+          className="h-1 w-16 accent-zinc-300"
         />
+      </div>
       </div>
     </header>
   );

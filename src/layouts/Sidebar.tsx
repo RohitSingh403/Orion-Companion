@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   FiAward,
   FiBarChart2,
+  FiBell,
   FiCalendar,
   FiClock,
   FiFileText,
@@ -10,6 +11,7 @@ import {
   FiSquare,
 } from "react-icons/fi";
 import OrionMark from "../components/brand/OrionMark";
+import { useSettingsStore } from "../store/settingsStore";
 
 const NAV_ITEMS = [
   { label: "Dashboard", path: "/app", icon: FiGrid },
@@ -19,15 +21,24 @@ const NAV_ITEMS = [
   { label: "Notes", path: "/notes", icon: FiFileText },
   { label: "Analytics", path: "/analytics", icon: FiBarChart2 },
   { label: "Achievements", path: "/achievements", icon: FiAward },
+  { label: "Reminders", path: "/reminders", icon: FiBell },
 ];
+
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "OC";
+  return parts.slice(0, 2).map((part) => part[0]?.toUpperCase() ?? "").join("");
+}
 
 export default function Sidebar() {
   const location = useLocation();
+  const displayName = useSettingsStore((state) => state.displayName);
+  const mark = initials(displayName);
 
   return (
     <aside className="flex w-[76px] shrink-0 flex-col items-center justify-between border-r border-white/5 bg-[#10131a] py-4">
       <div className="flex flex-col items-center gap-4">
-        <Link to="/app" className="rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5DFFC2]" aria-label="Orion Companion home">
+        <Link to="/app" className="rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40" aria-label="Orion Companion home">
           <OrionMark className="h-10 w-10" />
         </Link>
         <nav aria-label="Main navigation" className="flex flex-col items-center gap-1.5">
@@ -40,8 +51,8 @@ export default function Sidebar() {
                 to={item.path}
                 aria-current={active ? "page" : undefined}
                 title={item.label}
-                className={`flex h-10 w-10 items-center justify-center rounded-2xl transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5DFFC2] ${
-                  active ? "bg-white text-[#14161c]" : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                className={`flex h-10 w-10 items-center justify-center rounded-2xl transition focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+                  active ? "bg-[#2a303c] text-white" : "text-zinc-500 hover:bg-white/5 hover:text-zinc-200"
                 }`}
               >
                 <Icon className="h-4 w-4" aria-hidden="true" />
@@ -56,15 +67,15 @@ export default function Sidebar() {
           to="/settings"
           title="Settings"
           aria-current={location.pathname === "/settings" ? "page" : undefined}
-          className={`flex h-10 w-10 items-center justify-center rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5DFFC2] ${
-            location.pathname === "/settings" ? "bg-white text-[#14161c]" : "text-zinc-400 hover:bg-white/5 hover:text-white"
+          className={`flex h-10 w-10 items-center justify-center rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
+            location.pathname === "/settings" ? "bg-[#2a303c] text-white" : "text-zinc-500 hover:bg-white/5 hover:text-zinc-200"
           }`}
         >
           <FiSettings className="h-4 w-4" aria-hidden="true" />
           <span className="sr-only">Settings</span>
         </Link>
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#243044] text-[11px] font-semibold text-[#9eebd4]" title="Personal companion">
-          OC
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2a303c] text-[11px] font-semibold text-zinc-300" title={displayName || "Personal companion"}>
+          {mark}
         </div>
       </div>
     </aside>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import AppLayout from "../../layouts/AppLayout";
-import Topbar from "../../components/topbar/Topbar";
+import PageHeading from "../../components/shell/PageHeading";
 import { useNotesStore } from "../../store/notesStore";
 import { useTaskStore } from "../../store/taskStore";
 import { useSettingsStore } from "../../store/settingsStore";
@@ -132,8 +132,8 @@ export default function NotesPage() {
 
   return (
     <AppLayout>
-      <Topbar subtitle="Capture ideas and link tasks to your focus sessions" />
-      <div className="flex-1 p-8 flex gap-6 relative overflow-auto">
+      <PageHeading title="Notes" subtitle="Capture ideas and link them to tasks" />
+      <div className="relative flex gap-6 px-4 pb-6 md:px-6">
         {/* Quick Note Toast */}
         {showQuickNoteToast && (
           <div className={`absolute top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-lg z-50 border ${

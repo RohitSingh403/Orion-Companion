@@ -6,7 +6,7 @@ export const defaultAchievements: Achievement[] = [
     id: "first-session",
     title: "First Steps",
     description: "Complete your first focus session.",
-    unlocked: true,
+    unlocked: false,
     icon: "🌱",
     xp: 50,
     category: "sessions",

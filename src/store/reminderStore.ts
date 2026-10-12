@@ -13,6 +13,8 @@ interface ReminderState {
   // Status operations
   completeReminder: (id: string) => void;
   dismissReminder: (id: string) => void;
+  snoozeReminder: (id: string, minutes?: number) => void;
+  markAlerted: (id: string) => void;
   
   // Query operations
   getPendingReminders: () => Reminder[];
@@ -92,6 +94,33 @@ export const useReminderStore = create<ReminderState>()(
         }
       },
       
+      snoozeReminder: (id, minutes = 10) => {
+        const next = new Date(Date.now() + minutes * 60 * 1000);
+        const hours = String(next.getHours()).padStart(2, "0");
+        const mins = String(next.getMinutes()).padStart(2, "0");
+        set((state) => ({
+          reminders: state.reminders.map((reminder) =>
+            reminder.id === id
+              ? {
+                  ...reminder,
+                  status: "pending",
+                  dueDate: next.toISOString(),
+                  dueTime: `${hours}:${mins}`,
+                  alertedAt: undefined,
+                }
+              : reminder
+          ),
+        }));
+      },
+
+      markAlerted: (id) => {
+        set((state) => ({
+          reminders: state.reminders.map((reminder) =>
+            reminder.id === id ? { ...reminder, alertedAt: new Date().toISOString() } : reminder
+          ),
+        }));
+      },
+
       dismissReminder: (id) => {
         set((state) => ({
           reminders: state.reminders.map((r) =>
@@ -114,6 +143,8 @@ export const useReminderStore = create<ReminderState>()(
             const [hours, minutes] = r.dueTime.split(":").map(Number);
             dueDate.setHours(hours, minutes, 0, 0);
           }
+
+          if (r.alertedAt && new Date(r.alertedAt) >= dueDate) return false;
           
           return dueDate <= now;
         });

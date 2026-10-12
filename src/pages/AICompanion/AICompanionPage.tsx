@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import AppLayout from "../../layouts/AppLayout";
-import Topbar from "../../components/topbar/Topbar";
+import PageHeading from "../../components/shell/PageHeading";
 import { useAICompanionStore } from "../../store/aiCompanionStore";
 import { useSettingsStore } from "../../store/settingsStore";
 import { FiSun, FiMoon, FiCalendar, FiRefreshCw, FiZap, FiTarget } from "react-icons/fi";
@@ -50,8 +50,8 @@ export default function AICompanionPage() {
 
   return (
     <AppLayout>
-      <Topbar subtitle="Personalized productivity insights based on your patterns" />
-      <div className="flex-1 p-8 overflow-auto">
+      <PageHeading title="Companion" subtitle="Suggestions from the sessions stored on this computer" />
+      <div className="px-4 pb-6 md:px-6">
         <div className={`rounded-lg p-6 h-full flex flex-col border shadow-sm ${
           isDark 
             ? "bg-gray-800 border-gray-700" 

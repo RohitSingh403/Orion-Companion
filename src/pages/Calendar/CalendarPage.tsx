@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import AppLayout from "../../layouts/AppLayout";
-import Topbar from "../../components/topbar/Topbar";
+import PageHeading from "../../components/shell/PageHeading";
 import { useTaskStore } from "../../store/taskStore";
 import { useEventStore } from "../../store/eventStore";
 import { useSettingsStore } from "../../store/settingsStore";
@@ -284,8 +284,8 @@ export default function CalendarPage() {
 
   return (
     <AppLayout>
-      <Topbar subtitle="Plan your focus sessions & meetings" />
-      <div className="flex-1 p-8 space-y-6 overflow-auto no-scrollbar">
+      <PageHeading title="Calendar" subtitle="Plan focus sessions and meetings" />
+      <div className="space-y-4 px-4 pb-6 md:px-6">
         {/* Header Controls */}
         <div className={`flex items-center justify-between p-4 rounded-xl border shadow-sm ${
           isDark 

@@ -52,6 +52,30 @@ electron.contextBridge.exposeInMainWorld("focusAPI", {
   onGlobalShortcutQuickCapture(callback) {
     electron.ipcRenderer.on("global-shortcut-quick-capture", callback);
   },
+  reportTimer(snapshot) {
+    electron.ipcRenderer.send("report-timer", snapshot);
+  },
+  watchActivity(enabled) {
+    electron.ipcRenderer.send("watch-activity", enabled);
+  },
+  onMiniCommand(callback) {
+    const listener = (_event, command) => callback(command);
+    electron.ipcRenderer.on("mini-command", listener);
+    return () => electron.ipcRenderer.removeListener("mini-command", listener);
+  },
+  onActivitySample(callback) {
+    const listener = (_event, name) => callback(name);
+    electron.ipcRenderer.on("activity-sample", listener);
+    return () => electron.ipcRenderer.removeListener("activity-sample", listener);
+  },
+  onTimerState(callback) {
+    const listener = (_event, snapshot) => callback(snapshot);
+    electron.ipcRenderer.on("timer-state", listener);
+    return () => electron.ipcRenderer.removeListener("timer-state", listener);
+  },
+  sendMiniCommand(command) {
+    electron.ipcRenderer.send("mini-command", command);
+  },
   getAutoLaunchStatus() {
     return electron.ipcRenderer.invoke("get-auto-launch-status");
   },

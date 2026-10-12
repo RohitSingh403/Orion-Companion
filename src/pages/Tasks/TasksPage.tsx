@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import AppLayout from "../../layouts/AppLayout";
-import Topbar from "../../components/topbar/Topbar";
+import PageHeading from "../../components/shell/PageHeading";
 import { useTaskStore } from "../../store/taskStore";
 import { useProjectStore } from "../../store/projectStore";
 import { useSettingsStore } from "../../store/settingsStore";
@@ -77,8 +77,8 @@ export default function TasksPage() {
 
   return (
     <AppLayout>
-      <Topbar subtitle="Manage tasks & focus session estimates" />
-      <div className="flex-1 p-6 md:p-8 flex flex-col md:flex-row gap-6 overflow-auto">
+      <PageHeading title="Tasks" subtitle="Manage tasks and focus estimates" />
+      <div className="flex flex-col gap-6 px-4 pb-6 md:flex-row md:px-6">
         {/* Left Sub-Sidebar (Workspace Categories, Projects, Tags) */}
         <div className={`w-full md:w-64 rounded-xl p-4 flex flex-col justify-between flex-shrink-0 space-y-6 border shadow-sm ${
           isDark 

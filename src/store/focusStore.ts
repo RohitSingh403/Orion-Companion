@@ -20,6 +20,12 @@ export interface DailyStats {
   averageSessionDuration: number; // in seconds
 }
 
+export interface ActivitySample {
+  name: string;
+  seconds: number;
+  date: string;
+}
+
 // ----------------------
 // Default Values
 // ----------------------
@@ -52,6 +58,7 @@ interface FocusState {
 
   // Daily Statistics
   dailyStats: DailyStats[];
+  activityLog: ActivitySample[];
 
   start: () => void;
   pause: () => void;
@@ -62,6 +69,7 @@ interface FocusState {
   addHistory: () => void;
   updateStreak: () => void;
   updateDailyStats: () => void;
+  recordActivity: (name: string, seconds: number) => void;
   getYesterdayStats: () => DailyStats | undefined;
   getProductivityComparison: () => { percentage: number; label: string };
   getFocusInsights: () => string[];
@@ -104,6 +112,7 @@ export const useFocusStore = create<FocusState>()(
       bestStreak: 0,
 
       dailyStats: [],
+      activityLog: [],
 
       start: () =>
         set({
@@ -242,6 +251,26 @@ export const useFocusStore = create<FocusState>()(
             ],
           });
         }
+      },
+
+      recordActivity: (name, seconds) => {
+        const trimmed = name.trim();
+        if (!trimmed || seconds <= 0) return;
+        const today = getTodayString();
+        const label = trimmed.slice(0, 80);
+        set((state) => {
+          const existing = state.activityLog.find((item) => item.date === today && item.name === label);
+          if (existing) {
+            return {
+              activityLog: state.activityLog.map((item) =>
+                item === existing ? { ...item, seconds: item.seconds + seconds } : item
+              ),
+            };
+          }
+          return {
+            activityLog: [...state.activityLog, { name: label, seconds, date: today }],
+          };
+        });
       },
 
       getYesterdayStats: () => {
@@ -461,8 +490,11 @@ export const useFocusStore = create<FocusState>()(
           completedSessions: 0,
 
           history: [],
+          dailyStats: [],
+          activityLog: [],
 
           currentStreak: 0,
+          bestStreak: 0,
           lastCompletedDate: null,
         }),
     }),
@@ -476,8 +508,11 @@ export const useFocusStore = create<FocusState>()(
 
         completedSessions: state.completedSessions,
         history: state.history,
+        dailyStats: state.dailyStats,
+        activityLog: state.activityLog,
 
         currentStreak: state.currentStreak,
+        bestStreak: state.bestStreak,
         lastCompletedDate: state.lastCompletedDate,
       }),
     },

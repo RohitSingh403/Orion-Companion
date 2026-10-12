@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import AppLayout from "../../layouts/AppLayout";
-import Topbar from "../../components/topbar/Topbar";
+import PageHeading from "../../components/shell/PageHeading";
 import { useReminderStore } from "../../store/reminderStore";
 import { useSettingsStore } from "../../store/settingsStore";
 import { FiPlus, FiBell, FiClock, FiCheck, FiX, FiRepeat } from "react-icons/fi";
 import type { ReminderFrequency } from "../../types/reminder";
 
 export default function RemindersPage() {
-  const { reminders, addReminder, completeReminder, dismissReminder, deleteReminder } = useReminderStore();
+  const { reminders, addReminder, completeReminder, dismissReminder, deleteReminder, snoozeReminder } = useReminderStore();
   const theme = useSettingsStore((s) => s.theme);
   const isDark = theme === "dark";
   const [showModal, setShowModal] = useState(false);
@@ -78,8 +78,8 @@ export default function RemindersPage() {
 
   return (
     <AppLayout>
-      <Topbar subtitle="Never forget important tasks and events" />
-      <div className="flex-1 p-8 overflow-auto">
+      <PageHeading title="Reminders" subtitle="Snooze, complete, or dismiss what is due" />
+      <div className="px-4 pb-6 md:px-6">
         <div className={`rounded-lg p-6 h-full flex flex-col border shadow-sm ${
           isDark 
             ? "bg-gray-800 border-gray-700" 
@@ -164,6 +164,17 @@ export default function RemindersPage() {
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => snoozeReminder(reminder.id, 10)}
+                              className={`px-2 py-1 rounded-lg text-xs font-medium transition-all ${
+                                isDark
+                                  ? "text-zinc-300 hover:bg-white/10"
+                                  : "text-gray-600 hover:bg-gray-200"
+                              }`}
+                              title="Snooze 10 minutes"
+                            >
+                              Snooze
+                            </button>
                             <button
                               onClick={() => completeReminder(reminder.id)}
                               className={`p-1.5 rounded-lg transition-all ${

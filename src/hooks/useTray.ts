@@ -1,83 +1,51 @@
-// src/hooks/useTray.ts
-
 import { useEffect } from "react";
 import { useFocusStore } from "../store/focusStore";
 import { useTaskStore } from "../store/taskStore";
 
 export default function useTray() {
-  const { running, session, start, pause, remainingTime } = useFocusStore();
-  const { addTask } = useTaskStore();
+  const running = useFocusStore((state) => state.running);
+  const session = useFocusStore((state) => state.session);
+  const remainingTime = useFocusStore((state) => state.remainingTime);
+  const start = useFocusStore((state) => state.start);
+  const pause = useFocusStore((state) => state.pause);
+  const reset = useFocusStore((state) => state.reset);
+  const addTask = useTaskStore((state) => state.addTask);
 
   useEffect(() => {
-    // Update tray status based on focus state
-    const updateStatus = () => {
-      if (running) {
-        const minutes = Math.floor(remainingTime / 60);
-        const seconds = remainingTime % 60;
-        const timeStr = `${minutes}:${seconds.toString().padStart(2, "0")}`;
-        window.focusAPI?.updateTrayStatus(`${session === "focus" ? "Focus" : "Break"} - ${timeStr}`);
-      } else {
-        window.focusAPI?.updateTrayStatus("Paused");
-      }
-    };
+    if (new URLSearchParams(window.location.search).get("surface") === "mini") return;
 
-    updateStatus();
-
-    // Update every second when running
-    const interval = running ? setInterval(updateStatus, 1000) : undefined;
-    return () => clearInterval(interval);
+    const minutes = Math.floor(remainingTime / 60);
+    const seconds = remainingTime % 60;
+    const time = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+    const status = running ? `${session === "focus" ? "Focus" : "Break"} ${time}` : "Ready";
+    window.focusAPI?.updateTrayStatus(status);
+    window.focusAPI?.reportTimer?.({ remainingTime, running, session });
+    window.focusAPI?.watchActivity?.(running && session === "focus");
   }, [running, session, remainingTime]);
 
   useEffect(() => {
-    // Handle tray events
-    const handleStartFocus = () => {
-      if (!running) {
-        start();
-      }
-    };
+    if (!window.focusAPI || new URLSearchParams(window.location.search).get("surface") === "mini") return;
 
-    const handlePauseFocus = () => {
-      if (running) {
-        pause();
-      }
-    };
-
-    const handleResumeFocus = () => {
-      if (!running) {
-        start();
-      }
-    };
-
-    const handleQuickAddTask = () => {
-      // This would open a quick add dialog
-      // For now, just add a default task
-      addTask("Quick Task from Tray");
-    };
-
-    const handleShowProgress = () => {
-      // Navigate to analytics page
-      // This would be handled by routing
-      console.log("Show progress - navigate to analytics");
-    };
-
-    const handleGlobalShortcutQuickCapture = () => {
-      // Show quick capture modal
-      console.log("Quick capture triggered");
-      // This would open a modal for quick task capture
-    };
-
-    // Register event listeners
-    window.focusAPI?.onTrayStartFocus(handleStartFocus);
-    window.focusAPI?.onTrayPauseFocus(handlePauseFocus);
-    window.focusAPI?.onTrayResumeFocus(handleResumeFocus);
-    window.focusAPI?.onTrayQuickAddTask(handleQuickAddTask);
-    window.focusAPI?.onTrayShowProgress(handleShowProgress);
-    window.focusAPI?.onGlobalShortcutQuickCapture(handleGlobalShortcutQuickCapture);
-
-    // Cleanup
-    return () => {
-      // Note: Electron doesn't provide a way to remove listeners from IPC
-      // This is a known limitation
-    };
-  }, [running, start, pause, addTask]);
+    window.focusAPI.onTrayStartFocus(() => useFocusStore.getState().start());
+    window.focusAPI.onTrayPauseFocus(() => useFocusStore.getState().pause());
+    window.focusAPI.onTrayResumeFocus(() => useFocusStore.getState().start());
+    window.focusAPI.onTrayQuickAddTask(() => {
+      window.dispatchEvent(new CustomEvent("orion-quick-add"));
+    });
+    window.focusAPI.onTrayShowProgress(() => {
+      window.location.assign("/analytics");
+    });
+    window.focusAPI.onGlobalShortcutQuickCapture(() => {
+      window.dispatchEvent(new CustomEvent("orion-quick-add"));
+    });
+    window.focusAPI.onMiniCommand?.((command) => {
+      const store = useFocusStore.getState();
+      if (command === "start") store.start();
+      if (command === "pause") store.pause();
+      if (command === "reset") store.reset();
+    });
+    window.focusAPI.onActivitySample?.((name) => {
+      useFocusStore.getState().recordActivity(name, 15);
+    });
+  }, [addTask, pause, reset, start]);
 }
