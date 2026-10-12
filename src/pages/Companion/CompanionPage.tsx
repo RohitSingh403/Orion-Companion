@@ -6,6 +6,8 @@ export default function CompanionPage() {
     const previous = document.body.style.background;
     document.body.style.background = "transparent";
     document.documentElement.style.background = "transparent";
+    const root = document.getElementById("root");
+    if (root) root.style.background = "transparent";
     return () => {
       document.body.style.background = previous;
     };

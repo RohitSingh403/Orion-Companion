@@ -116,6 +116,10 @@ contextBridge.exposeInMainWorld("focusAPI", {
     ipcRenderer.send("companion-visibility", visible);
   },
 
+  setCompanionMousePassthrough(ignore: boolean) {
+    ipcRenderer.send("companion-mouse-passthrough", ignore);
+  },
+
   onCompanionVisibility(callback: (visible: boolean) => void) {
     const listener = (_event: IpcRendererEvent, visible: boolean) => callback(visible);
     ipcRenderer.on("companion-visibility", listener);

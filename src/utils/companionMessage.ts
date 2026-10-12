@@ -5,7 +5,7 @@ export interface CompanionSnapshot {
 }
 
 export interface CompanionLine {
-  pose: "front" | "back";
+  mode: "idle" | "focus" | "break";
   title: string;
   body: string;
 }
@@ -16,50 +16,50 @@ export function companionMessage(snapshot: CompanionSnapshot): CompanionLine {
   if (snapshot.session === "break" && snapshot.running) {
     if (snapshot.remainingTime <= 60) {
       return {
-        pose: "front",
+        mode: "break",
         title: "Break is ending",
-        body: "Come back when you are ready for the next block.",
+        body: "Finish the coffee. The next block is close.",
       };
     }
     return {
-      pose: "front",
-      title: "Take a break",
-      body: "Stand up, stretch, and leave the screen for a minute.",
+      mode: "break",
+      title: "Coffee break",
+      body: "Step away from the laptop. The mug is yours for a few minutes.",
     };
   }
 
   if (snapshot.session === "break") {
     return {
-      pose: "front",
+      mode: "break",
       title: "Break is paused",
-      body: "The break is waiting. Resume it when you want.",
+      body: "The coffee is waiting. Resume the break when you want.",
     };
   }
 
   if (snapshot.running) {
     if (snapshot.remainingTime <= 60) {
       return {
-        pose: "back",
+        mode: "focus",
         title: "Last minute",
-        body: "Finish the thought you are on.",
+        body: "One more line, then close the laptop.",
       };
     }
     if (snapshot.remainingTime <= 5 * 60) {
       return {
-        pose: "back",
+        mode: "focus",
         title: "Almost there",
-        body: `${minutes} minutes left in this focus block.`,
+        body: `${minutes} minutes left. Keep typing.`,
       };
     }
     return {
-      pose: "back",
+      mode: "focus",
       title: "Focus is on",
-      body: `${minutes} minutes left. Stay with this block.`,
+      body: `${minutes} minutes left. Working through this block.`,
     };
   }
 
   return {
-    pose: "front",
+    mode: "idle",
     title: "Waiting",
     body: "Start a focus block when you want.",
   };

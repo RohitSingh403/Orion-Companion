@@ -1,113 +1,143 @@
-import { app as d, globalShortcut as F, ipcMain as l, Notification as g, autoUpdater as u, BrowserWindow as D, Tray as A, screen as L, nativeImage as j, Menu as U } from "electron";
-import { execFile as k } from "node:child_process";
-import { fileURLToPath as M } from "node:url";
-import c from "node:path";
-const C = c.dirname(M(import.meta.url));
-d.commandLine.appendSwitch("force-gpu-mem-available-mb", "1024");
-process.env.APP_ROOT = c.join(C, "..");
-const w = process.env.VITE_DEV_SERVER_URL, Q = c.join(process.env.APP_ROOT, "dist-electron"), x = c.join(process.env.APP_ROOT, "dist");
-process.env.VITE_PUBLIC = w ? c.join(process.env.APP_ROOT, "public") : x;
-let t = null, a = null, i = null, y = null, P = !1, v = !1, T = "Ready", I = !1, f = null, m = null;
-function $() {
+import { app as f, globalShortcut as _, ipcMain as c, BrowserWindow as g, screen as A, Notification as v, autoUpdater as m, Tray as $, nativeImage as V, Menu as z } from "electron";
+import { execFile as D } from "node:child_process";
+import E from "node:fs";
+import { fileURLToPath as N } from "node:url";
+import u from "node:path";
+const x = u.dirname(N(import.meta.url));
+f.commandLine.appendSwitch("force-gpu-mem-available-mb", "1024");
+process.env.APP_ROOT = u.join(x, "..");
+const y = process.env.VITE_DEV_SERVER_URL, ie = u.join(process.env.APP_ROOT, "dist-electron"), j = u.join(process.env.APP_ROOT, "dist");
+process.env.VITE_PUBLIC = y ? u.join(process.env.APP_ROOT, "public") : j;
+let i = null, l = null, t = null, b = null, R = !1, T = !1, k = "Ready", F = !1, p = null, h = null;
+function q() {
   const e = Buffer.alloc(1024);
   for (let o = 0; o < 16; o += 1)
     for (let r = 0; r < 16; r += 1) {
-      const s = r - 7.5, p = o - 7.5;
-      if (Math.sqrt(s * s + p * p) >= 6.5) continue;
-      const h = (o * 16 + r) * 4;
-      e[h] = 245, e[h + 1] = 215, e[h + 2] = 122, e[h + 3] = 255;
+      const s = r - 7.5, a = o - 7.5;
+      if (Math.sqrt(s * s + a * a) >= 6.5) continue;
+      const d = (o * 16 + r) * 4;
+      e[d] = 245, e[d + 1] = 215, e[d + 2] = 122, e[d + 3] = 255;
     }
-  return j.createFromBitmap(e, { width: 16, height: 16 });
+  return V.createFromBitmap(e, { width: 16, height: 16 });
 }
-function O(n, e, o = {}) {
-  if (w) {
-    const r = w.endsWith("/") ? w : `${w}/`, s = new URL(e.replace(/^\//, ""), r);
-    Object.entries(o).forEach(([p, h]) => s.searchParams.set(p, h)), n.loadURL(s.toString());
+function M(n, e, o = {}) {
+  if (y) {
+    const r = y.endsWith("/") ? y : `${y}/`, s = new URL(e.replace(/^\//, ""), r);
+    Object.entries(o).forEach(([a, d]) => s.searchParams.set(a, d)), n.loadURL(s.toString());
     return;
   }
-  n.loadFile(c.join(x, "index.html"), { query: o });
+  n.loadFile(u.join(j, "index.html"), { query: o });
 }
-function b() {
-  if (!t || t.isDestroyed()) {
-    _();
+function w() {
+  if (!i || i.isDestroyed()) {
+    I();
     return;
   }
-  t.isMinimized() && t.restore(), t.show(), t.focus();
+  i.isMinimized() && i.restore(), i.show(), i.focus();
 }
-function S() {
-  y && (y.setToolTip(`Orion Companion — ${T}`), y.setContextMenu(
-    U.buildFromTemplate([
-      { label: T, enabled: !1 },
-      { label: "Show Orion", click: () => b() },
-      { label: "Start focus", click: () => t == null ? void 0 : t.webContents.send("tray-start-focus") },
-      { label: "Pause", click: () => t == null ? void 0 : t.webContents.send("tray-pause-focus") },
-      { label: "Mini timer", click: () => z() },
+function P() {
+  b && (b.setToolTip(`Orion Companion — ${k}`), b.setContextMenu(
+    z.buildFromTemplate([
+      { label: k, enabled: !1 },
+      { label: "Show Orion", click: () => w() },
+      { label: "Start focus", click: () => i == null ? void 0 : i.webContents.send("tray-start-focus") },
+      { label: "Pause", click: () => i == null ? void 0 : i.webContents.send("tray-pause-focus") },
+      { label: "Mini timer", click: () => Y() },
       {
-        label: i && !i.isDestroyed() && i.isVisible() ? "Hide companion" : "Show companion",
+        label: t && !t.isDestroyed() && t.isVisible() ? "Hide companion" : "Show companion",
         click: () => {
-          i && !i.isDestroyed() && i.isVisible() ? E() : R();
+          t && !t.isDestroyed() && t.isVisible() ? L() : O();
         }
       },
       {
         label: "Quick add",
         click: () => {
-          b(), t == null || t.webContents.send("tray-quick-add-task");
+          w(), i == null || i.webContents.send("tray-quick-add-task");
         }
       },
       { type: "separator" },
       {
         label: "Quit",
         click: () => {
-          P = !0, d.quit();
+          R = !0, f.quit();
         }
       }
     ])
   ));
 }
-function B() {
+function G() {
   try {
-    y = new A($()), v = !0, S(), y.on("click", () => b());
+    b = new $(q()), T = !0, P(), b.on("click", () => w());
   } catch (n) {
-    console.error("Tray unavailable:", n), v = !1;
+    console.error("Tray unavailable:", n), T = !1;
   }
 }
-function R() {
-  if (i && !i.isDestroyed()) {
-    i.isVisible() || i.showInactive(), m && i.webContents.send("timer-state", m);
+function B() {
+  return u.join(f.getPath("userData"), "companion-position.json");
+}
+function H() {
+  try {
+    const n = JSON.parse(E.readFileSync(B(), "utf8"));
+    if (typeof n.x == "number" && typeof n.y == "number") return { x: n.x, y: n.y };
+  } catch {
+    return null;
+  }
+  return null;
+}
+function J() {
+  if (!t || t.isDestroyed()) return;
+  const [n, e] = t.getPosition();
+  try {
+    E.writeFileSync(B(), JSON.stringify({ x: n, y: e }));
+  } catch {
+  }
+}
+function Q(n) {
+  const r = H(), s = r ?? { x: 0, y: 0 }, a = A.getDisplayNearestPoint(s).workArea, d = a.x + a.width - 300 - 24, S = a.y + a.height - 360 - 24, U = r ? Math.min(Math.max(a.x, r.x), a.x + a.width - 300) : d, W = r ? Math.min(Math.max(a.y, r.y), a.y + a.height - 360) : S;
+  n.setBounds({ x: Math.round(U), y: Math.round(W), width: 300, height: 360 });
+}
+function C() {
+  !t || t.isDestroyed() || (t.setAlwaysOnTop(!0, "floating"), t.setVisibleOnAllWorkspaces(!0, { visibleOnFullScreen: !0 }));
+}
+function O() {
+  if (t && !t.isDestroyed()) {
+    t.isVisible() || t.showInactive(), C(), h && t.webContents.send("timer-state", h);
     return;
   }
-  const n = L.getPrimaryDisplay().workArea, e = 260, o = 280;
-  i = new D({
-    width: e,
-    height: o,
-    x: n.x + n.width - e - 24,
-    y: n.y + n.height - o - 24,
+  t = new g({
+    width: 300,
+    height: 360,
     frame: !1,
     transparent: !0,
     resizable: !1,
     alwaysOnTop: !0,
     skipTaskbar: !0,
     hasShadow: !1,
+    focusable: !0,
     title: "Orion Companion",
     backgroundColor: "#00000000",
+    ...process.platform === "darwin" ? { type: "panel" } : {},
     webPreferences: {
-      preload: c.join(C, "preload.mjs")
+      preload: u.join(x, "preload.mjs"),
+      backgroundThrottling: !1
     }
-  }), O(i, "companion", { surface: "companion" }), i.once("ready-to-show", () => i == null ? void 0 : i.showInactive()), i.webContents.on("did-finish-load", () => {
-    m && i && !i.isDestroyed() && i.webContents.send("timer-state", m);
-  }), i.on("closed", () => {
-    i = null;
+  }), Q(t), C(), M(t, "companion", { surface: "companion" }), t.once("ready-to-show", () => {
+    t == null || t.showInactive(), C();
+  }), t.webContents.on("did-finish-load", () => {
+    h && t && !t.isDestroyed() && t.webContents.send("timer-state", h);
+  }), t.on("moved", J), t.on("closed", () => {
+    t = null;
   });
 }
-function E() {
-  i && !i.isDestroyed() && i.hide();
+function L() {
+  t && !t.isDestroyed() && t.hide();
 }
-function z() {
-  if (a && !a.isDestroyed()) {
-    a.show(), a.focus();
+function Y() {
+  if (l && !l.isDestroyed()) {
+    l.show(), l.focus();
     return;
   }
-  a = new D({
+  l = new g({
     width: 280,
     height: 188,
     frame: !1,
@@ -117,15 +147,15 @@ function z() {
     title: "Orion Mini Timer",
     backgroundColor: "#121418",
     webPreferences: {
-      preload: c.join(C, "preload.mjs")
+      preload: u.join(x, "preload.mjs")
     }
-  }), O(a, "mini-timer", { surface: "mini" }), a.webContents.on("did-finish-load", () => {
-    m && a && !a.isDestroyed() && a.webContents.send("timer-state", m);
-  }), a.on("closed", () => {
-    a = null;
+  }), M(l, "mini-timer", { surface: "mini" }), l.webContents.on("did-finish-load", () => {
+    h && l && !l.isDestroyed() && l.webContents.send("timer-state", h);
+  }), l.on("closed", () => {
+    l = null;
   });
 }
-function V() {
+function X() {
   return new Promise((n) => {
     const e = (o) => {
       if (!o) {
@@ -140,7 +170,7 @@ function V() {
       n(r.slice(0, 80));
     };
     if (process.platform === "darwin") {
-      k(
+      D(
         "osascript",
         ["-e", 'tell application "System Events" to get name of first application process whose frontmost is true'],
         { timeout: 2e3 },
@@ -149,7 +179,7 @@ function V() {
       return;
     }
     if (process.platform === "win32") {
-      k(
+      D(
         "powershell",
         [
           "-NoProfile",
@@ -161,29 +191,29 @@ function V() {
       );
       return;
     }
-    k("xdotool", ["getactivewindow", "getwindowname"], { timeout: 2e3 }, (o, r) => {
+    D("xdotool", ["getactivewindow", "getwindowname"], { timeout: 2e3 }, (o, r) => {
       if (o || !r.trim()) {
         e(null);
         return;
       }
-      const s = r.trim().split(" - ").map((p) => p.trim()).filter(Boolean);
+      const s = r.trim().split(" - ").map((a) => a.trim()).filter(Boolean);
       e(s[s.length - 1] ?? null);
     });
   });
 }
-function W(n) {
-  if (I = n, !n) {
-    f && clearInterval(f), f = null;
+function K(n) {
+  if (F = n, !n) {
+    p && clearInterval(p), p = null;
     return;
   }
-  f || (f = setInterval(() => {
-    V().then((e) => {
-      !I || !e || !t || t.isDestroyed() || t.webContents.send("activity-sample", e);
+  p || (p = setInterval(() => {
+    X().then((e) => {
+      !F || !e || !i || i.isDestroyed() || i.webContents.send("activity-sample", e);
     });
   }, 15e3));
 }
-function _() {
-  t = new D({
+function I() {
+  i = new g({
     width: 1280,
     height: 820,
     minWidth: 1100,
@@ -191,72 +221,80 @@ function _() {
     title: "Orion Companion",
     backgroundColor: "#121418",
     autoHideMenuBar: !0,
-    icon: c.join(process.env.VITE_PUBLIC, "orion.svg"),
+    icon: u.join(process.env.VITE_PUBLIC, "orion.svg"),
     webPreferences: {
-      preload: c.join(C, "preload.mjs")
+      preload: u.join(x, "preload.mjs"),
+      backgroundThrottling: !1
     }
-  }), t.webContents.on("did-finish-load", () => {
-    t == null || t.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
-  }), t.on("close", (n) => {
-    P || !v || (n.preventDefault(), t == null || t.hide());
-  }), O(t, "app");
+  }), i.webContents.on("did-finish-load", () => {
+    i == null || i.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
+  }), i.on("close", (n) => {
+    R || !T || (n.preventDefault(), i == null || i.hide());
+  }), i.on("hide", () => {
+    !t || t.isDestroyed() || !t.isVisible() || (t.showInactive(), C());
+  }), M(i, "app");
 }
-d.on("window-all-closed", () => {
-  !v && process.platform !== "darwin" && (d.quit(), t = null);
+f.on("window-all-closed", () => {
+  !T && process.platform !== "darwin" && (f.quit(), i = null);
 });
-d.on("activate", () => {
-  !t || t.isDestroyed() ? _() : b();
+f.on("activate", () => {
+  !i || i.isDestroyed() ? I() : w();
 });
-d.on("before-quit", () => {
-  P = !0;
+f.on("before-quit", () => {
+  R = !0;
 });
-d.on("will-quit", () => {
-  F.unregisterAll(), f && clearInterval(f);
+f.on("will-quit", () => {
+  _.unregisterAll(), p && clearInterval(p);
 });
-d.whenReady().then(() => {
-  _(), B(), R();
+f.whenReady().then(() => {
+  I(), G(), O();
   try {
-    F.register("CommandOrControl+Shift+Space", () => {
-      b(), t == null || t.webContents.send("global-shortcut-quick-capture");
+    _.register("CommandOrControl+Shift+Space", () => {
+      w(), i == null || i.webContents.send("global-shortcut-quick-capture");
     });
   } catch (n) {
     console.error("Shortcut unavailable:", n);
   }
-  l.on("update-tray-status", (n, e) => {
-    T = e || "Ready", S();
-  }), l.on("report-timer", (n, e) => {
+  c.on("update-tray-status", (n, e) => {
+    k = e || "Ready", P();
+  }), c.on("report-timer", (n, e) => {
     if (!e) return;
-    m = e;
+    h = e;
     const o = Math.floor(e.remainingTime / 60), r = e.remainingTime % 60, s = `${o}:${r.toString().padStart(2, "0")}`;
-    T = e.running ? `${e.session === "focus" ? "Focus" : "Break"} ${s}` : "Ready", S(), a && !a.isDestroyed() && a.webContents.send("timer-state", e), i && !i.isDestroyed() && i.webContents.send("timer-state", e);
-  }), l.on("companion-nudge", (n, e, o) => {
-    if (!i || i.isDestroyed() || !Number.isFinite(e) || !Number.isFinite(o)) return;
-    const [r, s] = i.getPosition();
-    i.setPosition(Math.round(r + e), Math.round(s + o));
-  }), l.on("companion-show-main", () => {
-    b();
-  }), l.on("companion-visibility", (n, e) => {
-    e ? R() : E(), t && !t.isDestroyed() && t.webContents.send("companion-visibility", !!e);
-  }), l.on("mini-command", (n, e) => {
-    t == null || t.webContents.send("mini-command", e);
-  }), l.on("watch-activity", (n, e) => {
-    W(!!e);
-  }), l.on("show-break-notification", () => {
-    new g({
+    k = e.running ? `${e.session === "focus" ? "Focus" : "Break"} ${s}` : "Ready", P(), l && !l.isDestroyed() && l.webContents.send("timer-state", e), t && !t.isDestroyed() && t.webContents.send("timer-state", e);
+  }), c.on("companion-nudge", (n, e, o) => {
+    const r = g.fromWebContents(n.sender);
+    if (!r || r.isDestroyed() || !Number.isFinite(e) || !Number.isFinite(o)) return;
+    const s = r.getBounds(), a = A.getDisplayNearestPoint({ x: s.x, y: s.y }).workArea, d = Math.min(Math.max(a.x, s.x + e), a.x + a.width - s.width), S = Math.min(Math.max(a.y, s.y + o), a.y + a.height - s.height);
+    r.setPosition(Math.round(d), Math.round(S));
+  }), c.on("companion-mouse-passthrough", (n, e) => {
+    if (process.platform === "linux") return;
+    const o = g.fromWebContents(n.sender);
+    !o || o.isDestroyed() || o.setIgnoreMouseEvents(!!e, { forward: !0 });
+  }), c.on("companion-show-main", () => {
+    w();
+  }), c.on("companion-visibility", (n, e) => {
+    e ? O() : L(), i && !i.isDestroyed() && i.webContents.send("companion-visibility", !!e);
+  }), c.on("mini-command", (n, e) => {
+    i == null || i.webContents.send("mini-command", e);
+  }), c.on("watch-activity", (n, e) => {
+    K(!!e);
+  }), c.on("show-break-notification", () => {
+    new v({
       title: "☕ Break Time!",
       body: "Great work! Stand up, stretch, and drink some water."
     }).show();
-  }), l.on("show-focus-notification", () => {
-    new g({
+  }), c.on("show-focus-notification", () => {
+    new v({
       title: "🧠 Focus Time!",
       body: "Your break is over. Ready for another deep focus session?"
     }).show();
-  }), l.on("show-reminder-notification", (n, e, o) => {
-    new g({
+  }), c.on("show-reminder-notification", (n, e, o) => {
+    new v({
       title: `🔔 ${e}`,
       body: o
     }).show();
-  }), l.handle("get-auto-launch-status", async () => {
+  }), c.handle("get-auto-launch-status", async () => {
     try {
       const n = (await import("./index-BYV84ozA.js").then((r) => r.i)).default;
       return await new n({
@@ -266,7 +304,7 @@ d.whenReady().then(() => {
     } catch (n) {
       return console.error("Failed to get auto-launch status:", n), !1;
     }
-  }), l.handle("toggle-auto-launch", async (n, e) => {
+  }), c.handle("toggle-auto-launch", async (n, e) => {
     try {
       const o = (await import("./index-BYV84ozA.js").then((s) => s.i)).default, r = new o({
         name: "Orion Companion",
@@ -276,28 +314,28 @@ d.whenReady().then(() => {
     } catch (o) {
       return console.error("Failed to toggle auto-launch:", o), !1;
     }
-  }), w || (u.setFeedURL({
+  }), y || (m.setFeedURL({
     url: "https://github.com/RohitSingh403/Orion-Companion/releases/latest",
     headers: { Accept: "application/json" }
-  }), u.on("checking-for-update", () => {
+  }), m.on("checking-for-update", () => {
     console.log("Checking for update...");
-  }), u.on("update-available", (o) => {
+  }), m.on("update-available", (o) => {
     console.log("Update available:", o);
-  }), u.on("update-not-available", (o) => {
+  }), m.on("update-not-available", (o) => {
     console.log("Update not available:", o);
-  }), u.on("error", (o) => {
+  }), m.on("error", (o) => {
     console.error("Auto-updater error:", o);
-  }), u.on("update-downloaded", (o) => {
-    console.log("Update downloaded:", o), new g({
+  }), m.on("update-downloaded", (o) => {
+    console.log("Update downloaded:", o), new v({
       title: "Update Available",
       body: "A new version is ready to install. Restart to apply."
     }).show();
   }), setInterval(() => {
-    u.checkForUpdates();
-  }, 4 * 60 * 60 * 1e3), u.checkForUpdates());
+    m.checkForUpdates();
+  }, 4 * 60 * 60 * 1e3), m.checkForUpdates());
 });
 export {
-  Q as MAIN_DIST,
-  x as RENDERER_DIST,
-  w as VITE_DEV_SERVER_URL
+  ie as MAIN_DIST,
+  j as RENDERER_DIST,
+  y as VITE_DEV_SERVER_URL
 };

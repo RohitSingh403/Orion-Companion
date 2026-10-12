@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { useFocusStore } from "../../store/focusStore";
 import { companionMessage, type CompanionSnapshot } from "../../utils/companionMessage";
+import CompanionActor from "./CompanionActor";
 
 function clock(total: number) {
   const minutes = Math.floor(Math.max(0, total) / 60);
@@ -16,15 +17,36 @@ export default function ScreenCompanion({ variant = "overlay" }: { variant?: "ov
   const pause = useFocusStore((state) => state.pause);
   const [remote, setRemote] = useState<CompanionSnapshot | null>(null);
   const drag = useRef<{ x: number; y: number } | null>(null);
+  const passthrough = useRef<boolean | null>(null);
+  const desktop = variant === "desktop";
 
   useEffect(() => {
-    if (variant !== "desktop" || !window.focusAPI?.onTimerState) return undefined;
+    if (!desktop || !window.focusAPI?.onTimerState) return undefined;
     return window.focusAPI.onTimerState(setRemote);
-  }, [variant]);
+  }, [desktop]);
+
+  useEffect(() => {
+    if (!desktop || !window.focusAPI?.setCompanionMousePassthrough) return undefined;
+
+    const sync = (event: MouseEvent) => {
+      if (drag.current) return;
+      const node = document.elementFromPoint(event.clientX, event.clientY);
+      const hit = Boolean(node?.closest("[data-companion-hit]"));
+      const ignore = !hit;
+      if (passthrough.current === ignore) return;
+      passthrough.current = ignore;
+      window.focusAPI?.setCompanionMousePassthrough(ignore);
+    };
+
+    window.addEventListener("mousemove", sync);
+    return () => {
+      window.removeEventListener("mousemove", sync);
+      window.focusAPI?.setCompanionMousePassthrough(false);
+    };
+  }, [desktop]);
 
   const snapshot = remote ?? { remainingTime, running, session };
   const line = companionMessage(snapshot);
-  const desktop = variant === "desktop";
 
   function toggle() {
     if (desktop) {
@@ -35,17 +57,15 @@ export default function ScreenCompanion({ variant = "overlay" }: { variant?: "ov
     else start();
   }
 
-  function hide() {
-    window.focusAPI?.setCompanionVisible(false);
-  }
-
-  function onPointerDown(event: PointerEvent<HTMLElement>) {
+  function onDragStart(event: PointerEvent<HTMLElement>) {
     if (!desktop || event.button !== 0) return;
     drag.current = { x: event.screenX, y: event.screenY };
+    passthrough.current = false;
+    window.focusAPI?.setCompanionMousePassthrough(false);
     event.currentTarget.setPointerCapture(event.pointerId);
   }
 
-  function onPointerMove(event: PointerEvent<HTMLElement>) {
+  function onDragMove(event: PointerEvent<HTMLElement>) {
     if (!drag.current) return;
     const dx = event.screenX - drag.current.x;
     const dy = event.screenY - drag.current.y;
@@ -53,37 +73,35 @@ export default function ScreenCompanion({ variant = "overlay" }: { variant?: "ov
     if (dx !== 0 || dy !== 0) window.focusAPI?.nudgeCompanion(dx, dy);
   }
 
-  function onPointerUp() {
+  function onDragEnd() {
     drag.current = null;
   }
 
   return (
     <aside
-      className={desktop ? "h-screen w-screen bg-transparent p-2" : "pointer-events-none fixed bottom-4 right-4 z-30 w-[220px]"}
+      className={desktop ? "h-screen w-screen bg-transparent p-2" : "pointer-events-none fixed bottom-4 right-4 z-30 w-[250px]"}
       aria-label="Screen companion"
+      data-companion-root
     >
       <div className={desktop ? "flex h-full flex-col justify-end" : "pointer-events-auto"}>
-        <div className="rounded-2xl border border-white/10 bg-[#1b1f27] px-3 py-2 text-[#f4f4f5]">
+        <div data-companion-hit className="relative rounded-2xl border border-white/10 bg-[#1b1f27] px-3 py-2 text-[#f4f4f5]">
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#7CFFD4]">{line.title}</p>
           <p className="mt-1 text-xs leading-relaxed text-zinc-300">{line.body}</p>
           <p className="mt-2 font-semibold tabular-nums text-[#8AF6FF]">{clock(snapshot.remainingTime)}</p>
+          <span className="absolute -bottom-1.5 left-8 h-3 w-3 rotate-45 border-b border-r border-white/10 bg-[#1b1f27]" />
         </div>
-        <div
-          className={`mt-1 flex items-end justify-between ${desktop ? "cursor-grab" : ""}`}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-        >
-          <img
-            src={line.pose === "back" ? "/companion/back.png" : "/companion/front.png"}
-            alt=""
-            width={96}
-            height={160}
-            draggable={false}
-            className="h-40 w-auto select-none"
-            style={{ imageRendering: "pixelated" }}
-          />
-          <div className="mb-2 flex flex-col gap-1">
+        <div className="mt-2 flex items-end justify-between gap-2">
+          <div
+            data-companion-hit
+            className={desktop ? "cursor-grab touch-none" : ""}
+            onPointerDown={onDragStart}
+            onPointerMove={onDragMove}
+            onPointerUp={onDragEnd}
+            onPointerCancel={onDragEnd}
+          >
+            <CompanionActor mode={line.mode} />
+          </div>
+          <div data-companion-hit className="mb-3 flex flex-col gap-1.5">
             <button
               type="button"
               onClick={toggle}
@@ -103,7 +121,7 @@ export default function ScreenCompanion({ variant = "overlay" }: { variant?: "ov
             {desktop && (
               <button
                 type="button"
-                onClick={hide}
+                onClick={() => window.focusAPI?.setCompanionVisible(false)}
                 className="rounded-full px-3 py-1 text-[11px] text-zinc-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7CFFD4]"
               >
                 Hide

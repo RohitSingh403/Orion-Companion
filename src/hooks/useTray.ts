@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useFocusStore } from "../store/focusStore";
 import { useTaskStore } from "../store/taskStore";
+import { isSideSurface } from "../utils/surface";
 
 export default function useTray() {
   const running = useFocusStore((state) => state.running);
@@ -12,7 +13,7 @@ export default function useTray() {
   const addTask = useTaskStore((state) => state.addTask);
 
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("surface") === "mini") return;
+    if (isSideSurface()) return;
 
     const minutes = Math.floor(remainingTime / 60);
     const seconds = remainingTime % 60;
@@ -24,7 +25,7 @@ export default function useTray() {
   }, [running, session, remainingTime]);
 
   useEffect(() => {
-    if (!window.focusAPI || new URLSearchParams(window.location.search).get("surface") === "mini") return;
+    if (!window.focusAPI || isSideSurface()) return;
 
     window.focusAPI.onTrayStartFocus(() => useFocusStore.getState().start());
     window.focusAPI.onTrayPauseFocus(() => useFocusStore.getState().pause());

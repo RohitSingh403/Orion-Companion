@@ -1,5 +1,6 @@
 import { app, BrowserWindow, Menu, Notification, Tray, autoUpdater, globalShortcut, ipcMain, nativeImage, screen } from "electron";
 import { execFile } from "node:child_process";
+import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
@@ -123,39 +124,87 @@ function createTray() {
   }
 }
 
+function companionPositionFile() {
+  return path.join(app.getPath("userData"), "companion-position.json");
+}
+
+function readCompanionPosition() {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(companionPositionFile(), "utf8")) as { x?: number; y?: number };
+    if (typeof parsed.x === "number" && typeof parsed.y === "number") return { x: parsed.x, y: parsed.y };
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function rememberCompanionPosition() {
+  if (!companion || companion.isDestroyed()) return;
+  const [x, y] = companion.getPosition();
+  try {
+    fs.writeFileSync(companionPositionFile(), JSON.stringify({ x, y }));
+  } catch {
+    // The pet still works if the position file cannot be written.
+  }
+}
+
+function placeCompanion(target: BrowserWindow) {
+  const width = 300;
+  const height = 360;
+  const saved = readCompanionPosition();
+  const anchor = saved ?? { x: 0, y: 0 };
+  const area = screen.getDisplayNearestPoint(anchor).workArea;
+  const fallbackX = area.x + area.width - width - 24;
+  const fallbackY = area.y + area.height - height - 24;
+  const x = saved ? Math.min(Math.max(area.x, saved.x), area.x + area.width - width) : fallbackX;
+  const y = saved ? Math.min(Math.max(area.y, saved.y), area.y + area.height - height) : fallbackY;
+  target.setBounds({ x: Math.round(x), y: Math.round(y), width, height });
+}
+
+function keepCompanionAbove() {
+  if (!companion || companion.isDestroyed()) return;
+  companion.setAlwaysOnTop(true, "floating");
+  companion.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+}
+
 function showCompanion() {
   if (companion && !companion.isDestroyed()) {
     if (!companion.isVisible()) companion.showInactive();
+    keepCompanionAbove();
     if (latestTimer) companion.webContents.send("timer-state", latestTimer);
     return;
   }
 
-  const area = screen.getPrimaryDisplay().workArea;
-  const width = 260;
-  const height = 280;
   companion = new BrowserWindow({
-    width,
-    height,
-    x: area.x + area.width - width - 24,
-    y: area.y + area.height - height - 24,
+    width: 300,
+    height: 360,
     frame: false,
     transparent: true,
     resizable: false,
     alwaysOnTop: true,
     skipTaskbar: true,
     hasShadow: false,
+    focusable: true,
     title: "Orion Companion",
     backgroundColor: "#00000000",
+    ...(process.platform === "darwin" ? { type: "panel" as const } : {}),
     webPreferences: {
       preload: path.join(__dirname, "preload.mjs"),
+      backgroundThrottling: false,
     },
   });
+  placeCompanion(companion);
+  keepCompanionAbove();
 
   loadSurface(companion, "companion", { surface: "companion" });
-  companion.once("ready-to-show", () => companion?.showInactive());
+  companion.once("ready-to-show", () => {
+    companion?.showInactive();
+    keepCompanionAbove();
+  });
   companion.webContents.on("did-finish-load", () => {
     if (latestTimer && companion && !companion.isDestroyed()) companion.webContents.send("timer-state", latestTimer);
   });
+  companion.on("moved", rememberCompanionPosition);
   companion.on("closed", () => {
     companion = null;
   });
@@ -278,6 +327,7 @@ function createWindow() {
 
     webPreferences: {
       preload: path.join(__dirname, "preload.mjs"),
+      backgroundThrottling: false,
     },
   });
 
@@ -289,6 +339,12 @@ function createWindow() {
     if (quitting || !trayReady) return;
     event.preventDefault();
     win?.hide();
+  });
+
+  win.on("hide", () => {
+    if (!companion || companion.isDestroyed() || !companion.isVisible()) return;
+    companion.showInactive();
+    keepCompanionAbove();
   });
 
   loadSurface(win, "app");
@@ -346,10 +402,21 @@ app.whenReady().then(() => {
     if (companion && !companion.isDestroyed()) companion.webContents.send("timer-state", snapshot);
   });
 
-  ipcMain.on("companion-nudge", (_event, dx: number, dy: number) => {
-    if (!companion || companion.isDestroyed() || !Number.isFinite(dx) || !Number.isFinite(dy)) return;
-    const [x, y] = companion.getPosition();
-    companion.setPosition(Math.round(x + dx), Math.round(y + dy));
+  ipcMain.on("companion-nudge", (event, dx: number, dy: number) => {
+    const target = BrowserWindow.fromWebContents(event.sender);
+    if (!target || target.isDestroyed() || !Number.isFinite(dx) || !Number.isFinite(dy)) return;
+    const bounds = target.getBounds();
+    const area = screen.getDisplayNearestPoint({ x: bounds.x, y: bounds.y }).workArea;
+    const x = Math.min(Math.max(area.x, bounds.x + dx), area.x + area.width - bounds.width);
+    const y = Math.min(Math.max(area.y, bounds.y + dy), area.y + area.height - bounds.height);
+    target.setPosition(Math.round(x), Math.round(y));
+  });
+
+  ipcMain.on("companion-mouse-passthrough", (event, ignore: boolean) => {
+    if (process.platform === "linux") return;
+    const target = BrowserWindow.fromWebContents(event.sender);
+    if (!target || target.isDestroyed()) return;
+    target.setIgnoreMouseEvents(Boolean(ignore), { forward: true });
   });
 
   ipcMain.on("companion-show-main", () => {
