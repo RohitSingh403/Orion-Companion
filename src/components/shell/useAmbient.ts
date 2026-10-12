@@ -44,6 +44,8 @@ export function useAmbient() {
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.35);
   const nodes = useRef<AmbientNodes | null>(null);
+  const volumeRef = useRef(volume);
+  volumeRef.current = volume;
 
   const stop = () => {
     const current = nodes.current;
@@ -74,7 +76,7 @@ export function useAmbient() {
       filter.frequency.value = sceneFrequency(scene);
 
       const gain = context.createGain();
-      gain.gain.value = volume * 0.12;
+      gain.gain.value = volumeRef.current * 0.12;
 
       source.connect(filter);
       filter.connect(gain);

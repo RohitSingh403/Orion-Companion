@@ -65,7 +65,7 @@ function PreviewBoard() {
             <div className="mt-2 flex h-10 items-end gap-1">
               {[20, 55, 40, 70, 48, 80, 36, 62, 28, 50, 74, 22].map((height, index) => (
                 <span
-                  key={height + index}
+                  key={`bar-${index}`}
                   className="flex-1 rounded-sm"
                   style={{
                     height: `${height}%`,
