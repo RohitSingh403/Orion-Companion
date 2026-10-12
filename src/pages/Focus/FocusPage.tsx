@@ -18,18 +18,20 @@ export default function FocusPage() {
   const [ambientEffect, setAmbientEffect] = useState("none");
   const [showTaskQueue, setShowTaskQueue] = useState(true);
   const { tasks, activeTaskId, setActiveTask } = useTaskStore();
-  const { running, session, completedSessions, focusDuration, dailyGoal, history } = useFocusStore();
+  const { running, session, dailyGoal, history } = useFocusStore();
   const theme = useSettingsStore((s) => s.theme);
   const isDark = theme === "dark";
 
   const activeTask = tasks.find((t) => t.id === activeTaskId);
-  const completedMinutes = Math.floor((completedSessions * focusDuration) / 60);
+  const todayKey = new Date().toLocaleDateString("en-CA");
+  const todayHistory = history.filter((item) => item.date === todayKey);
+  const sessionsToday = todayHistory.length;
+  const completedMinutes = Math.floor(todayHistory.reduce((sum, item) => sum + item.duration, 0) / 60);
   const completedHours = Math.floor(completedMinutes / 60);
   const completedMinutesRemainder = completedMinutes % 60;
   const focusTimeDisplay = completedHours > 0 ? `${completedHours}h ${completedMinutesRemainder}m` : `${completedMinutes}m`;
 
-  // Calculate productivity score based on daily goal completion
-  const productivityScore = dailyGoal > 0 ? Math.min(Math.round((completedSessions / dailyGoal) * 100), 100) : 0;
+  const productivityScore = dailyGoal > 0 ? Math.min(Math.round((sessionsToday / dailyGoal) * 100), 100) : 0;
 
   // Calculate task progress percentage
   const getTaskProgress = () => {
@@ -183,7 +185,7 @@ export default function FocusPage() {
               {/* Session Progress Ring */}
               <div className="mt-8 flex items-center justify-center gap-8">
                 <div className="text-center">
-                  <div className={`text-3xl font-bold ${isDark ? "text-violet-400" : "text-violet-600"}`}>{completedSessions}</div>
+                  <div className={`text-3xl font-bold ${isDark ? "text-zinc-100" : "text-gray-900"}`}>{sessionsToday}</div>
                   <div className={`text-xs mt-1 ${isDark ? "text-gray-500" : "text-gray-500"}`}>Sessions Today</div>
                 </div>
                 <div className={`w-px h-12 ${isDark ? "bg-gray-700" : "bg-gray-200"}`}></div>

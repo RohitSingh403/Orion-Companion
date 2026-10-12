@@ -1,82 +1,80 @@
-// src/pages/MiniTimer/MiniTimerPage.tsx
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { FiPause, FiPlay, FiSkipForward } from "react-icons/fi";
 import { useFocusStore } from "../../store/focusStore";
-import { useSettingsStore } from "../../store/settingsStore";
-import { FiPlay, FiPause, FiSkipForward } from "react-icons/fi";
+
+interface TimerSnapshot {
+  remainingTime: number;
+  running: boolean;
+  session: "focus" | "break";
+}
 
 export default function MiniTimerPage() {
-  const { running, session, remainingTime, start, pause, reset } = useFocusStore();
-  const theme = useSettingsStore((s) => s.theme);
-  const isDark = theme === "dark";
+  const store = useFocusStore();
+  const isMini = new URLSearchParams(window.location.search).get("surface") === "mini";
+  const [remote, setRemote] = useState<TimerSnapshot | null>(null);
 
-  const minutes = Math.floor(remainingTime / 60);
-  const seconds = remainingTime % 60;
-  const timeStr = `${minutes}:${seconds.toString().padStart(2, "0")}`;
-
-  // Handle window close from renderer
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        window.close();
-      }
-    };
+    if (!isMini) return;
+    return window.focusAPI?.onTimerState?.(setRemote);
+  }, [isMini]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") window.close();
+    };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  const remainingTime = isMini ? remote?.remainingTime ?? store.remainingTime : store.remainingTime;
+  const running = isMini ? remote?.running ?? false : store.running;
+  const session = isMini ? remote?.session ?? store.session : store.session;
+  const minutes = Math.floor(remainingTime / 60);
+  const seconds = remainingTime % 60;
+  const timeStr = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+
+  const send = (command: "start" | "pause" | "reset") => {
+    if (isMini) {
+      window.focusAPI?.sendMiniCommand?.(command);
+      return;
+    }
+    if (command === "start") store.start();
+    if (command === "pause") store.pause();
+    if (command === "reset") store.reset();
+  };
+
   return (
-    <div className={`w-full h-full backdrop-blur-xl flex flex-col items-center justify-center p-4 ${
-      isDark ? "bg-black/70 text-gray-100" : "bg-black/50 text-gray-900"
-    }`}>
-      {/* Timer Display */}
-      <div className={`text-5xl font-semibold mb-2 tabular-nums tracking-tight ${
-        isDark ? "text-violet-400" : "text-violet-600"
-      }`}>
+    <div className="flex h-full w-full flex-col items-center justify-center bg-[#121418] p-4 text-zinc-100">
+      <div className="mb-2 font-semibold tabular-nums tracking-tight text-[#8AF6FF]" style={{ fontSize: 48 }}>
         {timeStr}
       </div>
-
-      {/* Session Type */}
-      <div className={`text-sm font-medium mb-4 uppercase tracking-wider px-3 py-1 rounded border ${
-        isDark 
-          ? "bg-violet-500/10 text-violet-400 border-violet-500/30" 
-          : "bg-violet-50 text-violet-600 border-violet-200"
-      }`}>
+      <div className="mb-4 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium uppercase tracking-wider text-zinc-300">
         {session === "focus" ? "Focus" : "Break"}
       </div>
-
-      {/* Controls */}
       <div className="flex items-center gap-3">
         {running ? (
           <button
-            onClick={pause}
-            className={`p-2 rounded-lg transition-all ${
-              isDark 
-                ? "text-gray-400 hover:bg-gray-700 hover:text-gray-100" 
-                : "text-gray-600 hover:bg-gray-200 hover:text-gray-900"
-            }`}
+            onClick={() => send("pause")}
+            className="rounded-full p-2 text-zinc-300 transition hover:bg-white/10"
+            aria-label="Pause"
           >
-            <FiPause className="w-4 h-4" />
+            <FiPause className="h-4 w-4" />
           </button>
         ) : (
           <button
-            onClick={start}
-            className="w-10 h-10 rounded-full btn-primary flex items-center justify-center"
+            onClick={() => send("start")}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#14161c]"
+            aria-label="Start"
           >
-            <FiPlay className="w-4 h-4 ml-0.5" />
+            <FiPlay className="ml-0.5 h-4 w-4" />
           </button>
         )}
-
         <button
-          onClick={reset}
-          className={`p-2 rounded-lg transition-all ${
-            isDark 
-              ? "text-gray-400 hover:bg-gray-700 hover:text-gray-100" 
-              : "text-gray-600 hover:bg-gray-200 hover:text-gray-900"
-          }`}
+          onClick={() => send("reset")}
+          className="rounded-full p-2 text-zinc-400 transition hover:bg-white/10 hover:text-zinc-100"
+          aria-label="Reset"
         >
-          <FiSkipForward className="w-4 h-4" />
+          <FiSkipForward className="h-4 w-4" />
         </button>
       </div>
     </div>

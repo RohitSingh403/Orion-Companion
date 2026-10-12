@@ -9,6 +9,16 @@ import { useSettingsStore } from "../../store/settingsStore";
 import { FiClock, FiTrendingUp, FiActivity, FiDownload, FiCalendar } from "react-icons/fi";
 import ContributionHeatmap from "../../components/analytics/ContributionHeatmap";
 
+function dateKey(date: Date) {
+  return date.toLocaleDateString("en-CA");
+}
+
+function shiftDays(date: Date, days: number) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
 export default function AnalyticsPage() {
   const [activeTab, setActiveTab] = useState<"overview" | "focus" | "tasks" | "trends">("overview");
   const [timeRange, setTimeRange] = useState<"week" | "month" | "year" | "custom">("week");
@@ -17,7 +27,7 @@ export default function AnalyticsPage() {
   const theme = useSettingsStore((s) => s.theme);
   const isDark = theme === "dark";
 
-  const { completedSessions, focusDuration, bestStreak, getProductivityComparison, getFocusInsights, dailyStats } = useFocusStore();
+  const { history, dailyGoal, bestStreak, getProductivityComparison, getFocusInsights, dailyStats } = useFocusStore();
 
   // Get productivity comparison
   const productivityComparison = useMemo(() => getProductivityComparison(), [getProductivityComparison]);
@@ -33,61 +43,105 @@ export default function AnalyticsPage() {
     }));
   }, [dailyStats]);
 
-  // Generate real trend data based on time range
-  const trendData = useMemo(() => {
-    const days = timeRange === "week" ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] : 
-                   timeRange === "month" ? ["Week 1", "Week 2", "Week 3", "Week 4"] :
-                   timeRange === "custom" ? ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"] :
-                   ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const dataPoints = days.length;
-    
-    const heights = days.map((_, idx) => {
-      // Generate realistic trend data based on completed sessions
-      const baseHeight = Math.min((completedSessions / 10) * 100, 95);
-      const recencyBonus = (dataPoints - idx) * 5;
-      const variation = Math.floor(Math.random() * 30) - 15;
-      return Math.max(20, Math.min(95, baseHeight + recencyBonus + variation));
+  const period = useMemo(() => {
+    const today = new Date();
+    let start = shiftDays(today, -6);
+    let end = today;
+    if (timeRange === "month") start = shiftDays(today, -29);
+    if (timeRange === "year") start = shiftDays(today, -364);
+    if (timeRange === "custom" && customStartDate && customEndDate) {
+      const customStart = new Date(`${customStartDate}T00:00:00`);
+      const customEnd = new Date(`${customEndDate}T00:00:00`);
+      if (!Number.isNaN(customStart.getTime()) && !Number.isNaN(customEnd.getTime()) && customStart <= customEnd) {
+        start = customStart;
+        end = customEnd;
+      }
+    }
+
+    const startKey = dateKey(start);
+    const endKey = dateKey(end);
+    const sessions = history.filter((item) => item.date >= startKey && item.date <= endKey);
+    const byDate = new Map<string, { sessions: number; minutes: number }>();
+    sessions.forEach((item) => {
+      const current = byDate.get(item.date) ?? { sessions: 0, minutes: 0 };
+      current.sessions += 1;
+      current.minutes += item.duration / 60;
+      byDate.set(item.date, current);
     });
-    return { days, heights };
-  }, [completedSessions, timeRange]);
 
-  // Calculate statistics based on time range
-  const rangeStats = useMemo(() => {
-    const multiplier = timeRange === "week" ? 1 : timeRange === "month" ? 4 : timeRange === "custom" ? 1 : 52;
-    const totalSessions = completedSessions * multiplier;
-    const totalMinutes = totalSessions * focusDuration;
+    const dayCount = Math.max(1, Math.round((end.getTime() - start.getTime()) / 86400000) + 1);
+    const totalMinutes = sessions.reduce((sum, item) => sum + item.duration / 60, 0);
     const totalHours = Math.floor(totalMinutes / 60);
-    const remainingMinutes = totalMinutes % 60;
-    const totalFocusTimeDisplay = `${totalHours}h ${remainingMinutes}m`;
-    
-    const daysInPeriod = timeRange === "week" ? 7 : timeRange === "month" ? 30 : timeRange === "custom" ? 7 : 365;
-    const avgSessionsPerDay = totalSessions > 0 ? (totalSessions / daysInPeriod).toFixed(1) : "0";
-    const avgFocusPerDay = totalSessions > 0 ? ((totalSessions * focusDuration) / daysInPeriod / 60).toFixed(1) : "0";
-    
-    return {
-      totalFocusTimeDisplay,
-      totalSessions,
-      avgSessionsPerDay,
-      avgFocusPerDay,
-    };
-  }, [completedSessions, focusDuration, timeRange]);
+    const remainingMinutes = Math.round(totalMinutes % 60);
+    const daysWithSessions = byDate.size;
+    const daysMeetingGoal = Array.from(byDate.values()).filter((day) => dailyGoal > 0 && day.sessions >= dailyGoal).length;
 
-  // Calculate period-specific statistics
-  const periodStats = useMemo(() => {
-    const daysInPeriod = timeRange === "week" ? 7 : timeRange === "month" ? 30 : timeRange === "custom" ? 7 : 365;
-    const multiplier = timeRange === "week" ? 1 : timeRange === "month" ? 4 : timeRange === "custom" ? 1 : 52;
-    const totalSessions = completedSessions * multiplier;
-    
-    const avgSessionsPerDay = totalSessions > 0 ? (totalSessions / daysInPeriod).toFixed(1) : "0";
-    const avgFocusPerDay = totalSessions > 0 ? ((totalSessions * focusDuration) / daysInPeriod / 60).toFixed(1) : "0";
-    const bestDay = timeRange === "week" ? "Wednesday" : timeRange === "month" ? "Week 3" : timeRange === "custom" ? "Day 3" : "December";
-    
+    const buckets: { label: string; minutes: number }[] = [];
+    if (timeRange === "year") {
+      for (let month = 11; month >= 0; month -= 1) {
+        const cursor = new Date(today.getFullYear(), today.getMonth() - month, 1);
+        const prefix = dateKey(cursor).slice(0, 7);
+        const minutes = sessions
+          .filter((item) => item.date.startsWith(prefix))
+          .reduce((sum, item) => sum + item.duration / 60, 0);
+        buckets.push({ label: cursor.toLocaleDateString("en-US", { month: "short" }), minutes });
+      }
+    } else if (timeRange === "month") {
+      for (let week = 0; week < 4; week += 1) {
+        const bucketStart = shiftDays(start, week * 7);
+        const bucketEnd = shiftDays(bucketStart, 6);
+        const minutes = sessions
+          .filter((item) => item.date >= dateKey(bucketStart) && item.date <= dateKey(bucketEnd))
+          .reduce((sum, item) => sum + item.duration / 60, 0);
+        buckets.push({ label: `Week ${week + 1}`, minutes });
+      }
+    } else {
+      const span = timeRange === "custom" ? Math.min(dayCount, 14) : 7;
+      const bucketStart = timeRange === "custom" ? start : shiftDays(today, -6);
+      for (let index = 0; index < span; index += 1) {
+        const day = shiftDays(bucketStart, index);
+        const key = dateKey(day);
+        buckets.push({
+          label: day.toLocaleDateString("en-US", { weekday: "short" }),
+          minutes: byDate.get(key)?.minutes ?? 0,
+        });
+      }
+    }
+
+    const peak = Math.max(...buckets.map((bucket) => bucket.minutes), 1);
+    let bestLabel = "None yet";
+    let bestMinutes = 0;
+    byDate.forEach((value, key) => {
+      if (value.minutes > bestMinutes) {
+        bestMinutes = value.minutes;
+        bestLabel = new Date(`${key}T00:00:00`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+      }
+    });
+
+    const consistency = Math.round((daysWithSessions / dayCount) * 100);
+    const goalRate = Math.round((daysMeetingGoal / dayCount) * 100);
+    const streakStrength = Math.min(100, Math.round((bestStreak / 7) * 100));
+    const overall = Math.round((consistency + goalRate + streakStrength) / 3);
+
     return {
-      avgSessionsPerDay,
-      avgFocusPerDay,
-      bestDay,
+      totalFocusTimeDisplay: `${totalHours}h ${remainingMinutes}m`,
+      totalSessions: sessions.length,
+      avgSessionsPerDay: (sessions.length / dayCount).toFixed(1),
+      avgFocusPerDay: (totalMinutes / dayCount / 60).toFixed(1),
+      bestDay: bestLabel,
+      days: buckets.map((bucket) => bucket.label),
+      heights: buckets.map((bucket) => (bucket.minutes === 0 ? 0 : Math.max(8, Math.round((bucket.minutes / peak) * 100)))),
+      details: buckets.map((bucket) => `${Math.round(bucket.minutes)}m`),
+      consistency,
+      goalRate,
+      streakStrength,
+      overall,
     };
-  }, [completedSessions, focusDuration, timeRange]);
+  }, [bestStreak, customEndDate, customStartDate, dailyGoal, history, timeRange]);
+
+  const rangeStats = period;
+  const periodStats = period;
+  const trendData = period;
 
   // Export analytics data
   const handleExport = () => {
@@ -97,9 +151,8 @@ export default function AnalyticsPage() {
       periodStats,
       productivityComparison,
       focusInsights,
-      completedSessions,
+      totalSessions: rangeStats.totalSessions,
       bestStreak,
-      focusDuration,
       exportDate: new Date().toISOString(),
     };
 
@@ -371,11 +424,11 @@ export default function AnalyticsPage() {
                 <div className="flex-1 h-2 rounded-full overflow-hidden bg-gray-700">
                   <div 
                     className="h-full bg-gradient-to-r from-violet-600 to-pink-600 rounded-full"
-                    style={{ width: `${Math.min((completedSessions / 10) * 100, 100)}%` }}
+                    style={{ width: `${rangeStats.consistency}%` }}
                   />
                 </div>
                 <span className={`text-sm font-semibold ${isDark ? "text-gray-100" : "text-gray-900"}`}>
-                  {Math.min(Math.round((completedSessions / 10) * 100), 100)}%
+                  {rangeStats.consistency}%
                 </span>
               </div>
             </div>
@@ -389,11 +442,11 @@ export default function AnalyticsPage() {
                 <div className="flex-1 h-2 rounded-full overflow-hidden bg-gray-700">
                   <div 
                     className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
-                    style={{ width: `${Math.min((completedSessions / 20) * 100, 100)}%` }}
+                    style={{ width: `${rangeStats.goalRate}%` }}
                   />
                 </div>
                 <span className={`text-sm font-semibold ${isDark ? "text-gray-100" : "text-gray-900"}`}>
-                  {Math.min(Math.round((completedSessions / 20) * 100), 100)}%
+                  {rangeStats.goalRate}%
                 </span>
               </div>
             </div>
@@ -407,11 +460,11 @@ export default function AnalyticsPage() {
                 <div className="flex-1 h-2 rounded-full overflow-hidden bg-gray-700">
                   <div 
                     className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full"
-                    style={{ width: `${Math.min((bestStreak / 7) * 100, 100)}%` }}
+                    style={{ width: `${rangeStats.streakStrength}%` }}
                   />
                 </div>
                 <span className={`text-sm font-semibold ${isDark ? "text-gray-100" : "text-gray-900"}`}>
-                  {Math.min(Math.round((bestStreak / 7) * 100), 100)}%
+                  {rangeStats.streakStrength}%
                 </span>
               </div>
             </div>
@@ -425,11 +478,11 @@ export default function AnalyticsPage() {
                 <div className="flex-1 h-2 rounded-full overflow-hidden bg-gray-700">
                   <div 
                     className="h-full bg-gradient-to-r from-emerald-500 to-green-500 rounded-full"
-                    style={{ width: `${Math.min(((completedSessions + bestStreak) / 30) * 100, 100)}%` }}
+                    style={{ width: `${rangeStats.overall}%` }}
                   />
                 </div>
-                <span className={`text-sm font-semibold ${isDark ? "text-violet-300" : "text-violet-600"}`}>
-                  {Math.min(Math.round(((completedSessions + bestStreak) / 30) * 100), 100)}%
+                <span className={`text-sm font-semibold ${isDark ? "text-zinc-100" : "text-gray-900"}`}>
+                  {rangeStats.overall}%
                 </span>
               </div>
             </div>
@@ -459,7 +512,7 @@ export default function AnalyticsPage() {
               : "border-gray-200"
           }`}>
             {trendData.days.map((day, idx) => (
-              <div key={day} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
+              <div key={`${day}-${idx}`} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
                 <div className="relative w-full">
                   <div
                     style={{ height: `${trendData.heights[idx]}%` }}
@@ -474,7 +527,7 @@ export default function AnalyticsPage() {
                         ? "bg-gray-700 border border-gray-600 text-gray-100" 
                         : "bg-white border border-gray-200 text-gray-900"
                     }`}>
-                      {trendData.heights[idx]}%
+                      {trendData.details[idx]}
                     </div>
                   </div>
                 </div>

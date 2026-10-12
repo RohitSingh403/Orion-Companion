@@ -16,7 +16,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <div className="h-screen w-screen bg-[#3a3e46] p-2 font-sans text-zinc-100 md:p-3">
-      <div className="flex h-full w-full overflow-hidden rounded-[28px] border border-black/40 bg-[#121418] shadow-[0_30px_80px_rgba(0,0,0,0.35)]">
+      <div className="orion-shell flex h-full w-full overflow-hidden rounded-[28px] border border-black/40 bg-[#121418] shadow-[0_30px_80px_rgba(0,0,0,0.35)]">
         <Sidebar />
         <div className="flex min-w-0 flex-1 flex-col">
           <CommandBar />

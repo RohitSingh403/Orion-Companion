@@ -13,6 +13,7 @@ export interface Reminder {
   taskId?: string; // Link to a task
   createdAt: string;
   completedAt?: string;
+  alertedAt?: string;
   customDays?: number[]; // For custom frequency (0 = Sunday, 6 = Saturday)
   customInterval?: number; // For custom frequency (e.g., every 3 days)
 }

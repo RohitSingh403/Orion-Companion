@@ -35,6 +35,14 @@ interface Window {
     onTrayQuickAddTask: (callback: () => void) => void;
     onTrayShowProgress: (callback: () => void) => void;
     onGlobalShortcutQuickCapture: (callback: () => void) => void;
+    reportTimer: (snapshot: { remainingTime: number; running: boolean; session: "focus" | "break" }) => void;
+    watchActivity: (enabled: boolean) => void;
+    onMiniCommand: (callback: (command: "start" | "pause" | "reset") => void) => () => void;
+    onActivitySample: (callback: (name: string) => void) => () => void;
+    onTimerState: (
+      callback: (snapshot: { remainingTime: number; running: boolean; session: "focus" | "break" }) => void
+    ) => () => void;
+    sendMiniCommand: (command: "start" | "pause" | "reset") => void;
     getAutoLaunchStatus: () => Promise<boolean>;
     toggleAutoLaunch: (enabled: boolean) => Promise<boolean>;
   }

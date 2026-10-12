@@ -1,39 +1,45 @@
 import { useEffect } from "react";
 import { useReminderStore } from "../store/reminderStore";
+import { useSettingsStore } from "../store/settingsStore";
+
+function notify(title: string, body: string) {
+  if (window.focusAPI?.showReminderNotification) {
+    window.focusAPI.showReminderNotification(title, body);
+    return;
+  }
+
+  if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+    new Notification(title, { body });
+  }
+}
 
 export default function useReminders() {
-  const { getDueReminders, processRecurringReminders } = useReminderStore();
+  const getDueReminders = useReminderStore((state) => state.getDueReminders);
+  const processRecurringReminders = useReminderStore((state) => state.processRecurringReminders);
+  const markAlerted = useReminderStore((state) => state.markAlerted);
+  const desktopNotifications = useSettingsStore((state) => state.desktopNotifications);
 
   useEffect(() => {
-    // Check for due reminders every minute
-    const interval = setInterval(() => {
+    if (!desktopNotifications) return;
+    if (!window.focusAPI && typeof Notification !== "undefined" && Notification.permission === "default") {
+      void Notification.requestPermission();
+    }
+  }, [desktopNotifications]);
+
+  useEffect(() => {
+    const check = () => {
       const dueReminders = getDueReminders();
-      
       dueReminders.forEach((reminder) => {
-        // Show desktop notification
-        if (window.focusAPI?.showReminderNotification) {
-          window.focusAPI.showReminderNotification(
-            reminder.title,
-            reminder.description || "Reminder"
-          );
+        if (desktopNotifications) {
+          notify(reminder.title, reminder.description || "Reminder");
         }
+        markAlerted(reminder.id);
       });
-      
-      // Process recurring reminders
       processRecurringReminders();
-    }, 60000); // Check every minute
+    };
 
-    // Initial check
-    const dueReminders = getDueReminders();
-    dueReminders.forEach((reminder) => {
-      if (window.focusAPI?.showReminderNotification) {
-        window.focusAPI.showReminderNotification(
-          reminder.title,
-          reminder.description || "Reminder"
-        );
-      }
-    });
-
+    check();
+    const interval = setInterval(check, 60000);
     return () => clearInterval(interval);
-  }, [getDueReminders, processRecurringReminders]);
+  }, [desktopNotifications, getDueReminders, markAlerted, processRecurringReminders]);
 }

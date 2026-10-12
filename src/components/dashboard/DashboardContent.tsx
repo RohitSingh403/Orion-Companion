@@ -165,6 +165,7 @@ export default function DashboardContent() {
   const focusDuration = useFocusStore((state) => state.focusDuration);
   const breakDuration = useFocusStore((state) => state.breakDuration);
   const dailyGoal = useFocusStore((state) => state.dailyGoal);
+  const activityLog = useFocusStore((state) => state.activityLog);
   const tasks = useTaskStore((state) => state.tasks);
   const projects = useProjectStore((state) => state.projects);
   const events = useEventStore((state) => state.events);
@@ -183,8 +184,9 @@ export default function DashboardContent() {
         focusDuration,
         breakDuration,
         dailyGoal,
+        activity: activityLog,
       }),
-    [anchor, range, history, events, tasks, projects, focusDuration, breakDuration, dailyGoal]
+    [anchor, range, history, events, tasks, projects, focusDuration, breakDuration, dailyGoal, activityLog]
   );
 
   const work = splitDuration(snapshot.workSeconds);
@@ -351,8 +353,12 @@ export default function DashboardContent() {
             <ShareList rows={snapshot.categories} empty="Tag a task to see where your focus collects." variant="ring" />
           </section>
           <section className="rounded-[24px] border border-white/5 bg-[#1b1f27] p-5">
-            <h2 className="mb-4 text-sm font-medium text-zinc-100">Tasks</h2>
-            <ShareList rows={snapshot.tasks} empty="Finish a session on a task and it will show up here." variant="ring" />
+            <h2 className="mb-4 text-sm font-medium text-zinc-100">Apps</h2>
+            <ShareList
+              rows={snapshot.apps}
+              empty="While a desktop focus session runs, the app in front is recorded here. Nothing is recorded in the browser."
+              variant="ring"
+            />
           </section>
           <section className="rounded-[24px] border border-white/5 bg-[#1b1f27] p-5">
             <h2 className="mb-4 text-sm font-medium text-zinc-100">Projects</h2>

@@ -68,6 +68,7 @@ export interface ActivitySnapshot {
   categories: ShareRow[];
   tasks: ShareRow[];
   projects: ShareRow[];
+  apps: ShareRow[];
 }
 
 export interface ActivityInput {
@@ -77,6 +78,7 @@ export interface ActivityInput {
   events: ActivityEvent[];
   tasks: ActivityTask[];
   projects: ActivityProject[];
+  activity: Array<{ name: string; seconds: number; date: string }>;
   focusDuration: number;
   breakDuration: number;
   dailyGoal: number;
@@ -427,6 +429,16 @@ export function buildActivity(input: ActivityInput): ActivitySnapshot {
         seconds: project.seconds,
         color: project.color,
       }))
+    ),
+    apps: toShares(
+      Array.from(
+        input.activity
+          .filter((sample) => inDateKeyRange(sample.date, start, end))
+          .reduce((map, sample) => {
+            map.set(sample.name, (map.get(sample.name) ?? 0) + sample.seconds);
+            return map;
+          }, new Map<string, number>())
+      ).map(([name, seconds]) => ({ id: name, label: name, seconds }))
     ),
   };
 }

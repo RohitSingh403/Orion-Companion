@@ -46,6 +46,7 @@ describe("buildActivity", () => {
         },
       ],
       projects: [{ id: "project-1", name: "Orion", color: "#5EEAD4" }],
+      activity: [],
       focusDuration: 25 * 60,
       breakDuration: 5 * 60,
       dailyGoal: 8,
@@ -60,6 +61,30 @@ describe("buildActivity", () => {
     expect(snapshot.bars.some((bar) => bar.kind === "focus")).toBe(true);
     expect(snapshot.categories[0]?.label).toBe("Design");
     expect(snapshot.projects[0]?.label).toBe("Orion");
+    expect(snapshot.apps).toHaveLength(0);
+  });
+
+  it("sums recorded foreground apps inside the selected range", () => {
+    const snapshot = buildActivity({
+      anchor,
+      range: "day",
+      history: [],
+      events: [],
+      tasks: [],
+      projects: [],
+      activity: [
+        { name: "Terminal", seconds: 30, date: "2026-05-22" },
+        { name: "Terminal", seconds: 15, date: "2026-05-22" },
+        { name: "Editor", seconds: 15, date: "2026-05-21" },
+      ],
+      focusDuration: 25 * 60,
+      breakDuration: 5 * 60,
+      dailyGoal: 8,
+    });
+
+    expect(snapshot.apps).toEqual([
+      expect.objectContaining({ label: "Terminal", seconds: 45, percent: 100 }),
+    ]);
   });
 
   it("returns an empty day without inventing activity", () => {
@@ -70,6 +95,7 @@ describe("buildActivity", () => {
       events: [],
       tasks: [],
       projects: [],
+      activity: [],
       focusDuration: 25 * 60,
       breakDuration: 5 * 60,
       dailyGoal: 8,

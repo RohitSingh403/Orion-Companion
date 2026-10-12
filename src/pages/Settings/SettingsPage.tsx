@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import AppLayout from "../../layouts/AppLayout";
 import Topbar from "../../components/topbar/Topbar";
-import { useSettingsStore } from "../../store/settingsStore";
 import { useFocusStore } from "../../store/focusStore";
+import { useSettingsStore } from "../../store/settingsStore";
+import { exportBackup, importBackup } from "../../utils/backup";
 import {
   FiSliders,
   FiEye,
@@ -309,7 +310,7 @@ export default function SettingsPage() {
             <option value="dark">Dark Mode</option>
             <option value="light">Light Mode</option>
           </select>
-          <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Light mode coming soon</p>
+          <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Light mode changes the inner pages. The dashboard stays in the dark workspace.</p>
         </div>
       </div>
     </div>
@@ -371,28 +372,54 @@ export default function SettingsPage() {
           </button>
         </div>
 
-        <div className={`text-center py-8 border border-dashed rounded-lg ${
-          isDark 
-            ? "border-gray-700 bg-gray-800" 
-            : "border-gray-300 bg-white"
-        }`}>
-          <p className={`text-sm ${isDark ? "text-gray-500" : "text-gray-500"}`}>Backup and export features coming soon.</p>
+        <div className={`rounded-lg border p-4 ${isDark ? "border-white/10 bg-[#1b1f27]" : "border-gray-200 bg-white"}`}>
+          <h4 className={`text-sm font-medium ${isDark ? "text-gray-100" : "text-gray-900"}`}>Export backup</h4>
+          <p className={`mt-1 text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>
+            Download tasks, notes, sessions, reminders, and settings as a JSON file stored on this computer.
+          </p>
+          <button
+            type="button"
+            onClick={exportBackup}
+            className="mt-3 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#14161c]"
+          >
+            Download backup
+          </button>
+        </div>
+        <div className={`rounded-lg border p-4 ${isDark ? "border-white/10 bg-[#1b1f27]" : "border-gray-200 bg-white"}`}>
+          <h4 className={`text-sm font-medium ${isDark ? "text-gray-100" : "text-gray-900"}`}>Import backup</h4>
+          <p className={`mt-1 text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>
+            Replace the data on this computer with a backup file. The page reloads after a valid import.
+          </p>
+          <input
+            type="file"
+            accept="application/json"
+            className="mt-3 block text-sm text-zinc-300"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = () => {
+                const result = importBackup(String(reader.result ?? ""));
+                if (!result.ok) window.alert(result.message);
+              };
+              reader.readAsText(file);
+            }}
+          />
         </div>
       </div>
     </div>
   );
 
-  const renderPlaceholder = (title: string) => (
+  const renderAdvancedSettings = () => (
     <div className="space-y-6">
-      <h3 className={`text-base font-semibold pb-3 border-b ${isDark ? "text-violet-400 border-gray-700" : "text-violet-600 border-gray-200"}`}>
-        {title}
+      <h3 className={`text-base font-semibold pb-3 border-b ${isDark ? "text-zinc-200 border-white/10" : "text-gray-900 border-gray-200"}`}>
+        Desktop
       </h3>
-      <div className={`text-center py-12 border border-dashed rounded-lg ${
-        isDark 
-          ? "border-gray-700 bg-gray-800" 
-          : "border-gray-300 bg-white"
-      }`}>
-        <p className={`text-sm ${isDark ? "text-gray-500" : "text-gray-500"}`}>This section is coming soon.</p>
+      <div className="space-y-3 text-sm text-zinc-400">
+        <p>Closing the window keeps Orion in the tray. Quit from the tray menu.</p>
+        <p>Press Ctrl+Shift+Space, or Cmd+Shift+Space on Mac, to open quick add.</p>
+        <p>The tray menu can open a small always-on-top timer. That window follows the main timer.</p>
+        <p>While a desktop focus session is running, the app in front is recorded every 15 seconds and shown on the dashboard. The browser does not record apps.</p>
       </div>
     </div>
   );
@@ -443,7 +470,7 @@ export default function SettingsPage() {
           {activeTab === "appearance" && renderAppearanceSettings()}
           {activeTab === "general" && renderGeneralSettings()}
           {activeTab === "data" && renderDataSettings()}
-          {activeTab === "advanced" && renderPlaceholder("Advanced Settings")}
+          {activeTab === "advanced" && renderAdvancedSettings()}
         </div>
       </div>
     </AppLayout>

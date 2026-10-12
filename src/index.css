@@ -620,3 +620,24 @@
   background: #7AF0FF;
   border: 1px solid #a5f3fc;
 }
+
+.orion-shell .bg-gray-900 {
+  background-color: #121418;
+}
+
+.orion-shell .bg-gray-800 {
+  background-color: #1b1f27;
+}
+
+.orion-shell .bg-gray-700 {
+  background-color: #262b36;
+}
+
+.orion-shell .bg-gray-600 {
+  background-color: #323846;
+}
+
+.orion-shell .border-gray-700,
+.orion-shell .border-gray-600 {
+  border-color: rgba(255, 255, 255, 0.08);
+}

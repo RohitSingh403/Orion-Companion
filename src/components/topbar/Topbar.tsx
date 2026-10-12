@@ -35,6 +35,12 @@ export default function Topbar({
   const [dynamicGreeting, setDynamicGreeting] = useState(getInitialGreeting());
   const addTask = useTaskStore((s) => s.addTask);
 
+  useEffect(() => {
+    const openQuickAdd = () => setQuickAddOpen(true);
+    window.addEventListener("orion-quick-add", openQuickAdd);
+    return () => window.removeEventListener("orion-quick-add", openQuickAdd);
+  }, []);
+
   // Update greeting based on time of day
   useEffect(() => {
     const updateGreeting = () => {

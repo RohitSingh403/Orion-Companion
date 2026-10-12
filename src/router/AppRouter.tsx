@@ -32,12 +32,17 @@ function LoadingFallback() {
 function RootRoute() {
   const navigate = useNavigate();
   const desktop = typeof window !== "undefined" && Boolean(window.focusAPI);
+  const mini = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("surface") === "mini";
 
   useEffect(() => {
+    if (mini) {
+      navigate("/mini-timer?surface=mini", { replace: true });
+      return;
+    }
     if (desktop) navigate("/app", { replace: true });
-  }, [desktop, navigate]);
+  }, [desktop, mini, navigate]);
 
-  if (desktop) return null;
+  if (mini || desktop) return null;
   return <SitePage />;
 }
 
