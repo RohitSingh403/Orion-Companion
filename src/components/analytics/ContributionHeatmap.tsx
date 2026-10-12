@@ -1,6 +1,7 @@
 // src/components/analytics/ContributionHeatmap.tsx
 
-import { useCallback, useMemo, useState } from "react";
+import { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useSettingsStore } from "../../store/settingsStore";
 import { FiActivity, FiDownload, FiX, FiCalendar, FiFilter } from "react-icons/fi";
 
@@ -152,7 +153,7 @@ export default function ContributionHeatmap({
   }, []);
 
   return (
-    <div className={`p-6 space-y-4 rounded-xl border shadow-sm ${
+    <div className={`analytics-defer p-6 space-y-4 rounded-xl border ${
       isDark 
         ? "bg-gray-800 border-gray-700" 
         : "bg-white border-gray-200"
@@ -274,9 +275,8 @@ export default function ContributionHeatmap({
         </div>
 
         {/* Heatmap Grid */}
-        <div className="flex gap-3 items-start">
-          {/* Day Labels - GitHub style (Mon, Wed, Fri) */}
-          <div className={`flex flex-col justify-between text-[10px] font-medium h-[91px] pr-2 flex-shrink-0 ${isDark ? "text-gray-500" : "text-gray-500"}`}>
+        <div className="flex items-start gap-3">
+          <div className={`flex h-[91px] flex-shrink-0 flex-col justify-between pr-2 text-[10px] font-medium ${isDark ? "text-gray-500" : "text-gray-500"}`}>
             <span className="h-[11px]"></span>
             <span className="h-[11px]">Mon</span>
             <span className="h-[11px]"></span>
@@ -285,29 +285,13 @@ export default function ContributionHeatmap({
             <span className="h-[11px]">Fri</span>
             <span className="h-[11px]"></span>
           </div>
-
-          {/* Weeks */}
-          <div className="flex gap-[3px]">
-            {filteredWeeks.map((week, weekIdx) => (
-              <div key={weekIdx} className="grid grid-rows-7 gap-[3px] flex-shrink-0">
-                {week.map((day) => (
-                  <ContributionCell
-                    key={day.date}
-                    date={day.date}
-                    count={day.count}
-                    level={getLevel(day.count)}
-                    onSelect={selectDay}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
+          <HeatmapCanvas weeks={filteredWeeks} onSelect={selectDay} />
         </div>
 
       </div>
 
       {/* Day Detail Modal */}
-      {selectedDay && (
+      {selectedDay && createPortal(
         <div 
           className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
           onClick={() => setSelectedDay(null)}
@@ -377,7 +361,8 @@ export default function ContributionHeatmap({
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
       {/* Stats Footer */}
@@ -389,30 +374,105 @@ export default function ContributionHeatmap({
   );
 }
 
-// Contribution Cell Component
 const LEVEL_COLORS = ["#1c212b", "#164e63", "#0e7490", "#22d3ee", "#7AF0FF"];
+const CELL = 11;
+const STEP = 14;
 
-function ContributionCell({
-  date,
-  count,
-  level,
+function HeatmapCanvas({
+  weeks,
   onSelect,
 }: {
-  date: string;
-  count: number;
-  level: number;
+  weeks: ContributionDay[][];
   onSelect: (day: ContributionDay) => void;
 }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const weeksRef = useRef(weeks);
+  const hovered = useRef<string | null>(null);
+  const [tip, setTip] = useState<{ text: string; x: number; y: number } | null>(null);
+  weeksRef.current = weeks;
+
+  const width = Math.max(weeks.length, 1) * STEP;
+  const height = 7 * STEP;
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    const context = canvas.getContext("2d", { alpha: true });
+    if (!context) return;
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    context.clearRect(0, 0, width, height);
+    weeks.forEach((week, column) => {
+      week.forEach((day, row) => {
+        context.fillStyle = LEVEL_COLORS[levelFor(day.count)] ?? LEVEL_COLORS[0];
+        context.fillRect(column * STEP, row * STEP, CELL, CELL);
+      });
+    });
+  }, [weeks, width, height]);
+
+  function dayAt(event: MouseEvent<HTMLCanvasElement>) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const column = Math.floor(x / STEP);
+    const row = Math.floor(y / STEP);
+    if (x - column * STEP > CELL || y - row * STEP > CELL) return null;
+    return weeksRef.current[column]?.[row] ?? null;
+  }
+
   return (
-    <button
-      type="button"
-      title={`${count} session${count === 1 ? "" : "s"} on ${date}`}
-      aria-label={`${count} sessions on ${date}`}
-      onClick={() => onSelect({ date, count })}
-      className="h-[11px] w-[11px] rounded-[2px] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
-      style={{ backgroundColor: LEVEL_COLORS[level] ?? LEVEL_COLORS[0] }}
-    />
+    <div className="relative" style={{ width, height }}>
+      <canvas
+        ref={canvasRef}
+        style={{ width, height }}
+        className="block"
+        role="img"
+        aria-label={`Contribution activity for ${weeks.length} weeks`}
+        onMouseMove={(event) => {
+          const day = dayAt(event);
+          const key = day?.date ?? null;
+          if (key === hovered.current) return;
+          hovered.current = key;
+          if (!day) {
+            setTip(null);
+            return;
+          }
+          const rect = event.currentTarget.getBoundingClientRect();
+          setTip({
+            text: `${day.count} session${day.count === 1 ? "" : "s"} on ${day.date}`,
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top,
+          });
+        }}
+        onMouseLeave={() => {
+          hovered.current = null;
+          setTip(null);
+        }}
+        onClick={(event) => {
+          const day = dayAt(event);
+          if (day) onSelect(day);
+        }}
+      />
+      {tip && (
+        <div
+          className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded border border-white/10 bg-[#121418] px-2 py-1 text-[10px] text-zinc-100"
+          style={{ left: tip.x, top: Math.max(tip.y - 8, 0) }}
+        >
+          {tip.text}
+        </div>
+      )}
+    </div>
   );
+}
+
+function levelFor(count: number) {
+  if (count <= 0) return 0;
+  if (count <= 2) return 1;
+  if (count <= 5) return 2;
+  if (count <= 9) return 3;
+  return 4;
 }
 
 function localKey(date: Date) {

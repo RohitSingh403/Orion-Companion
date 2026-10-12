@@ -1,7 +1,6 @@
 // src/pages/Analytics/AnalyticsPage.tsx
 
 import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
 import AppLayout from "../../layouts/AppLayout";
 import PageHeading from "../../components/shell/PageHeading";
 import { useFocusStore } from "../../store/focusStore";
@@ -235,10 +234,8 @@ export default function AnalyticsPage() {
 
         {/* Custom Date Range Picker */}
         {timeRange === "custom" && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            className={`p-4 space-y-3 rounded-xl border shadow-sm ${
+          <div
+            className={`p-4 space-y-3 rounded-xl border ${
               isDark 
                 ? "bg-gray-800 border-gray-700" 
                 : "bg-white border-gray-200"
@@ -276,12 +273,12 @@ export default function AnalyticsPage() {
                 />
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Top 3 Stat Cards */}
         <div className="grid grid-cols-3 gap-6">
-          <div className={`p-5 space-y-2 rounded-xl border shadow-sm ${
+          <div className={`p-5 space-y-2 rounded-xl border ${
             isDark 
               ? "bg-gray-800 border-gray-700" 
               : "bg-white border-gray-200"
@@ -300,7 +297,7 @@ export default function AnalyticsPage() {
             </span>
           </div>
 
-          <div className={`p-5 space-y-2 rounded-xl border shadow-sm ${
+          <div className={`p-5 space-y-2 rounded-xl border ${
             isDark 
               ? "bg-gray-800 border-gray-700" 
               : "bg-white border-gray-200"
@@ -319,7 +316,7 @@ export default function AnalyticsPage() {
             </span>
           </div>
 
-          <div className={`p-5 space-y-2 rounded-xl border shadow-sm ${
+          <div className={`p-5 space-y-2 rounded-xl border ${
             isDark 
               ? "bg-gray-800 border-gray-700" 
               : "bg-white border-gray-200"
@@ -342,7 +339,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Period Statistics */}
-        <div className={`p-6 space-y-4 rounded-xl border shadow-sm ${
+        <div className={`p-6 space-y-4 rounded-xl border ${
           isDark 
             ? "bg-gray-800 border-gray-700" 
             : "bg-white border-gray-200"
@@ -379,7 +376,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Focus Insights */}
-        <div className={`p-6 space-y-4 rounded-xl border shadow-sm ${
+        <div className={`p-6 space-y-4 rounded-xl border ${
           isDark 
             ? "bg-gray-800 border-gray-700" 
             : "bg-white border-gray-200"
@@ -402,11 +399,8 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Productivity Scorecard */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className={`p-6 space-y-4 rounded-xl border shadow-sm ${
+        <div
+          className={`p-6 space-y-4 rounded-xl border ${
             isDark 
               ? "bg-gray-800 border-gray-700" 
               : "bg-white border-gray-200"
@@ -489,10 +483,10 @@ export default function AnalyticsPage() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Focus Time Trend Chart */}
-        <div className={`p-6 space-y-4 rounded-xl border shadow-sm ${
+        <div className={`p-6 space-y-4 rounded-xl border ${
           isDark 
             ? "bg-gray-800 border-gray-700" 
             : "bg-white border-gray-200"
@@ -518,11 +512,7 @@ export default function AnalyticsPage() {
                 <div className="relative w-full">
                   <div
                     style={{ height: `${trendData.heights[idx]}%` }}
-                    className={`w-full border-t-2 rounded-t-md transition-all duration-300 hover:brightness-125 cursor-pointer relative ${
-                      isDark 
-                        ? "bg-gradient-to-t from-violet-500/30 via-violet-500/60 to-violet-500 border-t-violet-500" 
-                        : "bg-gradient-to-t from-violet-500/30 via-violet-500/60 to-violet-500 border-t-violet-500"
-                    }`}
+                    className="relative w-full rounded-t-md bg-[#7AD7F5]"
                   >
                     <div className={`absolute -top-8 left-1/2 transform -translate-x-1/2 rounded px-2 py-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap ${
                       isDark 

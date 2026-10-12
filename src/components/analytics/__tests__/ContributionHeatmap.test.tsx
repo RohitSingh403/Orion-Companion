@@ -9,11 +9,14 @@ describe("ContributionHeatmap", () => {
       <ContributionHeatmap data={[{ date: `${year}-05-22`, count: 2 }]} />,
     );
 
-    const cells = screen.getAllByRole("button", { name: /sessions on/ });
-    expect(cells.length).toBeGreaterThan(360);
-    expect(cells.length).toBeLessThanOrEqual(54 * 7);
+    const canvas = container.querySelector("canvas");
+    expect(canvas).toBeTruthy();
+    expect(screen.queryAllByRole("button", { name: /sessions on/ })).toHaveLength(0);
     expect(container.querySelector("[class*='backdrop-blur']")).toBeNull();
-    expect(screen.getByLabelText(`2 sessions on ${year}-05-22`)).toBeDefined();
+    const cssWidth = Number.parseFloat(canvas?.style.width || "0");
+    expect(cssWidth).toBeGreaterThan(600);
+    expect(cssWidth).toBeLessThan(900);
+    expect(canvas?.getAttribute("aria-label")).toContain("weeks");
     ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].forEach((month) => {
       expect(screen.getByText(month)).toBeDefined();
     });

@@ -621,6 +621,11 @@
   border: 1px solid #a5f3fc;
 }
 
+.analytics-defer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 280px;
+}
+
 .orion-shell .bg-gray-900 {
   background-color: #121418;
 }
