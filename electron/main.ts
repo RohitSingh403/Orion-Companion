@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, Notification, Tray, autoUpdater, globalShortcut, ipcMain, nativeImage } from "electron";
+import { app, BrowserWindow, Menu, Notification, Tray, autoUpdater, globalShortcut, ipcMain, nativeImage, screen } from "electron";
 import { execFile } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -21,6 +21,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 
 let win: BrowserWindow | null = null;
 let mini: BrowserWindow | null = null;
+let companion: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let quitting = false;
 let trayReady = false;
@@ -85,6 +86,13 @@ function rebuildTray() {
       { label: "Pause", click: () => win?.webContents.send("tray-pause-focus") },
       { label: "Mini timer", click: () => createMiniWindow() },
       {
+        label: companion && !companion.isDestroyed() && companion.isVisible() ? "Hide companion" : "Show companion",
+        click: () => {
+          if (companion && !companion.isDestroyed() && companion.isVisible()) hideCompanion();
+          else showCompanion();
+        },
+      },
+      {
         label: "Quick add",
         click: () => {
           showMain();
@@ -113,6 +121,48 @@ function createTray() {
     console.error("Tray unavailable:", error);
     trayReady = false;
   }
+}
+
+function showCompanion() {
+  if (companion && !companion.isDestroyed()) {
+    if (!companion.isVisible()) companion.showInactive();
+    if (latestTimer) companion.webContents.send("timer-state", latestTimer);
+    return;
+  }
+
+  const area = screen.getPrimaryDisplay().workArea;
+  const width = 260;
+  const height = 280;
+  companion = new BrowserWindow({
+    width,
+    height,
+    x: area.x + area.width - width - 24,
+    y: area.y + area.height - height - 24,
+    frame: false,
+    transparent: true,
+    resizable: false,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    hasShadow: false,
+    title: "Orion Companion",
+    backgroundColor: "#00000000",
+    webPreferences: {
+      preload: path.join(__dirname, "preload.mjs"),
+    },
+  });
+
+  loadSurface(companion, "companion", { surface: "companion" });
+  companion.once("ready-to-show", () => companion?.showInactive());
+  companion.webContents.on("did-finish-load", () => {
+    if (latestTimer && companion && !companion.isDestroyed()) companion.webContents.send("timer-state", latestTimer);
+  });
+  companion.on("closed", () => {
+    companion = null;
+  });
+}
+
+function hideCompanion() {
+  if (companion && !companion.isDestroyed()) companion.hide();
 }
 
 function createMiniWindow() {
@@ -268,6 +318,7 @@ app.on("will-quit", () => {
 app.whenReady().then(() => {
   createWindow();
   createTray();
+  showCompanion();
 
   try {
     globalShortcut.register("CommandOrControl+Shift+Space", () => {
@@ -292,6 +343,23 @@ app.whenReady().then(() => {
     trayLabel = snapshot.running ? `${snapshot.session === "focus" ? "Focus" : "Break"} ${clock}` : "Ready";
     rebuildTray();
     if (mini && !mini.isDestroyed()) mini.webContents.send("timer-state", snapshot);
+    if (companion && !companion.isDestroyed()) companion.webContents.send("timer-state", snapshot);
+  });
+
+  ipcMain.on("companion-nudge", (_event, dx: number, dy: number) => {
+    if (!companion || companion.isDestroyed() || !Number.isFinite(dx) || !Number.isFinite(dy)) return;
+    const [x, y] = companion.getPosition();
+    companion.setPosition(Math.round(x + dx), Math.round(y + dy));
+  });
+
+  ipcMain.on("companion-show-main", () => {
+    showMain();
+  });
+
+  ipcMain.on("companion-visibility", (_event, visible: boolean) => {
+    if (visible) showCompanion();
+    else hideCompanion();
+    if (win && !win.isDestroyed()) win.webContents.send("companion-visibility", Boolean(visible));
   });
 
   ipcMain.on("mini-command", (_event, command: string) => {

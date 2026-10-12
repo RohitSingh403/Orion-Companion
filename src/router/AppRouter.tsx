@@ -16,6 +16,7 @@ const SettingsPage = lazy(() => import("../pages/Settings/SettingsPage").then(m 
 const MiniTimerPage = lazy(() => import("../pages/MiniTimer/MiniTimerPage").then(m => ({ default: m.default })));
 const RemindersPage = lazy(() => import("../pages/Reminders/RemindersPage").then(m => ({ default: m.default })));
 const AICompanionPage = lazy(() => import("../pages/AICompanion/AICompanionPage").then(m => ({ default: m.default })));
+const CompanionPage = lazy(() => import("../pages/Companion/CompanionPage").then(m => ({ default: m.default })));
 
 // Loading fallback component
 function LoadingFallback() {
@@ -32,17 +33,23 @@ function LoadingFallback() {
 function RootRoute() {
   const navigate = useNavigate();
   const desktop = typeof window !== "undefined" && Boolean(window.focusAPI);
-  const mini = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("surface") === "mini";
+  const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : new URLSearchParams();
+  const mini = params.get("surface") === "mini";
+  const companion = params.get("surface") === "companion";
 
   useEffect(() => {
     if (mini) {
       navigate("/mini-timer?surface=mini", { replace: true });
       return;
     }
+    if (companion) {
+      navigate("/companion?surface=companion", { replace: true });
+      return;
+    }
     if (desktop) navigate("/app", { replace: true });
-  }, [desktop, mini, navigate]);
+  }, [desktop, mini, companion, navigate]);
 
-  if (mini || desktop) return null;
+  if (mini || companion || desktop) return null;
   return <SitePage />;
 }
 
@@ -63,6 +70,7 @@ export default function AppRouter() {
           <Route path="/reminders" element={<RemindersPage />} />
           <Route path="/ai-companion" element={<AICompanionPage />} />
           <Route path="/mini-timer" element={<MiniTimerPage />} />
+          <Route path="/companion" element={<CompanionPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>

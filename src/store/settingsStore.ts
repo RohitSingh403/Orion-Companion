@@ -23,6 +23,7 @@ interface SettingsState {
   // Appearance Settings
   theme: "dark" | "light";
   displayName: string;
+  companionEnabled: boolean;
 
   // Actions
   setFocusMinutes: (minutes: number) => void;
@@ -37,6 +38,7 @@ interface SettingsState {
   setBreakReminder: (enabled: boolean) => void;
   setTheme: (theme: "dark" | "light") => void;
   setDisplayName: (name: string) => void;
+  setCompanionEnabled: (enabled: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -63,6 +65,7 @@ export const useSettingsStore = create<SettingsState>()(
       // Appearance Settings
       theme: "dark",
       displayName: "",
+      companionEnabled: true,
 
       // Actions
       setFocusMinutes: (minutes) =>
@@ -123,6 +126,11 @@ export const useSettingsStore = create<SettingsState>()(
       setDisplayName: (name) =>
         set({
           displayName: name,
+        }),
+
+      setCompanionEnabled: (enabled) =>
+        set({
+          companionEnabled: enabled,
         }),
     }),
     {

@@ -43,6 +43,10 @@ interface Window {
       callback: (snapshot: { remainingTime: number; running: boolean; session: "focus" | "break" }) => void
     ) => () => void;
     sendMiniCommand: (command: "start" | "pause" | "reset") => void;
+    nudgeCompanion: (dx: number, dy: number) => void;
+    showMainWindow: () => void;
+    setCompanionVisible: (visible: boolean) => void;
+    onCompanionVisibility: (callback: (visible: boolean) => void) => () => void;
     getAutoLaunchStatus: () => Promise<boolean>;
     toggleAutoLaunch: (enabled: boolean) => Promise<boolean>;
   }
