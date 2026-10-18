@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useReminderStore } from "../store/reminderStore";
 import { useSettingsStore } from "../store/settingsStore";
+import { isSideSurface } from "../utils/surface";
 
 function notify(title: string, body: string) {
   if (window.focusAPI?.showReminderNotification) {
@@ -20,13 +21,14 @@ export default function useReminders() {
   const desktopNotifications = useSettingsStore((state) => state.desktopNotifications);
 
   useEffect(() => {
-    if (!desktopNotifications) return;
+    if (isSideSurface() || !desktopNotifications) return;
     if (!window.focusAPI && typeof Notification !== "undefined" && Notification.permission === "default") {
       void Notification.requestPermission();
     }
   }, [desktopNotifications]);
 
   useEffect(() => {
+    if (isSideSurface()) return undefined;
     const check = () => {
       const dueReminders = getDueReminders();
       dueReminders.forEach((reminder) => {

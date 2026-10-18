@@ -8,9 +8,7 @@ import { useSettingsStore } from "../store/settingsStore";
 import { playSound } from "../utils/audio";
 import { checkFocusAchievements } from "../utils/checkAchievements";
 
-function isMiniSurface() {
-  return new URLSearchParams(window.location.search).get("surface") === "mini";
-}
+import { isSideSurface } from "../utils/surface";
 
 function notifySession(kind: "break" | "focus") {
   if (kind === "break") {
@@ -54,14 +52,14 @@ export default function usePomodoro() {
   const previousSession = useRef(session);
 
   useEffect(() => {
-    if (isMiniSurface() || !desktopNotifications || window.focusAPI) return;
+    if (isSideSurface() || !desktopNotifications || window.focusAPI) return;
     if (typeof Notification !== "undefined" && Notification.permission === "default") {
       void Notification.requestPermission();
     }
   }, [desktopNotifications]);
 
   useEffect(() => {
-    if (isMiniSurface()) return;
+    if (isSideSurface()) return;
 
     if (previousSession.current === "focus" && session === "break") {
       if (soundEnabled) playSound(breakSound || "break.mp3");
@@ -96,7 +94,7 @@ export default function usePomodoro() {
   ]);
 
   useEffect(() => {
-    if (!running || isMiniSurface()) return;
+    if (!running || isSideSurface()) return;
     const interval = setInterval(() => tick(), 1000);
     return () => clearInterval(interval);
   }, [running, tick]);

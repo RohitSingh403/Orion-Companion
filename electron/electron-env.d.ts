@@ -46,6 +46,9 @@ interface Window {
     nudgeCompanion: (dx: number, dy: number) => void;
     showMainWindow: () => void;
     setCompanionVisible: (visible: boolean) => void;
+    setCompanionMousePassthrough: (ignore: boolean) => void;
+    setCompanionActivity: (activity: { mode: "idle" | "focus" | "break"; dragging: boolean }) => void;
+    onCompanionWalk: (callback: (state: { walking: boolean; facing: 1 | -1 }) => void) => () => void;
     onCompanionVisibility: (callback: (visible: boolean) => void) => () => void;
     getAutoLaunchStatus: () => Promise<boolean>;
     toggleAutoLaunch: (enabled: boolean) => Promise<boolean>;

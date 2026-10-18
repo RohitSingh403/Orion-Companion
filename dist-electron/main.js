@@ -1,113 +1,175 @@
-import { app as d, globalShortcut as F, ipcMain as l, Notification as g, autoUpdater as u, BrowserWindow as D, Tray as A, screen as L, nativeImage as j, Menu as U } from "electron";
-import { execFile as k } from "node:child_process";
-import { fileURLToPath as M } from "node:url";
-import c from "node:path";
-const C = c.dirname(M(import.meta.url));
-d.commandLine.appendSwitch("force-gpu-mem-available-mb", "1024");
-process.env.APP_ROOT = c.join(C, "..");
-const w = process.env.VITE_DEV_SERVER_URL, Q = c.join(process.env.APP_ROOT, "dist-electron"), x = c.join(process.env.APP_ROOT, "dist");
-process.env.VITE_PUBLIC = w ? c.join(process.env.APP_ROOT, "public") : x;
-let t = null, a = null, i = null, y = null, P = !1, v = !1, T = "Ready", I = !1, f = null, m = null;
-function $() {
+import { app as f, globalShortcut as U, ipcMain as c, BrowserWindow as k, screen as E, Notification as x, autoUpdater as m, Tray as Q, nativeImage as Y, Menu as K } from "electron";
+import { execFile as R } from "node:child_process";
+import V from "node:fs";
+import { fileURLToPath as Z } from "node:url";
+import u from "node:path";
+const O = u.dirname(Z(import.meta.url));
+f.commandLine.appendSwitch("force-gpu-mem-available-mb", "1024");
+process.env.APP_ROOT = u.join(O, "..");
+const w = process.env.VITE_DEV_SERVER_URL, he = u.join(process.env.APP_ROOT, "dist-electron"), $ = u.join(process.env.APP_ROOT, "dist");
+process.env.VITE_PUBLIC = w ? u.join(process.env.APP_ROOT, "public") : $;
+let i = null, l = null, t = null, N = "idle", z = !1, q = !1, v = null, g = -1, C = 0, _ = 0, T = null, y = null, B = !1, P = !1, S = "Ready", W = !1, h = null, p = null;
+function ee() {
   const e = Buffer.alloc(1024);
   for (let o = 0; o < 16; o += 1)
     for (let r = 0; r < 16; r += 1) {
-      const s = r - 7.5, p = o - 7.5;
-      if (Math.sqrt(s * s + p * p) >= 6.5) continue;
-      const h = (o * 16 + r) * 4;
-      e[h] = 245, e[h + 1] = 215, e[h + 2] = 122, e[h + 3] = 255;
+      const a = r - 7.5, s = o - 7.5;
+      if (Math.sqrt(a * a + s * s) >= 6.5) continue;
+      const d = (o * 16 + r) * 4;
+      e[d] = 245, e[d + 1] = 215, e[d + 2] = 122, e[d + 3] = 255;
     }
-  return j.createFromBitmap(e, { width: 16, height: 16 });
+  return Y.createFromBitmap(e, { width: 16, height: 16 });
 }
-function O(n, e, o = {}) {
+function j(n, e, o = {}) {
   if (w) {
-    const r = w.endsWith("/") ? w : `${w}/`, s = new URL(e.replace(/^\//, ""), r);
-    Object.entries(o).forEach(([p, h]) => s.searchParams.set(p, h)), n.loadURL(s.toString());
+    const r = w.endsWith("/") ? w : `${w}/`, a = new URL(e.replace(/^\//, ""), r);
+    Object.entries(o).forEach(([s, d]) => a.searchParams.set(s, d)), n.loadURL(a.toString());
     return;
   }
-  n.loadFile(c.join(x, "index.html"), { query: o });
+  n.loadFile(u.join($, "index.html"), { query: o });
 }
 function b() {
-  if (!t || t.isDestroyed()) {
-    _();
+  if (!i || i.isDestroyed()) {
+    L();
     return;
   }
-  t.isMinimized() && t.restore(), t.show(), t.focus();
+  i.isMinimized() && i.restore(), i.show(), i.focus();
 }
-function S() {
-  y && (y.setToolTip(`Orion Companion — ${T}`), y.setContextMenu(
-    U.buildFromTemplate([
-      { label: T, enabled: !1 },
+function A() {
+  y && (y.setToolTip(`Orion Companion — ${S}`), y.setContextMenu(
+    K.buildFromTemplate([
+      { label: S, enabled: !1 },
       { label: "Show Orion", click: () => b() },
-      { label: "Start focus", click: () => t == null ? void 0 : t.webContents.send("tray-start-focus") },
-      { label: "Pause", click: () => t == null ? void 0 : t.webContents.send("tray-pause-focus") },
-      { label: "Mini timer", click: () => z() },
+      { label: "Start focus", click: () => i == null ? void 0 : i.webContents.send("tray-start-focus") },
+      { label: "Pause", click: () => i == null ? void 0 : i.webContents.send("tray-pause-focus") },
+      { label: "Mini timer", click: () => ae() },
       {
-        label: i && !i.isDestroyed() && i.isVisible() ? "Hide companion" : "Show companion",
+        label: t && !t.isDestroyed() && t.isVisible() ? "Hide companion" : "Show companion",
         click: () => {
-          i && !i.isDestroyed() && i.isVisible() ? E() : R();
+          t && !t.isDestroyed() && t.isVisible() ? H() : M();
         }
       },
       {
         label: "Quick add",
         click: () => {
-          b(), t == null || t.webContents.send("tray-quick-add-task");
+          b(), i == null || i.webContents.send("tray-quick-add-task");
         }
       },
       { type: "separator" },
       {
-        label: "Quit",
+        label: "Close dashboard",
         click: () => {
-          P = !0, d.quit();
+          i == null || i.hide(), M();
+        }
+      },
+      {
+        label: "Quit completely",
+        click: () => {
+          B = !0, f.quit();
         }
       }
     ])
   ));
 }
-function B() {
+function te() {
   try {
-    y = new A($()), v = !0, S(), y.on("click", () => b());
+    y = new Q(ee()), P = !0, A(), y.on("click", () => b());
   } catch (n) {
-    console.error("Tray unavailable:", n), v = !1;
+    console.error("Tray unavailable:", n), P = !1;
   }
 }
-function R() {
-  if (i && !i.isDestroyed()) {
-    i.isVisible() || i.showInactive(), m && i.webContents.send("timer-state", m);
+function G() {
+  return u.join(f.getPath("userData"), "companion-position.json");
+}
+function ne() {
+  try {
+    const n = JSON.parse(V.readFileSync(G(), "utf8"));
+    if (typeof n.x == "number" && typeof n.y == "number") return { x: n.x, y: n.y };
+  } catch {
+    return null;
+  }
+  return null;
+}
+function oe() {
+  if (!t || t.isDestroyed()) return;
+  const [n, e] = t.getPosition();
+  try {
+    V.writeFileSync(G(), JSON.stringify({ x: n, y: e }));
+  } catch {
+  }
+}
+function ie(n) {
+  const r = ne(), a = r ?? { x: 0, y: 0 }, s = E.getDisplayNearestPoint(a).workArea, d = s.x + s.width - 300 - 24, I = s.y + s.height - 360 - 24, X = r ? Math.min(Math.max(s.x, r.x), s.x + s.width - 300) : d, J = r ? Math.min(Math.max(s.y, r.y), s.y + s.height - 360) : I;
+  n.setBounds({ x: Math.round(X), y: Math.round(J), width: 300, height: 360 });
+}
+function D() {
+  !t || t.isDestroyed() || (t.setAlwaysOnTop(!0, "floating"), t.setVisibleOnAllWorkspaces(!0, { visibleOnFullScreen: !0 }));
+}
+function M() {
+  if (t && !t.isDestroyed()) {
+    t.isVisible() || t.showInactive(), D(), p && t.webContents.send("timer-state", p);
     return;
   }
-  const n = L.getPrimaryDisplay().workArea, e = 260, o = 280;
-  i = new D({
-    width: e,
-    height: o,
-    x: n.x + n.width - e - 24,
-    y: n.y + n.height - o - 24,
+  t = new k({
+    width: 300,
+    height: 360,
     frame: !1,
     transparent: !0,
     resizable: !1,
     alwaysOnTop: !0,
     skipTaskbar: !0,
     hasShadow: !1,
+    focusable: !0,
     title: "Orion Companion",
     backgroundColor: "#00000000",
+    ...process.platform === "darwin" ? { type: "panel" } : {},
     webPreferences: {
-      preload: c.join(C, "preload.mjs")
+      preload: u.join(O, "preload.mjs"),
+      backgroundThrottling: !1
     }
-  }), O(i, "companion", { surface: "companion" }), i.once("ready-to-show", () => i == null ? void 0 : i.showInactive()), i.webContents.on("did-finish-load", () => {
-    m && i && !i.isDestroyed() && i.webContents.send("timer-state", m);
-  }), i.on("closed", () => {
-    i = null;
+  }), ie(t), D(), j(t, "companion", { surface: "companion" }), t.once("ready-to-show", () => {
+    t == null || t.showInactive(), D();
+  }), t.webContents.on("did-finish-load", () => {
+    p && t && !t.isDestroyed() && t.webContents.send("timer-state", p);
+  }), t.on("moved", () => {
+    q || oe();
+  }), t.on("closed", () => {
+    t = null;
   });
 }
-function E() {
-  i && !i.isDestroyed() && i.hide();
+function H() {
+  t && !t.isDestroyed() && t.hide();
 }
-function z() {
-  if (a && !a.isDestroyed()) {
-    a.show(), a.focus();
+function F(n) {
+  q = n;
+  const e = { walking: n, facing: g };
+  T && T.walking === e.walking && T.facing === e.facing || (T = e, t && !t.isDestroyed() && t.webContents.send("companion-walk", e));
+}
+function re() {
+  v || (_ = Date.now() + 1600, v = setInterval(() => {
+    if (!t || t.isDestroyed() || !t.isVisible() || z || N !== "idle") {
+      F(!1);
+      return;
+    }
+    const n = Date.now();
+    if (n < _) {
+      F(!1);
+      return;
+    }
+    C <= 0 && (C = 280 + Math.round(Math.random() * 240), g = Math.random() > 0.5 ? 1 : -1);
+    const e = t.getBounds(), o = E.getDisplayNearestPoint({ x: e.x, y: e.y }).workArea;
+    let r = e.x + g * 4;
+    r <= o.x + 8 && (r = o.x + 8, g = 1);
+    const a = o.x + o.width - e.width - 8;
+    r >= a && (r = a, g = -1), t.setPosition(Math.round(r), e.y), C -= 4, C <= 0 && (_ = n + 5e3 + Math.round(Math.random() * 5e3)), F(!0);
+  }, 140));
+}
+function ae() {
+  if (l && !l.isDestroyed()) {
+    l.show(), l.focus();
     return;
   }
-  a = new D({
+  l = new k({
     width: 280,
     height: 188,
     frame: !1,
@@ -117,15 +179,15 @@ function z() {
     title: "Orion Mini Timer",
     backgroundColor: "#121418",
     webPreferences: {
-      preload: c.join(C, "preload.mjs")
+      preload: u.join(O, "preload.mjs")
     }
-  }), O(a, "mini-timer", { surface: "mini" }), a.webContents.on("did-finish-load", () => {
-    m && a && !a.isDestroyed() && a.webContents.send("timer-state", m);
-  }), a.on("closed", () => {
-    a = null;
+  }), j(l, "mini-timer", { surface: "mini" }), l.webContents.on("did-finish-load", () => {
+    p && l && !l.isDestroyed() && l.webContents.send("timer-state", p);
+  }), l.on("closed", () => {
+    l = null;
   });
 }
-function V() {
+function se() {
   return new Promise((n) => {
     const e = (o) => {
       if (!o) {
@@ -140,7 +202,7 @@ function V() {
       n(r.slice(0, 80));
     };
     if (process.platform === "darwin") {
-      k(
+      R(
         "osascript",
         ["-e", 'tell application "System Events" to get name of first application process whose frontmost is true'],
         { timeout: 2e3 },
@@ -149,7 +211,7 @@ function V() {
       return;
     }
     if (process.platform === "win32") {
-      k(
+      R(
         "powershell",
         [
           "-NoProfile",
@@ -161,29 +223,29 @@ function V() {
       );
       return;
     }
-    k("xdotool", ["getactivewindow", "getwindowname"], { timeout: 2e3 }, (o, r) => {
+    R("xdotool", ["getactivewindow", "getwindowname"], { timeout: 2e3 }, (o, r) => {
       if (o || !r.trim()) {
         e(null);
         return;
       }
-      const s = r.trim().split(" - ").map((p) => p.trim()).filter(Boolean);
-      e(s[s.length - 1] ?? null);
+      const a = r.trim().split(" - ").map((s) => s.trim()).filter(Boolean);
+      e(a[a.length - 1] ?? null);
     });
   });
 }
-function W(n) {
-  if (I = n, !n) {
-    f && clearInterval(f), f = null;
+function le(n) {
+  if (W = n, !n) {
+    h && clearInterval(h), h = null;
     return;
   }
-  f || (f = setInterval(() => {
-    V().then((e) => {
-      !I || !e || !t || t.isDestroyed() || t.webContents.send("activity-sample", e);
+  h || (h = setInterval(() => {
+    se().then((e) => {
+      !W || !e || !i || i.isDestroyed() || i.webContents.send("activity-sample", e);
     });
   }, 15e3));
 }
-function _() {
-  t = new D({
+function L() {
+  i = new k({
     width: 1280,
     height: 820,
     minWidth: 1100,
@@ -191,72 +253,82 @@ function _() {
     title: "Orion Companion",
     backgroundColor: "#121418",
     autoHideMenuBar: !0,
-    icon: c.join(process.env.VITE_PUBLIC, "orion.svg"),
+    icon: u.join(process.env.VITE_PUBLIC, "orion.svg"),
     webPreferences: {
-      preload: c.join(C, "preload.mjs")
+      preload: u.join(O, "preload.mjs"),
+      backgroundThrottling: !1
     }
-  }), t.webContents.on("did-finish-load", () => {
-    t == null || t.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
-  }), t.on("close", (n) => {
-    P || !v || (n.preventDefault(), t == null || t.hide());
-  }), O(t, "app");
+  }), i.webContents.on("did-finish-load", () => {
+    i == null || i.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
+  }), i.on("close", (n) => {
+    B || !P || (n.preventDefault(), i == null || i.hide());
+  }), i.on("hide", () => {
+    !t || t.isDestroyed() || !t.isVisible() || (t.showInactive(), D());
+  }), j(i, "app");
 }
-d.on("window-all-closed", () => {
-  !v && process.platform !== "darwin" && (d.quit(), t = null);
+f.on("window-all-closed", () => {
+  !P && process.platform !== "darwin" && (f.quit(), i = null);
 });
-d.on("activate", () => {
-  !t || t.isDestroyed() ? _() : b();
+f.on("activate", () => {
+  !i || i.isDestroyed() ? L() : b();
 });
-d.on("before-quit", () => {
-  P = !0;
+f.on("before-quit", () => {
+  B = !0;
 });
-d.on("will-quit", () => {
-  F.unregisterAll(), f && clearInterval(f);
+f.on("will-quit", () => {
+  U.unregisterAll(), h && clearInterval(h), v && clearInterval(v);
 });
-d.whenReady().then(() => {
-  _(), B(), R();
+f.whenReady().then(() => {
+  L(), te(), M(), re();
   try {
-    F.register("CommandOrControl+Shift+Space", () => {
-      b(), t == null || t.webContents.send("global-shortcut-quick-capture");
+    U.register("CommandOrControl+Shift+Space", () => {
+      b(), i == null || i.webContents.send("global-shortcut-quick-capture");
     });
   } catch (n) {
     console.error("Shortcut unavailable:", n);
   }
-  l.on("update-tray-status", (n, e) => {
-    T = e || "Ready", S();
-  }), l.on("report-timer", (n, e) => {
+  c.on("update-tray-status", (n, e) => {
+    S = e || "Ready", A();
+  }), c.on("report-timer", (n, e) => {
     if (!e) return;
-    m = e;
-    const o = Math.floor(e.remainingTime / 60), r = e.remainingTime % 60, s = `${o}:${r.toString().padStart(2, "0")}`;
-    T = e.running ? `${e.session === "focus" ? "Focus" : "Break"} ${s}` : "Ready", S(), a && !a.isDestroyed() && a.webContents.send("timer-state", e), i && !i.isDestroyed() && i.webContents.send("timer-state", e);
-  }), l.on("companion-nudge", (n, e, o) => {
-    if (!i || i.isDestroyed() || !Number.isFinite(e) || !Number.isFinite(o)) return;
-    const [r, s] = i.getPosition();
-    i.setPosition(Math.round(r + e), Math.round(s + o));
-  }), l.on("companion-show-main", () => {
+    p = e;
+    const o = Math.floor(e.remainingTime / 60), r = e.remainingTime % 60, a = `${o}:${r.toString().padStart(2, "0")}`;
+    S = e.running ? `${e.session === "focus" ? "Focus" : "Break"} ${a}` : "Ready", A(), l && !l.isDestroyed() && l.webContents.send("timer-state", e), t && !t.isDestroyed() && t.webContents.send("timer-state", e);
+  }), c.on("companion-activity", (n, e) => {
+    ((e == null ? void 0 : e.mode) === "idle" || (e == null ? void 0 : e.mode) === "focus" || (e == null ? void 0 : e.mode) === "break") && (N = e.mode), z = !!(e != null && e.dragging);
+  }), c.on("companion-nudge", (n, e, o) => {
+    const r = k.fromWebContents(n.sender);
+    if (!r || r.isDestroyed() || !Number.isFinite(e) || !Number.isFinite(o)) return;
+    const a = r.getBounds(), s = E.getDisplayNearestPoint({ x: a.x, y: a.y }).workArea, d = Math.min(Math.max(s.x, a.x + e), s.x + s.width - a.width), I = Math.min(Math.max(s.y, a.y + o), s.y + s.height - a.height);
+    r.setPosition(Math.round(d), Math.round(I));
+  }), c.on("companion-mouse-passthrough", (n, e) => {
+    if (process.platform === "linux") return;
+    const o = k.fromWebContents(n.sender);
+    !o || o.isDestroyed() || o.setIgnoreMouseEvents(!!e, { forward: !0 });
+  }), c.on("companion-show-main", () => {
     b();
-  }), l.on("companion-visibility", (n, e) => {
-    e ? R() : E(), t && !t.isDestroyed() && t.webContents.send("companion-visibility", !!e);
-  }), l.on("mini-command", (n, e) => {
-    t == null || t.webContents.send("mini-command", e);
-  }), l.on("watch-activity", (n, e) => {
-    W(!!e);
-  }), l.on("show-break-notification", () => {
-    new g({
+  }), c.on("companion-visibility", (n, e) => {
+    e ? M() : H(), i && !i.isDestroyed() && i.webContents.send("companion-visibility", !!e);
+  }), c.on("mini-command", (n, e) => {
+    i == null || i.webContents.send("mini-command", e);
+  }), c.on("watch-activity", (n, e) => {
+    le(!!e);
+  }), c.on("show-break-notification", () => {
+    new x({
       title: "☕ Break Time!",
       body: "Great work! Stand up, stretch, and drink some water."
     }).show();
-  }), l.on("show-focus-notification", () => {
-    new g({
+  }), c.on("show-focus-notification", () => {
+    new x({
       title: "🧠 Focus Time!",
       body: "Your break is over. Ready for another deep focus session?"
     }).show();
-  }), l.on("show-reminder-notification", (n, e, o) => {
-    new g({
+  }), c.on("show-reminder-notification", (n, e, o) => {
+    new x({
       title: `🔔 ${e}`,
       body: o
     }).show();
-  }), l.handle("get-auto-launch-status", async () => {
+  }), c.handle("get-auto-launch-status", async () => {
     try {
       const n = (await import("./index-BYV84ozA.js").then((r) => r.i)).default;
       return await new n({
@@ -266,9 +338,9 @@ d.whenReady().then(() => {
     } catch (n) {
       return console.error("Failed to get auto-launch status:", n), !1;
     }
-  }), l.handle("toggle-auto-launch", async (n, e) => {
+  }), c.handle("toggle-auto-launch", async (n, e) => {
     try {
-      const o = (await import("./index-BYV84ozA.js").then((s) => s.i)).default, r = new o({
+      const o = (await import("./index-BYV84ozA.js").then((a) => a.i)).default, r = new o({
         name: "Orion Companion",
         path: process.execPath
       });
@@ -276,28 +348,28 @@ d.whenReady().then(() => {
     } catch (o) {
       return console.error("Failed to toggle auto-launch:", o), !1;
     }
-  }), w || (u.setFeedURL({
+  }), w || (m.setFeedURL({
     url: "https://github.com/RohitSingh403/Orion-Companion/releases/latest",
     headers: { Accept: "application/json" }
-  }), u.on("checking-for-update", () => {
+  }), m.on("checking-for-update", () => {
     console.log("Checking for update...");
-  }), u.on("update-available", (o) => {
+  }), m.on("update-available", (o) => {
     console.log("Update available:", o);
-  }), u.on("update-not-available", (o) => {
+  }), m.on("update-not-available", (o) => {
     console.log("Update not available:", o);
-  }), u.on("error", (o) => {
+  }), m.on("error", (o) => {
     console.error("Auto-updater error:", o);
-  }), u.on("update-downloaded", (o) => {
-    console.log("Update downloaded:", o), new g({
+  }), m.on("update-downloaded", (o) => {
+    console.log("Update downloaded:", o), new x({
       title: "Update Available",
       body: "A new version is ready to install. Restart to apply."
     }).show();
   }), setInterval(() => {
-    u.checkForUpdates();
-  }, 4 * 60 * 60 * 1e3), u.checkForUpdates());
+    m.checkForUpdates();
+  }, 4 * 60 * 60 * 1e3), m.checkForUpdates());
 });
 export {
-  Q as MAIN_DIST,
-  x as RENDERER_DIST,
+  he as MAIN_DIST,
+  $ as RENDERER_DIST,
   w as VITE_DEV_SERVER_URL
 };

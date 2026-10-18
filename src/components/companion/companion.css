@@ -1,0 +1,106 @@
+.pet {
+  position: relative;
+  width: 148px;
+  height: 176px;
+  flex: none;
+}
+
+.pet-body {
+  display: block;
+  height: 168px;
+  width: auto;
+  margin: 0 auto;
+  image-rendering: pixelated;
+  transform-origin: 50% 100%;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.pet-idle .pet-body {
+  animation: pet-breathe 2.6s ease-in-out infinite;
+}
+
+.pet-walk .pet-body {
+  animation: pet-step 0.36s steps(2, end) infinite;
+}
+
+.pet-focus .pet-body {
+  animation: pet-type 0.7s ease-in-out infinite;
+}
+
+.pet-break .pet-body {
+  animation: pet-sip 3.2s ease-in-out infinite;
+}
+
+.pet-blink {
+  position: absolute;
+  top: 21%;
+  left: 36%;
+  width: 30%;
+  height: 5px;
+  background: #241910;
+  border-radius: 2px;
+  opacity: 0;
+  animation: pet-blink 4.2s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes pet-breathe {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes pet-step {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes pet-type {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(1px);
+  }
+}
+
+@keyframes pet-sip {
+  0%,
+  70%,
+  100% {
+    transform: translateY(0);
+  }
+  82% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes pet-blink {
+  0%,
+  90%,
+  100% {
+    opacity: 0;
+  }
+  93%,
+  96% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pet-body,
+  .pet-blink {
+    animation: none;
+  }
+}

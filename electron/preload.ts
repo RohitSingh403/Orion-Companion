@@ -116,6 +116,20 @@ contextBridge.exposeInMainWorld("focusAPI", {
     ipcRenderer.send("companion-visibility", visible);
   },
 
+  setCompanionMousePassthrough(ignore: boolean) {
+    ipcRenderer.send("companion-mouse-passthrough", ignore);
+  },
+
+  setCompanionActivity(activity: { mode: "idle" | "focus" | "break"; dragging: boolean }) {
+    ipcRenderer.send("companion-activity", activity);
+  },
+
+  onCompanionWalk(callback: (state: { walking: boolean; facing: 1 | -1 }) => void) {
+    const listener = (_event: IpcRendererEvent, state: { walking: boolean; facing: 1 | -1 }) => callback(state);
+    ipcRenderer.on("companion-walk", listener);
+    return () => ipcRenderer.removeListener("companion-walk", listener);
+  },
+
   onCompanionVisibility(callback: (visible: boolean) => void) {
     const listener = (_event: IpcRendererEvent, visible: boolean) => callback(visible);
     ipcRenderer.on("companion-visibility", listener);
