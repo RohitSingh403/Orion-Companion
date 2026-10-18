@@ -441,7 +441,20 @@ export default function NotesPage() {
                       ? "bg-gray-700 border-gray-600 text-gray-100 hover:border-gray-500 prose-headings:text-gray-100 prose-p:text-gray-400 prose-strong:text-gray-100 prose-code:text-violet-300 prose-pre:bg-gray-800 prose-pre:border-gray-600" 
                       : "bg-gray-50 border-gray-200 text-gray-900 hover:border-gray-300 prose-headings:text-gray-900 prose-p:text-gray-600 prose-strong:text-gray-900 prose-code:text-violet-600 prose-pre:bg-white prose-pre:border-gray-200"
                   }`}>
-                    <ReactMarkdown>{activeNote?.content || ""}</ReactMarkdown>
+                    <ReactMarkdown
+                      components={{
+                        a: ({ href, children }) => {
+                          const safe = href && /^(https?:|mailto:)/i.test(href) ? href : undefined;
+                          return (
+                            <a href={safe} rel="noreferrer noopener" target="_blank">
+                              {children}
+                            </a>
+                          );
+                        },
+                      }}
+                    >
+                      {activeNote?.content || ""}
+                    </ReactMarkdown>
                   </div>
                 )}
 

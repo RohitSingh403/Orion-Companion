@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, Notification, Tray, autoUpdater, globalShortcut, ipcMain, nativeImage, screen } from "electron";
+import { app, BrowserWindow, Menu, Notification, Tray, autoUpdater, globalShortcut, ipcMain, nativeImage, screen, session, type IpcMainEvent, type IpcMainInvokeEvent } from "electron";
 import { execFile } from "node:child_process";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -47,7 +47,14 @@ interface TimerSnapshot {
   session: "focus" | "break";
 }
 
+function productIcon() {
+  const image = nativeImage.createFromPath(path.join(process.env.VITE_PUBLIC, "icon.png"));
+  return image.isEmpty() ? null : image;
+}
+
 function trayIcon() {
+  const branded = productIcon();
+  if (branded) return branded.resize({ width: 18, height: 18 });
   const size = 16;
   const buffer = Buffer.alloc(size * size * 4);
   for (let y = 0; y < size; y += 1) {
@@ -64,6 +71,43 @@ function trayIcon() {
   }
   return nativeImage.createFromBitmap(buffer, { width: size, height: size });
 }
+
+function isAllowedNavigation(url: string) {
+  if (url.startsWith("file://")) return true;
+  if (!VITE_DEV_SERVER_URL) return false;
+  try {
+    return new URL(url).origin === new URL(VITE_DEV_SERVER_URL).origin;
+  } catch {
+    return false;
+  }
+}
+
+function harden(target: BrowserWindow) {
+  target.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+  target.webContents.on("will-navigate", (event, url) => {
+    if (!isAllowedNavigation(url)) event.preventDefault();
+  });
+}
+
+function fromApp(event: IpcMainEvent | IpcMainInvokeEvent) {
+  return [win, mini, companion].some((target) => target && !target.isDestroyed() && target.webContents.id === event.sender.id);
+}
+
+function plainText(value: unknown, max: number) {
+  if (typeof value !== "string") return "";
+  return [...value].map((char) => {
+    const code = char.charCodeAt(0);
+    return code < 32 || code === 127 ? " " : char;
+  }).join("").trim().slice(0, max);
+}
+
+const windowPreferences = {
+  preload: path.join(__dirname, "preload.mjs"),
+  contextIsolation: true,
+  nodeIntegration: false,
+  sandbox: true,
+  webSecurity: true,
+};
 
 function loadSurface(target: BrowserWindow, route: string, search: Record<string, string> = {}) {
   if (VITE_DEV_SERVER_URL) {
@@ -212,11 +256,13 @@ function showCompanion() {
     title: "Orion Companion",
     backgroundColor: "#00000000",
     ...(process.platform === "darwin" ? { type: "panel" as const } : {}),
+    icon: productIcon() ?? undefined,
     webPreferences: {
-      preload: path.join(__dirname, "preload.mjs"),
+      ...windowPreferences,
       backgroundThrottling: false,
     },
   });
+  harden(companion);
   placeCompanion(companion);
   keepCompanionAbove();
 
@@ -324,10 +370,10 @@ function createMiniWindow() {
     skipTaskbar: true,
     title: "Orion Mini Timer",
     backgroundColor: "#121418",
-    webPreferences: {
-      preload: path.join(__dirname, "preload.mjs"),
-    },
+    icon: productIcon() ?? undefined,
+    webPreferences: windowPreferences,
   });
+  harden(mini);
 
   loadSurface(mini, "mini-timer", { surface: "mini" });
   mini.webContents.on("did-finish-load", () => {
@@ -417,13 +463,16 @@ function createWindow() {
     title: "Orion Companion",
     backgroundColor: "#121418",
     autoHideMenuBar: true,
-    icon: path.join(process.env.VITE_PUBLIC, "orion.svg"),
+    icon: productIcon() ?? undefined,
 
     webPreferences: {
-      preload: path.join(__dirname, "preload.mjs"),
+      ...windowPreferences,
       backgroundThrottling: false,
     },
   });
+  harden(win);
+  const branded = productIcon();
+  if (branded && process.platform === "darwin" && app.dock) app.dock.setIcon(branded);
 
   win.webContents.on("did-finish-load", () => {
     win?.webContents.send("main-process-message", new Date().toLocaleString());
@@ -481,13 +530,20 @@ app.whenReady().then(() => {
     console.error("Shortcut unavailable:", error);
   }
 
-  ipcMain.on("update-tray-status", (_event, status: string) => {
-    trayLabel = status || "Ready";
+  session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) => {
+    callback(false);
+  });
+
+  ipcMain.on("update-tray-status", (event, status: string) => {
+    if (!fromApp(event)) return;
+    trayLabel = plainText(status, 80) || "Ready";
     rebuildTray();
   });
 
-  ipcMain.on("report-timer", (_event, snapshot: TimerSnapshot) => {
-    if (!snapshot) return;
+  ipcMain.on("report-timer", (event, snapshot: TimerSnapshot) => {
+    if (!fromApp(event) || !snapshot) return;
+    if (snapshot.session !== "focus" && snapshot.session !== "break") return;
+    if (typeof snapshot.remainingTime !== "number" || !Number.isFinite(snapshot.remainingTime)) return;
     latestTimer = snapshot;
     const minutes = Math.floor(snapshot.remainingTime / 60);
     const seconds = snapshot.remainingTime % 60;
@@ -498,14 +554,16 @@ app.whenReady().then(() => {
     if (companion && !companion.isDestroyed()) companion.webContents.send("timer-state", snapshot);
   });
 
-  ipcMain.on("companion-activity", (_event, activity: { mode?: "idle" | "focus" | "break"; dragging?: boolean }) => {
+  ipcMain.on("companion-activity", (event, activity: { mode?: "idle" | "focus" | "break"; dragging?: boolean }) => {
+    if (!fromApp(event)) return;
     if (activity?.mode === "idle" || activity?.mode === "focus" || activity?.mode === "break") petMode = activity.mode;
     petPaused = Boolean(activity?.dragging);
   });
 
   ipcMain.on("companion-nudge", (event, dx: number, dy: number) => {
-    const target = BrowserWindow.fromWebContents(event.sender);
-    if (!target || target.isDestroyed() || !Number.isFinite(dx) || !Number.isFinite(dy)) return;
+    if (!companion || companion.isDestroyed() || event.sender.id !== companion.webContents.id) return;
+    const target = companion;
+    if (!Number.isFinite(dx) || !Number.isFinite(dy)) return;
     const bounds = target.getBounds();
     const area = screen.getDisplayNearestPoint({ x: bounds.x, y: bounds.y }).workArea;
     const x = Math.min(Math.max(area.x, bounds.x + dx), area.x + area.width - bounds.width);
@@ -513,42 +571,50 @@ app.whenReady().then(() => {
     target.setPosition(Math.round(x), Math.round(y));
   });
 
-  ipcMain.on("companion-hits", (_event, rects: Array<{ x: number; y: number; width: number; height: number }>) => {
-    if (!Array.isArray(rects)) return;
-    hitRects = rects.filter(
-      (rect) => Number.isFinite(rect.x) && Number.isFinite(rect.y) && rect.width > 0 && rect.height > 0
-    );
+  ipcMain.on("companion-hits", (event, rects: Array<{ x: number; y: number; width: number; height: number }>) => {
+    if (!fromApp(event) || !Array.isArray(rects)) return;
+    hitRects = rects
+      .filter((rect) => Number.isFinite(rect?.x) && Number.isFinite(rect?.y) && rect.width > 0 && rect.height > 0 && rect.width < 2000 && rect.height < 2000)
+      .slice(0, 12);
   });
 
-  ipcMain.on("companion-reminder-sync", () => {
+  ipcMain.on("companion-reminder-sync", (event) => {
+    if (!fromApp(event)) return;
     if (win && !win.isDestroyed()) win.webContents.send("reminder-sync");
   });
 
-  ipcMain.on("companion-exit", () => {
+  ipcMain.on("companion-exit", (event) => {
+    if (!fromApp(event)) return;
     quitting = true;
     app.quit();
   });
 
-  ipcMain.on("companion-show-main", () => {
+  ipcMain.on("companion-show-main", (event) => {
+    if (!fromApp(event)) return;
     showMain();
   });
 
-  ipcMain.on("companion-visibility", (_event, visible: boolean) => {
+  ipcMain.on("companion-visibility", (event, visible: boolean) => {
+    if (!fromApp(event)) return;
     if (visible) showCompanion();
     else hideCompanion();
     if (win && !win.isDestroyed()) win.webContents.send("companion-visibility", Boolean(visible));
   });
 
-  ipcMain.on("mini-command", (_event, command: string) => {
+  ipcMain.on("mini-command", (event, command: string) => {
+    if (!fromApp(event)) return;
+    if (command !== "start" && command !== "pause" && command !== "reset") return;
     win?.webContents.send("mini-command", command);
   });
 
-  ipcMain.on("watch-activity", (_event, enabled: boolean) => {
+  ipcMain.on("watch-activity", (event, enabled: boolean) => {
+    if (!fromApp(event)) return;
     setActivityWatch(Boolean(enabled));
   });
 
   // Focus -> Break
-  ipcMain.on("show-break-notification", () => {
+  ipcMain.on("show-break-notification", (event) => {
+    if (!fromApp(event)) return;
     new Notification({
       title: "☕ Break Time!",
       body: "Great work! Stand up, stretch, and drink some water.",
@@ -556,7 +622,8 @@ app.whenReady().then(() => {
   });
 
   // Break -> Focus
-  ipcMain.on("show-focus-notification", () => {
+  ipcMain.on("show-focus-notification", (event) => {
+    if (!fromApp(event)) return;
     new Notification({
       title: "🧠 Focus Time!",
       body: "Your break is over. Ready for another deep focus session?",
@@ -564,15 +631,19 @@ app.whenReady().then(() => {
   });
 
   // Reminder notification
-  ipcMain.on("show-reminder-notification", (_event, title: string, body: string) => {
+  ipcMain.on("show-reminder-notification", (event, title: string, body: string) => {
+    if (!fromApp(event)) return;
+    const label = plainText(title, 80);
+    if (!label) return;
     new Notification({
-      title: `🔔 ${title}`,
-      body,
+      title: label,
+      body: plainText(body, 180),
     }).show();
   });
 
   // Auto-launch handlers
-  ipcMain.handle("get-auto-launch-status", async () => {
+  ipcMain.handle("get-auto-launch-status", async (event) => {
+    if (!fromApp(event)) return false;
     try {
       const AutoLaunch = (await import("electron-auto-launch")).default;
       const autoLaunch = new AutoLaunch({
@@ -587,7 +658,8 @@ app.whenReady().then(() => {
     }
   });
 
-  ipcMain.handle("toggle-auto-launch", async (_event, enable: boolean) => {
+  ipcMain.handle("toggle-auto-launch", async (event, enable: boolean) => {
+    if (!fromApp(event)) return false;
     try {
       const AutoLaunch = (await import("electron-auto-launch")).default;
       const autoLaunch = new AutoLaunch({

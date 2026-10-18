@@ -47,6 +47,8 @@ export default function SettingsPage() {
     setDisplayName,
     companionEnabled,
     setCompanionEnabled,
+    companionScale,
+    setCompanionScale,
   } = useSettingsStore();
 
   const { setFocusDuration, setBreakDuration, setDailyGoal: setFocusDailyGoal, resetAllData } = useFocusStore();
@@ -435,9 +437,29 @@ export default function SettingsPage() {
           <button
             type="button"
             aria-pressed={companionEnabled}
+            aria-label={companionEnabled ? "Hide companion" : "Show companion"}
             onClick={() => setCompanionEnabled(!companionEnabled)}
             className={`toggle ${companionEnabled ? "active" : ""}`}
           />
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-[#1b1f27] px-4 py-3">
+          <h4 className="text-sm font-medium text-zinc-100">Companion size</h4>
+          <p className="mt-1 text-xs text-zinc-500">The character keeps this size on the desktop and in the app. Actions stay in the menu until you hover or open it.</p>
+          <div className="mt-3 flex gap-2" role="group" aria-label="Companion size">
+            {(["small", "medium", "large"] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                aria-pressed={companionScale === option}
+                onClick={() => setCompanionScale(option)}
+                className={`h-9 flex-1 rounded-full text-xs font-semibold capitalize focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7CFFD4] ${
+                  companionScale === option ? "bg-[#7CFFD4] text-[#14161c]" : "bg-white/5 text-zinc-200"
+                }`}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
         </div>
         <p>While a desktop focus session is running, the app in front is recorded every 15 seconds and shown on the dashboard. The browser does not record apps.</p>
       </div>

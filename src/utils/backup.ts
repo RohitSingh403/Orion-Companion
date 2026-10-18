@@ -50,7 +50,13 @@ export function importBackup(raw: string): { ok: true } | { ok: false; message: 
   }
 
   Object.entries(parsed.data).forEach(([key, value]) => {
-    if (!BACKUP_KEYS.includes(key) || typeof value !== "string") return;
+    if (!BACKUP_KEYS.includes(key) || typeof value !== "string" || value.length > 1_500_000) return;
+    try {
+      const stored = JSON.parse(value) as unknown;
+      if (!stored || typeof stored !== "object" || Array.isArray(stored)) return;
+    } catch {
+      return;
+    }
     localStorage.setItem(key, value);
   });
 

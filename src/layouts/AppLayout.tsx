@@ -24,6 +24,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }, [companionEnabled]);
 
   useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === "focus-companion-settings") void useSettingsStore.persist.rehydrate();
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  useEffect(() => {
     if (!window.focusAPI?.onCompanionVisibility) return undefined;
     return window.focusAPI.onCompanionVisibility((visible) => {
       useSettingsStore.setState({ companionEnabled: visible });

@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+export type CompanionScale = "small" | "medium" | "large";
+
 interface SettingsState {
   // Timer Settings
   focusMinutes: number;
@@ -24,6 +26,7 @@ interface SettingsState {
   theme: "dark" | "light";
   displayName: string;
   companionEnabled: boolean;
+  companionScale: CompanionScale;
 
   // Actions
   setFocusMinutes: (minutes: number) => void;
@@ -39,6 +42,7 @@ interface SettingsState {
   setTheme: (theme: "dark" | "light") => void;
   setDisplayName: (name: string) => void;
   setCompanionEnabled: (enabled: boolean) => void;
+  setCompanionScale: (scale: CompanionScale) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -66,6 +70,7 @@ export const useSettingsStore = create<SettingsState>()(
       theme: "dark",
       displayName: "",
       companionEnabled: true,
+      companionScale: "medium",
 
       // Actions
       setFocusMinutes: (minutes) =>
@@ -131,6 +136,11 @@ export const useSettingsStore = create<SettingsState>()(
       setCompanionEnabled: (enabled) =>
         set({
           companionEnabled: enabled,
+        }),
+
+      setCompanionScale: (companionScale) =>
+        set({
+          companionScale,
         }),
     }),
     {
