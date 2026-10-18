@@ -1,46 +1,31 @@
 import "./companion.css";
 
-function Laptop() {
-  return (
-    <div className="pet-laptop" aria-hidden="true">
-      <div className="pet-screen">
-        <span />
-        <span />
-        <span />
-      </div>
-      <div className="pet-keyboard">
-        <i />
-        <i />
-        <i />
-        <i />
-      </div>
-      <div className="pet-deck" />
-    </div>
-  );
-}
+const SPRITES = {
+  idle: "/companion/front.png",
+  walk: "/companion/walk.png",
+  focus: "/companion/work.png",
+  break: "/companion/coffee.png",
+} as const;
 
-function Coffee() {
-  return (
-    <div className="pet-coffee" aria-hidden="true">
-      <span className="pet-steam pet-steam-a" />
-      <span className="pet-steam pet-steam-b" />
-      <span className="pet-mug" />
-    </div>
-  );
-}
+export type CompanionPose = keyof typeof SPRITES;
 
-export default function CompanionActor({ mode }: { mode: "idle" | "focus" | "break" }) {
+export default function CompanionActor({
+  mode,
+  facing = 1,
+}: {
+  mode: CompanionPose;
+  facing?: 1 | -1;
+}) {
+  const flip = mode === "walk" && facing < 0;
   return (
-    <div className={`pet pet-${mode}`}>
+    <div className={`pet pet-${mode}`} style={flip ? { transform: "scaleX(-1)" } : undefined}>
       <img
-        src="/companion/front.png"
+        src={SPRITES[mode]}
         alt=""
         draggable={false}
         className="pet-body"
       />
       {mode === "idle" && <span className="pet-blink" />}
-      {mode === "focus" && <Laptop />}
-      {mode === "break" && <Coffee />}
     </div>
   );
 }

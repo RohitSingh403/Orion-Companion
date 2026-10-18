@@ -23,6 +23,14 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 let win: BrowserWindow | null = null;
 let mini: BrowserWindow | null = null;
 let companion: BrowserWindow | null = null;
+let petMode: "idle" | "focus" | "break" = "idle";
+let petPaused = false;
+let walkingNow = false;
+let walkTimer: ReturnType<typeof setInterval> | null = null;
+let walkDirection: 1 | -1 = -1;
+let walkLeft = 0;
+let walkPausedUntil = 0;
+let lastWalk: { walking: boolean; facing: 1 | -1 } | null = null;
 let tray: Tray | null = null;
 let quitting = false;
 let trayReady = false;
@@ -102,7 +110,14 @@ function rebuildTray() {
       },
       { type: "separator" },
       {
-        label: "Quit",
+        label: "Close dashboard",
+        click: () => {
+          win?.hide();
+          showCompanion();
+        },
+      },
+      {
+        label: "Quit completely",
         click: () => {
           quitting = true;
           app.quit();
@@ -204,7 +219,10 @@ function showCompanion() {
   companion.webContents.on("did-finish-load", () => {
     if (latestTimer && companion && !companion.isDestroyed()) companion.webContents.send("timer-state", latestTimer);
   });
-  companion.on("moved", rememberCompanionPosition);
+  companion.on("moved", () => {
+    if (walkingNow) return;
+    rememberCompanionPosition();
+  });
   companion.on("closed", () => {
     companion = null;
   });
@@ -212,6 +230,50 @@ function showCompanion() {
 
 function hideCompanion() {
   if (companion && !companion.isDestroyed()) companion.hide();
+}
+
+function publishWalk(walking: boolean) {
+  walkingNow = walking;
+  const next = { walking, facing: walkDirection };
+  if (lastWalk && lastWalk.walking === next.walking && lastWalk.facing === next.facing) return;
+  lastWalk = next;
+  if (companion && !companion.isDestroyed()) companion.webContents.send("companion-walk", next);
+}
+
+function startCompanionWalk() {
+  if (walkTimer) return;
+  walkPausedUntil = Date.now() + 1600;
+  walkTimer = setInterval(() => {
+    if (!companion || companion.isDestroyed() || !companion.isVisible() || petPaused || petMode !== "idle") {
+      publishWalk(false);
+      return;
+    }
+    const now = Date.now();
+    if (now < walkPausedUntil) {
+      publishWalk(false);
+      return;
+    }
+    if (walkLeft <= 0) {
+      walkLeft = 280 + Math.round(Math.random() * 240);
+      walkDirection = Math.random() > 0.5 ? 1 : -1;
+    }
+    const bounds = companion.getBounds();
+    const area = screen.getDisplayNearestPoint({ x: bounds.x, y: bounds.y }).workArea;
+    let nextX = bounds.x + walkDirection * 4;
+    if (nextX <= area.x + 8) {
+      nextX = area.x + 8;
+      walkDirection = 1;
+    }
+    const maxX = area.x + area.width - bounds.width - 8;
+    if (nextX >= maxX) {
+      nextX = maxX;
+      walkDirection = -1;
+    }
+    companion.setPosition(Math.round(nextX), bounds.y);
+    walkLeft -= 4;
+    if (walkLeft <= 0) walkPausedUntil = now + 5000 + Math.round(Math.random() * 5000);
+    publishWalk(true);
+  }, 140);
 }
 
 function createMiniWindow() {
@@ -369,12 +431,14 @@ app.on("before-quit", () => {
 app.on("will-quit", () => {
   globalShortcut.unregisterAll();
   if (activityTimer) clearInterval(activityTimer);
+  if (walkTimer) clearInterval(walkTimer);
 });
 
 app.whenReady().then(() => {
   createWindow();
   createTray();
   showCompanion();
+  startCompanionWalk();
 
   try {
     globalShortcut.register("CommandOrControl+Shift+Space", () => {
@@ -400,6 +464,11 @@ app.whenReady().then(() => {
     rebuildTray();
     if (mini && !mini.isDestroyed()) mini.webContents.send("timer-state", snapshot);
     if (companion && !companion.isDestroyed()) companion.webContents.send("timer-state", snapshot);
+  });
+
+  ipcMain.on("companion-activity", (_event, activity: { mode?: "idle" | "focus" | "break"; dragging?: boolean }) => {
+    if (activity?.mode === "idle" || activity?.mode === "focus" || activity?.mode === "break") petMode = activity.mode;
+    petPaused = Boolean(activity?.dragging);
   });
 
   ipcMain.on("companion-nudge", (event, dx: number, dy: number) => {

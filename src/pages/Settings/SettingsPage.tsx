@@ -444,7 +444,7 @@ export default function SettingsPage() {
         <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-[#1b1f27] px-4 py-3">
           <div>
             <h4 className="text-sm font-medium text-zinc-100">Screen companion</h4>
-            <p className="mt-1 text-xs text-zinc-500">The character stays on the desktop after this window closes. It types during a focus block and drinks coffee on a break. Drag the character. Hide it from the character or the tray.</p>
+            <p className="mt-1 text-xs text-zinc-500">The character walks the desktop while you are idle, sits and types during a focus block, and drinks coffee on a break. Due reminders show on the message board. Close dashboard from the tray leaves the character on screen. Quit completely exits both.</p>
           </div>
           <button
             type="button"
