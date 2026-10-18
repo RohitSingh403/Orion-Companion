@@ -9,6 +9,7 @@ import {
   FiGrid,
   FiSettings,
   FiSquare,
+  FiZap,
 } from "react-icons/fi";
 import OrionMark from "../components/brand/OrionMark";
 import { useSettingsStore } from "../store/settingsStore";
@@ -20,6 +21,7 @@ const NAV_ITEMS = [
   { label: "Calendar", path: "/calendar", icon: FiCalendar },
   { label: "Notes", path: "/notes", icon: FiFileText },
   { label: "Analytics", path: "/analytics", icon: FiBarChart2 },
+  { label: "Suggestions", path: "/ai-companion", icon: FiZap },
   { label: "Achievements", path: "/achievements", icon: FiAward },
   { label: "Reminders", path: "/reminders", icon: FiBell },
 ];
@@ -41,7 +43,7 @@ export default function Sidebar() {
         <Link to="/app" className="rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40" aria-label="Orion Companion home">
           <OrionMark className="h-10 w-10" />
         </Link>
-        <nav aria-label="Main navigation" className="flex flex-col items-center gap-1.5">
+        <nav aria-label="Main navigation" className="flex max-h-[calc(100vh-11rem)] flex-col items-center gap-1.5 overflow-y-auto">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const active = location.pathname === item.path;

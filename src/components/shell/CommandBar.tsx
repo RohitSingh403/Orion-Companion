@@ -3,6 +3,7 @@ import { FiChevronDown, FiPlay, FiPlus, FiPower, FiSquare, FiVolume2 } from "rea
 import { useFocusStore } from "../../store/focusStore";
 import { useTaskStore } from "../../store/taskStore";
 import { formatClock } from "../../utils/activity";
+import CommandSearch from "./CommandSearch";
 import { useAmbient, type AmbientScene } from "./useAmbient";
 
 const SCENES: AmbientScene[] = ["Coffee Shop", "Rain", "Night"];
@@ -122,6 +123,8 @@ export default function CommandBar() {
           ) : null}
         </div>
       </div>
+
+      <CommandSearch />
 
       <div className="flex items-center gap-2">
         <div className="relative" ref={quickAddRef}>

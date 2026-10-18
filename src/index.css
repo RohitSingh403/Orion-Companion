@@ -105,6 +105,12 @@
   transform: translateY(0);
 }
 
+.orion-shell .btn-secondary {
+  background: #1c212b;
+  color: #f4f4f5;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
 .btn-secondary {
   background: #ffffff;
   color: #71717a;
@@ -630,8 +636,16 @@
   background-color: #121418;
 }
 
-.orion-shell .bg-gray-800 {
+.orion-shell .bg-gray-800,
+.orion-shell .bg-white.border-gray-200,
+.orion-shell .bg-white.border-gray-300,
+.orion-shell .bg-white.text-gray-900 {
   background-color: #1b1f27;
+}
+
+.orion-shell .bg-gray-50,
+.orion-shell .bg-gray-100 {
+  background-color: #1c212b;
 }
 
 .orion-shell .bg-gray-700 {
@@ -642,7 +656,65 @@
   background-color: #323846;
 }
 
+.orion-shell .hover\:bg-gray-100:hover,
+.orion-shell .hover\:bg-gray-700:hover {
+  background-color: #262b36;
+}
+
+.orion-shell .hover\:bg-gray-600:hover {
+  background-color: #323846;
+}
+
+.orion-shell .border-gray-200,
+.orion-shell .border-gray-300,
 .orion-shell .border-gray-700,
 .orion-shell .border-gray-600 {
   border-color: rgba(255, 255, 255, 0.08);
+}
+
+.orion-shell .text-gray-900,
+.orion-shell .text-gray-800,
+.orion-shell .text-gray-100,
+.orion-shell .hover\:text-gray-900:hover,
+.orion-shell .hover\:text-gray-100:hover {
+  color: #f4f4f5;
+}
+
+.orion-shell .text-gray-600,
+.orion-shell .text-gray-700 {
+  color: #a1a1aa;
+}
+
+.orion-shell .text-gray-500,
+.orion-shell .text-gray-400 {
+  color: #71717a;
+}
+
+.orion-shell .text-violet-300,
+.orion-shell .text-violet-400,
+.orion-shell .text-violet-500,
+.orion-shell .text-violet-600,
+.orion-shell .hover\:text-violet-300:hover,
+.orion-shell .hover\:text-violet-400:hover,
+.orion-shell .hover\:text-violet-600:hover {
+  color: #7cffd4;
+}
+
+.orion-shell .bg-violet-50,
+.orion-shell .bg-violet-500\/10 {
+  background-color: rgba(124, 255, 212, 0.12);
+}
+
+.orion-shell .border-violet-200,
+.orion-shell .border-violet-500\/30,
+.orion-shell .border-violet-500\/40 {
+  border-color: rgba(124, 255, 212, 0.35);
+}
+
+.orion-shell .focus\:border-violet-500:focus {
+  border-color: rgba(124, 255, 212, 0.55);
+}
+
+.orion-shell .focus\:ring-violet-500\/20:focus {
+  --tw-ring-color: rgba(124, 255, 212, 0.25);
 }

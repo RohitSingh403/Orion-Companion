@@ -36,8 +36,24 @@
   animation: pet-wave 0.45s ease-in-out 3;
 }
 
+.pet-sleep {
+  width: 120px;
+  height: 132px;
+}
+
 .pet-sleep .pet-body {
-  animation: pet-breathe 3.4s ease-in-out infinite;
+  height: 124px;
+  animation: pet-rest 4.2s ease-in-out infinite;
+}
+
+@keyframes pet-rest {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(2px);
+  }
 }
 
 .pet-blink {
@@ -113,6 +129,26 @@
   93%,
   96% {
     opacity: 1;
+  }
+}
+
+@media (max-width: 760px) {
+  .pet {
+    width: 108px;
+    height: 128px;
+  }
+
+  .pet-body {
+    height: 120px;
+  }
+
+  .pet-sleep {
+    width: 96px;
+    height: 100px;
+  }
+
+  .pet-sleep .pet-body {
+    height: 96px;
   }
 }
 

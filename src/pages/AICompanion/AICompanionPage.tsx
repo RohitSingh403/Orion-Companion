@@ -1,25 +1,19 @@
 // src/pages/AICompanion/AICompanionPage.tsx
 
-import { useState } from "react";
 import AppLayout from "../../layouts/AppLayout";
 import PageHeading from "../../components/shell/PageHeading";
 import { useAICompanionStore } from "../../store/aiCompanionStore";
 import { useSettingsStore } from "../../store/settingsStore";
-import { FiSun, FiMoon, FiCalendar, FiRefreshCw, FiZap, FiTarget } from "react-icons/fi";
+import { FiSun, FiMoon, FiCalendar, FiZap, FiTarget } from "react-icons/fi";
 
 export default function AICompanionPage() {
   const { suggestions, generateMorningSuggestion, generateEveningSuggestion, generateWeeklySuggestion, clearSuggestions } = useAICompanionStore();
   const theme = useSettingsStore((s) => s.theme);
   const isDark = theme === "dark";
-  const [loading, setLoading] = useState(false);
 
-  const handleGenerate = async (type: "morning" | "evening" | "weekly") => {
-    setLoading(true);
+  const handleGenerate = (type: "morning" | "evening" | "weekly") => {
     clearSuggestions();
-    
-    // Simulate AI processing delay for better UX
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    
+
     switch (type) {
       case "morning":
         generateMorningSuggestion();
@@ -31,8 +25,6 @@ export default function AICompanionPage() {
         generateWeeklySuggestion();
         break;
     }
-    
-    setLoading(false);
   };
 
   const getCurrentHour = () => {
@@ -62,10 +54,10 @@ export default function AICompanionPage() {
             <div>
               <h2 className={`text-lg font-semibold ${
                 isDark ? "text-violet-400" : "text-violet-600"
-              }`}>Your Personal Assistant</h2>
+              }`}>Suggestions on this computer</h2>
               <p className={`text-sm mt-1 ${
                 isDark ? "text-gray-500" : "text-gray-500"
-              }`}>Get context-aware suggestions based on your work patterns</p>
+              }`}>Morning, evening, and weekly notes from the sessions and tasks stored here</p>
             </div>
             <button
               onClick={() => clearSuggestions()}
@@ -81,7 +73,6 @@ export default function AICompanionPage() {
           <div className="grid grid-cols-3 gap-4 mb-6">
             <button
               onClick={() => handleGenerate("morning")}
-              disabled={loading}
               className={`flex flex-col items-center gap-2 p-4 border rounded-lg transition-all group ${
                 isDark 
                   ? "bg-gray-700 border-gray-600 hover:bg-gray-600" 
@@ -95,7 +86,6 @@ export default function AICompanionPage() {
             </button>
             <button
               onClick={() => handleGenerate("evening")}
-              disabled={loading}
               className={`flex flex-col items-center gap-2 p-4 border rounded-lg transition-all group ${
                 isDark 
                   ? "bg-gray-700 border-gray-600 hover:bg-gray-600" 
@@ -109,7 +99,6 @@ export default function AICompanionPage() {
             </button>
             <button
               onClick={() => handleGenerate("weekly")}
-              disabled={loading}
               className={`flex flex-col items-center gap-2 p-4 border rounded-lg transition-all group ${
                 isDark 
                   ? "bg-gray-700 border-gray-600 hover:bg-gray-600" 
@@ -125,16 +114,7 @@ export default function AICompanionPage() {
 
           {/* Suggestions Display */}
           <div className="flex-1 overflow-y-auto">
-            {loading ? (
-              <div className="flex flex-col items-center justify-center h-full py-12">
-                <FiRefreshCw className={`w-8 h-8 animate-spin mb-3 ${
-                  isDark ? "text-violet-400" : "text-violet-600"
-                }`} />
-                <p className={`text-sm ${
-                  isDark ? "text-gray-500" : "text-gray-500"
-                }`}>Analyzing your patterns...</p>
-              </div>
-            ) : suggestions.length === 0 ? (
+            {suggestions.length === 0 ? (
               <div className={`text-center py-12 border border-dashed rounded-lg ${
                 isDark 
                   ? "bg-gray-700 border-gray-600" 
@@ -198,7 +178,7 @@ export default function AICompanionPage() {
             <p className={`text-xs text-center ${
               isDark ? "text-gray-500" : "text-gray-500"
             }`}>
-              Suggestions are based on your local focus patterns, task completion, and productivity data. No data is sent to external servers.
+              These lines are calculated on this computer from your sessions and tasks. Nothing is sent anywhere.
             </p>
           </div>
         </div>

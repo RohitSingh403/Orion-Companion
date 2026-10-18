@@ -53,6 +53,7 @@ export default function ScreenCompanion({
   const [now, setNow] = useState(() => Date.now());
   const [floated, setFloated] = useState(false);
   const [walking, setWalking] = useState(false);
+  const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.innerWidth < 760);
   const [facing, setFacing] = useState<1 | -1>(1);
   const [spot, setSpot] = useState({ left: 0, ready: false });
   const [dragging, setDragging] = useState(false);
@@ -139,7 +140,14 @@ export default function ScreenCompanion({
   }, [desktop, line.mode, dragging, hovering, reacting, asleep]);
 
   useEffect(() => {
-    if (desktop || floating || line.mode !== "idle" || reacting || asleep) {
+    const onResize = () => setNarrow(window.innerWidth < 760);
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useEffect(() => {
+    if (desktop || floating || narrow || line.mode !== "idle" || reacting || asleep) {
       setWalking(false);
       return undefined;
     }
@@ -173,7 +181,7 @@ export default function ScreenCompanion({
       setSpot({ left, ready: true });
     }, 120);
     return () => window.clearInterval(id);
-  }, [desktop, floating, line.mode, reacting, asleep]);
+  }, [desktop, floating, narrow, line.mode, reacting, asleep]);
 
   function toggle() {
     if (desktop) {
@@ -260,7 +268,7 @@ export default function ScreenCompanion({
     ? "w-full bg-transparent p-3"
     : desktop
       ? "h-screen w-screen bg-transparent p-2"
-      : `pointer-events-none fixed bottom-4 z-30 w-[250px] ${spot.ready ? "" : "right-4"}`;
+      : `pointer-events-none fixed bottom-4 z-30 w-[300px] ${spot.ready ? "" : "right-4"}`;
 
   return (
     <aside

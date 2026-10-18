@@ -43,7 +43,6 @@ export default function SettingsPage() {
     setFocusSound,
     setDesktopNotifications,
     setBreakReminder,
-    setTheme,
     displayName,
     setDisplayName,
     companionEnabled,
@@ -295,27 +294,14 @@ export default function SettingsPage() {
   const renderAppearanceSettings = () => (
     <div className="space-y-6">
       <h3 className={`text-base font-semibold pb-3 border-b ${isDark ? "text-violet-400 border-gray-700" : "text-violet-600 border-gray-200"}`}>
-        Appearance Settings
+        Appearance
       </h3>
 
-      <div className="space-y-4">
-        {/* Theme Select */}
-        <div className="space-y-2">
-          <label className={`text-sm font-medium ${isDark ? "text-gray-500" : "text-gray-600"}`}>Theme</label>
-          <select
-            value={theme}
-            onChange={(e) => setTheme(e.target.value as "dark" | "light")}
-            className={`w-full h-10 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
-              isDark 
-                ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500" 
-                : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500"
-            } border`}
-          >
-            <option value="dark">Dark Mode</option>
-            <option value="light">Light Mode</option>
-          </select>
-          <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Light mode changes the inner pages. The dashboard stays in the dark workspace.</p>
-        </div>
+      <div className="space-y-2">
+        <h4 className={`text-sm font-medium ${isDark ? "text-gray-100" : "text-gray-900"}`}>Workspace</h4>
+        <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>
+          Orion uses one dark workspace on every page, including Tasks, Notes, Calendar, Reminders, and Settings.
+        </p>
       </div>
     </div>
   );
@@ -349,7 +335,7 @@ export default function SettingsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h4 className={`text-sm font-medium ${isDark ? "text-gray-100" : "text-gray-900"}`}>Auto Launch on Startup</h4>
-            <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Start Focus Companion automatically when your computer starts</p>
+            <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>Start Orion when this computer starts</p>
           </div>
           <button
             onClick={handleToggleAutoLaunch}

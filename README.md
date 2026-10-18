@@ -1,6 +1,6 @@
-# Focus Companion v2.0.0
+# Orion Companion
 
-A complete personal productivity operating system built around Focus Sessions (Pomodoro). Everything connects to the Focus Timer — tasks, reminders, analytics, achievements, projects, notes, and statistics.
+A local personal productivity app built around Focus Sessions (Pomodoro). Tasks, notes, reminders, analytics, and achievements stay on this computer. A pixel screen character walks the desktop, sits down while a timer runs, and rests when you leave it alone.
 
 ![version](https://img.shields.io/badge/version-2.0.0--latest--release-brightgreen)
 ![platform](https://img.shields.io/badge/platform-desktop-lightgrey)
@@ -10,21 +10,21 @@ A complete personal productivity operating system built around Focus Sessions (P
 
 ## Overview
 
-Focus Companion is a production-ready, single-user desktop application designed for deep work and productivity. Built with Electron, React, and TypeScript, it provides a complete productivity ecosystem with intelligent insights, local AI companion, and a modern professional UI design system.
+Orion Companion is a single-user desktop app for deep work. It is built with Electron, React, and TypeScript. Sessions, tasks, notes, and reminders are stored in the browser profile on this computer. There is no account and no network call for suggestions.
 
 **Key Features:**
 - 🎯 Focus Timer with Pomodoro sessions
 - 📋 Task Management with priority and session estimates
 - 📅 Calendar with event scheduling and export
 - 📝 Notes with markdown and attachments
-- 📊 Advanced Analytics with pattern detection
-- 🔔 Reminders with custom recurring schedules
-- 🤖 Local AI Companion for personalized suggestions
+- 📊 Analytics with a canvas contribution heatmap
+- 🔔 Reminders with custom recurring schedules, including Done and Snooze on the character
+- 💡 Suggestions calculated on this computer from sessions and tasks
+- 🧍 Screen character that walks, works at a laptop, drinks coffee, waves, and rests
 - 🏆 Achievements and XP system
-- ⚙️ Comprehensive Settings with real-time sync
+- ⚙️ Settings, including launch at startup
 - 🖥️ Desktop integration (system tray, global shortcuts, mini timer)
-- 🔄 Auto-updates via GitHub releases
-- 🎨 Modern professional UI design system
+- 🎨 One dark workspace across Dashboard, Focus, Tasks, Notes, Calendar, and Settings
 
 ---
 
@@ -185,7 +185,7 @@ Focus Companion is a production-ready, single-user desktop application designed 
 - **Focus Settings**: Focus duration (15-60 min), break duration (3-15 min), daily session goal (4-12 sessions)
 - **Sounds**: Sound enabled toggle, custom break/focus sound selection (Default Chime, Bell, Gentle Tone, Motivation, Subtle Tone)
 - **Notifications**: Desktop notifications toggle, break reminder toggle
-- **Appearance**: Theme selection (Dark/Light mode) with real-time application
+- **Appearance**: One dark workspace across every page
 - **General**: Auto-launch on startup toggle
 - **Auto-start Features**: Auto-start break timer when focus completes, auto-start focus when break ends
 - **Data & Backup**: Reset all stats button to clear focus sessions, history, streaks, and daily statistics
@@ -197,6 +197,7 @@ Focus Companion is a production-ready, single-user desktop application designed 
 - Window minimizes to tray instead of closing
 - Dynamic tray tooltip showing focus status and time
 - Floating Mini Timer (always on top, frameless, transparent)
+- Screen character that stays up when the dashboard is closed, walks the desktop, and can snooze a due reminder
 - Global Shortcut (Ctrl + Shift + Space for quick capture)
 - Auto Launch (start with OS with toggle in Settings)
 - Auto-updates via GitHub releases
@@ -233,8 +234,8 @@ App.tsx
 └── AppRouter
     └── AppLayout
         ├── Sidebar (Navigation)
-        ├── Topbar (Global Header)
-        └── Pages (9 Modules)
+        ├── CommandBar (timer, search, quick add)
+        └── Pages (Dashboard, Focus, Workspace, Calendar, Notes, Analytics, Suggestions, Achievements, Reminders, Settings)
             └── Components
                 └── Stores (Zustand)
 ```
@@ -425,7 +426,7 @@ No environment variables required for local development. The app uses Electron's
 Build configuration is defined in `package.json` under the `build` section:
 
 - **App ID**: `com.focuscompanion.app`
-- **Product Name**: `Focus Companion`
+- **Product Name**: `Orion Companion`
 - **Output Directory**: `release/`
 - **Update Provider**: GitHub Releases
 - **Platforms**: macOS (x64, arm64), Windows, Linux
