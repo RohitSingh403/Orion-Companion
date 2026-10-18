@@ -31,6 +31,8 @@ let walkDirection: 1 | -1 = -1;
 let walkLeft = 0;
 let walkPausedUntil = 0;
 let lastWalk: { walking: boolean; facing: 1 | -1 } | null = null;
+let hitRects: Array<{ x: number; y: number; width: number; height: number }> = [];
+let mouseIgnored = false;
 let tray: Tray | null = null;
 let quitting = false;
 let trayReady = false;
@@ -118,6 +120,13 @@ function rebuildTray() {
       },
       {
         label: "Quit completely",
+        click: () => {
+          win?.hide();
+          showCompanion();
+        },
+      },
+      {
+        label: "Exit Orion",
         click: () => {
           quitting = true;
           app.quit();
@@ -240,6 +249,28 @@ function publishWalk(walking: boolean) {
   if (companion && !companion.isDestroyed()) companion.webContents.send("companion-walk", next);
 }
 
+function syncCompanionMouse() {
+  if (!companion || companion.isDestroyed() || !companion.isVisible()) return;
+  if (petPaused) {
+    if (mouseIgnored) {
+      companion.setIgnoreMouseEvents(false);
+      mouseIgnored = false;
+    }
+    return;
+  }
+  const point = screen.getCursorScreenPoint();
+  const bounds = companion.getBounds();
+  const inside = hitRects.some((rect) => {
+    const x = bounds.x + rect.x;
+    const y = bounds.y + rect.y;
+    return point.x >= x && point.x <= x + rect.width && point.y >= y && point.y <= y + rect.height;
+  });
+  if (inside === !mouseIgnored) return;
+  mouseIgnored = !inside;
+  if (process.platform === "linux") companion.setIgnoreMouseEvents(mouseIgnored);
+  else companion.setIgnoreMouseEvents(mouseIgnored, { forward: true });
+}
+
 function startCompanionWalk() {
   if (walkTimer) return;
   walkPausedUntil = Date.now() + 1600;
@@ -274,6 +305,7 @@ function startCompanionWalk() {
     if (walkLeft <= 0) walkPausedUntil = now + 5000 + Math.round(Math.random() * 5000);
     publishWalk(true);
   }, 140);
+  setInterval(syncCompanionMouse, 40);
 }
 
 function createMiniWindow() {
@@ -481,11 +513,20 @@ app.whenReady().then(() => {
     target.setPosition(Math.round(x), Math.round(y));
   });
 
-  ipcMain.on("companion-mouse-passthrough", (event, ignore: boolean) => {
-    if (process.platform === "linux") return;
-    const target = BrowserWindow.fromWebContents(event.sender);
-    if (!target || target.isDestroyed()) return;
-    target.setIgnoreMouseEvents(Boolean(ignore), { forward: true });
+  ipcMain.on("companion-hits", (_event, rects: Array<{ x: number; y: number; width: number; height: number }>) => {
+    if (!Array.isArray(rects)) return;
+    hitRects = rects.filter(
+      (rect) => Number.isFinite(rect.x) && Number.isFinite(rect.y) && rect.width > 0 && rect.height > 0
+    );
+  });
+
+  ipcMain.on("companion-reminder-sync", () => {
+    if (win && !win.isDestroyed()) win.webContents.send("reminder-sync");
+  });
+
+  ipcMain.on("companion-exit", () => {
+    quitting = true;
+    app.quit();
   });
 
   ipcMain.on("companion-show-main", () => {

@@ -120,6 +120,24 @@ contextBridge.exposeInMainWorld("focusAPI", {
     ipcRenderer.send("companion-mouse-passthrough", ignore);
   },
 
+  setCompanionHits(rects: Array<{ x: number; y: number; width: number; height: number }>) {
+    ipcRenderer.send("companion-hits", rects);
+  },
+
+  syncReminders() {
+    ipcRenderer.send("companion-reminder-sync");
+  },
+
+  exitCompanion() {
+    ipcRenderer.send("companion-exit");
+  },
+
+  onReminderSync(callback: () => void) {
+    const listener = () => callback();
+    ipcRenderer.on("reminder-sync", listener);
+    return () => ipcRenderer.removeListener("reminder-sync", listener);
+  },
+
   setCompanionActivity(activity: { mode: "idle" | "focus" | "break"; dragging: boolean }) {
     ipcRenderer.send("companion-activity", activity);
   },

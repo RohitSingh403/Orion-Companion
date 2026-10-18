@@ -30,6 +30,7 @@ describe("companionMessage", () => {
   it("puts a due reminder on the board and previews one that is close", () => {
     const now = Date.parse("2026-10-18T12:00:00");
     const due = {
+      id: "stretch",
       title: "Stand up",
       status: "pending",
       dueDate: "2026-10-18T11:50:00",
@@ -38,6 +39,7 @@ describe("companionMessage", () => {
       mode: "focus",
       title: "Reminder",
       body: "Stand up",
+      reminderId: "stretch",
     });
 
     const soon = {

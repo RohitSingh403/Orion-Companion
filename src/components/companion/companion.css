@@ -32,6 +32,14 @@
   animation: pet-sip 3.2s ease-in-out infinite;
 }
 
+.pet-react .pet-body {
+  animation: pet-wave 0.45s ease-in-out 3;
+}
+
+.pet-sleep .pet-body {
+  animation: pet-breathe 3.4s ease-in-out infinite;
+}
+
 .pet-blink {
   position: absolute;
   top: 21%;
@@ -83,6 +91,16 @@
   }
   82% {
     transform: translateY(-2px);
+  }
+}
+
+@keyframes pet-wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-4deg);
   }
 }
 

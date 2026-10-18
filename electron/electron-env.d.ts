@@ -47,6 +47,10 @@ interface Window {
     showMainWindow: () => void;
     setCompanionVisible: (visible: boolean) => void;
     setCompanionMousePassthrough: (ignore: boolean) => void;
+    setCompanionHits: (rects: Array<{ x: number; y: number; width: number; height: number }>) => void;
+    syncReminders: () => void;
+    exitCompanion: () => void;
+    onReminderSync: (callback: () => void) => () => void;
     setCompanionActivity: (activity: { mode: "idle" | "focus" | "break"; dragging: boolean }) => void;
     onCompanionWalk: (callback: (state: { walking: boolean; facing: 1 | -1 }) => void) => () => void;
     onCompanionVisibility: (callback: (visible: boolean) => void) => () => void;

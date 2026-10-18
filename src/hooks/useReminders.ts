@@ -29,6 +29,22 @@ export default function useReminders() {
 
   useEffect(() => {
     if (isSideSurface()) return undefined;
+    const sync = (event: StorageEvent) => {
+      if (event.key && event.key !== "reminder-storage") return;
+      void useReminderStore.persist.rehydrate();
+    };
+    window.addEventListener("storage", sync);
+    const stop = window.focusAPI?.onReminderSync?.(() => {
+      void useReminderStore.persist.rehydrate();
+    });
+    return () => {
+      window.removeEventListener("storage", sync);
+      stop?.();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isSideSurface()) return undefined;
     const check = () => {
       const dueReminders = getDueReminders();
       dueReminders.forEach((reminder) => {

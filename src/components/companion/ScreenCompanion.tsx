@@ -57,8 +57,11 @@ export default function ScreenCompanion({
   const [spot, setSpot] = useState({ left: 0, ready: false });
   const [dragging, setDragging] = useState(false);
   const [hovering, setHovering] = useState(false);
-  const drag = useRef<{ x: number; y: number } | null>(null);
-  const passthrough = useRef<boolean | null>(null);
+  const [reacting, setReacting] = useState(false);
+  const [asleep, setAsleep] = useState(false);
+  const drag = useRef<{ x: number; y: number; moved: boolean } | null>(null);
+  const reactTimer = useRef<number | null>(null);
+  const lastTouch = useRef(Date.now());
   const pipRoot = useRef<Root | null>(null);
   const desktop = variant === "desktop";
   const canFloat = !desktop && !floating && "documentPictureInPicture" in window;
@@ -90,40 +93,53 @@ export default function ScreenCompanion({
   }, []);
 
   useEffect(() => {
-    if (!desktop || !window.focusAPI?.setCompanionMousePassthrough) return undefined;
-
-    const sync = (event: MouseEvent) => {
-      if (drag.current) return;
-      const node = document.elementFromPoint(event.clientX, event.clientY);
-      const hit = Boolean(node?.closest("[data-companion-hit]"));
-      const ignore = !hit;
-      if (passthrough.current === ignore) return;
-      passthrough.current = ignore;
-      setHovering(!ignore);
-      window.focusAPI?.setCompanionMousePassthrough(ignore);
+    if (!desktop || !window.focusAPI?.setCompanionHits) return undefined;
+    const send = () => {
+      const rects = [...document.querySelectorAll("[data-companion-hit]")].map((node) => {
+        const rect = node.getBoundingClientRect();
+        return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+      });
+      window.focusAPI?.setCompanionHits(rects);
     };
-
-    window.addEventListener("mousemove", sync);
-    return () => {
-      window.removeEventListener("mousemove", sync);
-      window.focusAPI?.setCompanionMousePassthrough(false);
-    };
-  }, [desktop]);
+    send();
+    const id = window.setInterval(send, 200);
+    return () => window.clearInterval(id);
+  }, [desktop, reacting, asleep]);
 
   const snapshot = remote ?? { remainingTime, running, session };
   const line = companionMessage(snapshot, reminders, now);
-  const pose: CompanionPose = walking && line.mode === "idle" ? "walk" : line.mode;
+  const pose: CompanionPose =
+    line.mode === "focus" || line.mode === "break"
+      ? line.mode
+      : reacting
+        ? "react"
+        : walking
+          ? "walk"
+          : asleep
+            ? "sleep"
+            : "idle";
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      if (line.mode !== "idle" || dragging || reacting) {
+        setAsleep(false);
+        return;
+      }
+      if (Date.now() - lastTouch.current >= 12000) setAsleep(true);
+    }, 500);
+    return () => window.clearInterval(id);
+  }, [line.mode, dragging, reacting]);
 
   useEffect(() => {
     if (!desktop) return;
     window.focusAPI?.setCompanionActivity({
       mode: line.mode,
-      dragging: dragging || hovering,
+      dragging: dragging || hovering || reacting || asleep,
     });
-  }, [desktop, line.mode, dragging, hovering]);
+  }, [desktop, line.mode, dragging, hovering, reacting, asleep]);
 
   useEffect(() => {
-    if (desktop || floating || line.mode !== "idle") {
+    if (desktop || floating || line.mode !== "idle" || reacting || asleep) {
       setWalking(false);
       return undefined;
     }
@@ -157,7 +173,7 @@ export default function ScreenCompanion({
       setSpot({ left, ready: true });
     }, 120);
     return () => window.clearInterval(id);
-  }, [desktop, floating, line.mode]);
+  }, [desktop, floating, line.mode, reacting, asleep]);
 
   function toggle() {
     if (desktop) {
@@ -168,14 +184,17 @@ export default function ScreenCompanion({
     else start();
   }
 
+  function wake() {
+    lastTouch.current = Date.now();
+    setAsleep(false);
+  }
+
   function onDragStart(event: PointerEvent<HTMLElement>) {
     if (event.button !== 0) return;
-    drag.current = { x: event.screenX, y: event.screenY };
+    wake();
+    drag.current = { x: event.screenX, y: event.screenY, moved: false };
     setDragging(true);
-    if (desktop) {
-      passthrough.current = false;
-      window.focusAPI?.setCompanionMousePassthrough(false);
-    }
+    setAsleep(false);
     event.currentTarget.setPointerCapture(event.pointerId);
   }
 
@@ -183,7 +202,8 @@ export default function ScreenCompanion({
     if (!drag.current) return;
     const dx = event.screenX - drag.current.x;
     const dy = event.screenY - drag.current.y;
-    drag.current = { x: event.screenX, y: event.screenY };
+    if (Math.abs(dx) + Math.abs(dy) > 4) drag.current.moved = true;
+    drag.current = { x: event.screenX, y: event.screenY, moved: drag.current.moved };
     if (desktop) {
       if (dx !== 0 || dy !== 0) window.focusAPI?.nudgeCompanion(dx, dy);
       return;
@@ -195,8 +215,22 @@ export default function ScreenCompanion({
   }
 
   function onDragEnd() {
+    const clicked = Boolean(drag.current && !drag.current.moved);
     drag.current = null;
     setDragging(false);
+    if (!clicked || line.mode !== "idle") return;
+    setReacting(true);
+    setAsleep(false);
+    if (reactTimer.current) window.clearTimeout(reactTimer.current);
+    reactTimer.current = window.setTimeout(() => setReacting(false), 1600);
+  }
+
+  function settleReminder(action: "done" | "snooze") {
+    const id = line.reminderId;
+    if (!id) return;
+    if (action === "done") useReminderStore.getState().completeReminder(id);
+    else useReminderStore.getState().snoozeReminder(id, 10);
+    window.focusAPI?.syncReminders();
   }
 
   async function floatOut() {
@@ -234,12 +268,35 @@ export default function ScreenCompanion({
       style={!desktop && !floating && spot.ready ? { left: spot.left, right: "auto" } : undefined}
       aria-label="Screen companion"
       data-companion-root
+      onPointerEnter={() => {
+        wake();
+        setHovering(true);
+      }}
+      onPointerLeave={() => setHovering(false)}
     >
       <div className={desktop || floating ? "flex h-full flex-col justify-end" : "pointer-events-auto"}>
         <div data-companion-hit className="relative rounded-2xl border border-white/10 bg-[#1b1f27] px-3 py-2 text-[#f4f4f5]">
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#7CFFD4]">{line.title}</p>
           <p className="mt-1 text-xs leading-relaxed text-zinc-300">{line.body}</p>
           <p className="mt-2 font-semibold tabular-nums text-[#8AF6FF]">{clock(snapshot.remainingTime)}</p>
+          {line.reminderId && (
+            <div className="mt-2 flex gap-1.5">
+              <button
+                type="button"
+                onClick={() => settleReminder("done")}
+                className="rounded-full bg-[#7CFFD4] px-2.5 py-1 text-[11px] font-semibold text-[#14161c] focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                Done
+              </button>
+              <button
+                type="button"
+                onClick={() => settleReminder("snooze")}
+                className="rounded-full border border-white/15 px-2.5 py-1 text-[11px] font-semibold text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7CFFD4]"
+              >
+                Snooze
+              </button>
+            </div>
+          )}
           <span className="absolute -bottom-1.5 left-8 h-3 w-3 rotate-45 border-b border-r border-white/10 bg-[#1b1f27]" />
         </div>
         <div className="mt-2 flex items-end justify-between gap-2">
@@ -286,6 +343,15 @@ export default function ScreenCompanion({
                 className="rounded-full px-3 py-1 text-[11px] text-zinc-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7CFFD4]"
               >
                 Hide
+              </button>
+            )}
+            {desktop && (
+              <button
+                type="button"
+                onClick={() => window.focusAPI?.exitCompanion()}
+                className="rounded-full px-3 py-1 text-[11px] text-zinc-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7CFFD4]"
+              >
+                Exit
               </button>
             )}
           </div>
