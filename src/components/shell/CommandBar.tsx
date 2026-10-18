@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { FiChevronDown, FiPlay, FiPlus, FiPower, FiSquare, FiVolume2 } from "react-icons/fi";
+import { FiChevronDown, FiEye, FiEyeOff, FiPlay, FiPlus, FiPower, FiSquare, FiVolume2 } from "react-icons/fi";
 import { useFocusStore } from "../../store/focusStore";
+import { useSettingsStore } from "../../store/settingsStore";
 import { useTaskStore } from "../../store/taskStore";
 import { formatClock } from "../../utils/activity";
 import CommandSearch from "./CommandSearch";
@@ -17,6 +18,8 @@ export default function CommandBar() {
   const reset = useFocusStore((state) => state.reset);
   const ambient = useAmbient();
   const addTask = useTaskStore((state) => state.addTask);
+  const companionEnabled = useSettingsStore((state) => state.companionEnabled);
+  const setCompanionEnabled = useSettingsStore((state) => state.setCompanionEnabled);
   const [menuOpen, setMenuOpen] = useState(false);
   const [quickAddOpen, setQuickAddOpen] = useState(false);
   const [taskTitle, setTaskTitle] = useState("");
@@ -127,6 +130,15 @@ export default function CommandBar() {
       <CommandSearch />
 
       <div className="flex items-center gap-2">
+        <button
+          type="button"
+          aria-pressed={companionEnabled}
+          onClick={() => setCompanionEnabled(!companionEnabled)}
+          className="flex h-10 items-center gap-1.5 rounded-full border border-white/10 bg-[#1c212b] px-3 text-xs font-semibold text-zinc-100 hover:bg-[#262b36] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+        >
+          {companionEnabled ? <FiEyeOff className="h-3.5 w-3.5" aria-hidden="true" /> : <FiEye className="h-3.5 w-3.5" aria-hidden="true" />}
+          {companionEnabled ? "Hide companion" : "Show companion"}
+        </button>
         <div className="relative" ref={quickAddRef}>
           <button
             type="button"

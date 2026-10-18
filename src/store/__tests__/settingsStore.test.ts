@@ -19,6 +19,8 @@ describe("settingsStore", () => {
       desktopNotifications: true,
       breakReminder: true,
       theme: "dark",
+      companionEnabled: true,
+      companionScale: "medium",
     });
   });
 
@@ -146,5 +148,15 @@ describe("settingsStore", () => {
     });
 
     expect(result.current.theme).toBe("light");
+  });
+
+  it("should set companion size", () => {
+    const { result } = renderHook(() => useSettingsStore());
+
+    act(() => {
+      result.current.setCompanionScale("large");
+    });
+
+    expect(result.current.companionScale).toBe("large");
   });
 });

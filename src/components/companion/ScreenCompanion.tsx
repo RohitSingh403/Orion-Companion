@@ -5,6 +5,8 @@ import { useFocusStore } from "../../store/focusStore";
 import { useReminderStore } from "../../store/reminderStore";
 import { companionMessage, type CompanionSnapshot } from "../../utils/companionMessage";
 import CompanionActor, { type CompanionPose } from "./CompanionActor";
+import CompanionControls from "./CompanionControls";
+import { useSettingsStore } from "../../store/settingsStore";
 
 function clock(total: number) {
   const minutes = Math.floor(Math.max(0, total) / 60);
@@ -60,6 +62,8 @@ export default function ScreenCompanion({
   const [hovering, setHovering] = useState(false);
   const [reacting, setReacting] = useState(false);
   const [asleep, setAsleep] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const scale = useSettingsStore((state) => state.companionScale);
   const drag = useRef<{ x: number; y: number; moved: boolean } | null>(null);
   const reactTimer = useRef<number | null>(null);
   const lastTouch = useRef(Date.now());
@@ -83,10 +87,12 @@ export default function ScreenCompanion({
   useEffect(() => {
     const refresh = () => {
       void useReminderStore.persist.rehydrate();
+      void useSettingsStore.persist.rehydrate();
       setNow(Date.now());
     };
     window.addEventListener("storage", refresh);
     const id = window.setInterval(refresh, 15000);
+    void useSettingsStore.persist.rehydrate();
     return () => {
       window.removeEventListener("storage", refresh);
       window.clearInterval(id);
@@ -135,9 +141,9 @@ export default function ScreenCompanion({
     if (!desktop) return;
     window.focusAPI?.setCompanionActivity({
       mode: line.mode,
-      dragging: dragging || hovering || reacting || asleep,
+      dragging: dragging || hovering || reacting || asleep || menuOpen,
     });
-  }, [desktop, line.mode, dragging, hovering, reacting, asleep]);
+  }, [desktop, line.mode, dragging, hovering, reacting, asleep, menuOpen]);
 
   useEffect(() => {
     const onResize = () => setNarrow(window.innerWidth < 760);
@@ -310,7 +316,9 @@ export default function ScreenCompanion({
         <div className="mt-2 flex items-end justify-between gap-2">
           <div
             data-companion-hit
-            className={desktop || !floating ? "cursor-grab touch-none" : ""}
+            className={`${desktop || !floating ? "cursor-grab touch-none" : ""} ${
+              scale === "small" ? "origin-bottom scale-[0.82]" : scale === "large" ? "origin-bottom scale-110" : ""
+            }`}
             onPointerDown={onDragStart}
             onPointerMove={onDragMove}
             onPointerUp={onDragEnd}
@@ -318,51 +326,15 @@ export default function ScreenCompanion({
           >
             <CompanionActor mode={pose} facing={facing} />
           </div>
-          <div data-companion-hit className="mb-3 flex flex-col gap-1.5">
-            <button
-              type="button"
-              onClick={toggle}
-              className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-[#14161c] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7CFFD4]"
-            >
-              {snapshot.running ? "Hold" : "Begin"}
-            </button>
-            {canFloat && (
-              <button
-                type="button"
-                onClick={() => void floatOut()}
-                className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7CFFD4]"
-              >
-                Float
-              </button>
-            )}
-            {desktop && (
-              <button
-                type="button"
-                onClick={() => window.focusAPI?.showMainWindow()}
-                className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7CFFD4]"
-              >
-                Open app
-              </button>
-            )}
-            {desktop && (
-              <button
-                type="button"
-                onClick={() => window.focusAPI?.setCompanionVisible(false)}
-                className="rounded-full px-3 py-1 text-[11px] text-zinc-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7CFFD4]"
-              >
-                Hide
-              </button>
-            )}
-            {desktop && (
-              <button
-                type="button"
-                onClick={() => window.focusAPI?.exitCompanion()}
-                className="rounded-full px-3 py-1 text-[11px] text-zinc-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7CFFD4]"
-              >
-                Exit
-              </button>
-            )}
-          </div>
+          <CompanionControls
+            running={snapshot.running}
+            canFloat={canFloat}
+            desktop={desktop}
+            revealed={hovering}
+            onOpenChange={setMenuOpen}
+            onToggleTimer={toggle}
+            onFloat={() => void floatOut()}
+          />
         </div>
       </div>
     </aside>
