@@ -444,7 +444,7 @@ export default function SettingsPage() {
         <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-[#1b1f27] px-4 py-3">
           <div>
             <h4 className="text-sm font-medium text-zinc-100">Screen companion</h4>
-            <p className="mt-1 text-xs text-zinc-500">The character walks the desktop while you are idle, sits and types during a focus block, and drinks coffee on a break. Due reminders show on the message board. Close dashboard from the tray leaves the character on screen. Quit completely exits both.</p>
+            <p className="mt-1 text-xs text-zinc-500">The character walks, waves when tapped, and sleeps when left alone. Due reminders can be marked done or snoozed on the board. Quit completely hides this window and leaves the character running. Exit Orion, on the character or in the tray, stops both.</p>
           </div>
           <button
             type="button"

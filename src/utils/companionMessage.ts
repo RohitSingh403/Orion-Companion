@@ -8,9 +8,11 @@ export interface CompanionLine {
   mode: "idle" | "focus" | "break";
   title: string;
   body: string;
+  reminderId?: string;
 }
 
 export interface CompanionReminderInput {
+  id?: string;
   title: string;
   status: string;
   dueDate: string;
@@ -29,12 +31,13 @@ export function reminderMoment(reminder: CompanionReminderInput) {
 }
 
 function withReminder(line: CompanionLine, reminders: CompanionReminderInput[], now: number): CompanionLine {
-  const pending = reminders
-    .map((reminder) => ({ title: reminder.title.trim(), dueAt: reminderMoment(reminder) }))
-    .filter((reminder): reminder is { title: string; dueAt: number } => reminder.dueAt !== null)
-    .sort((a, b) => a.dueAt - b.dueAt);
+  const pending = reminders.flatMap((reminder) => {
+    const dueAt = reminderMoment(reminder);
+    if (dueAt === null) return [];
+    return [{ id: reminder.id, title: reminder.title.trim(), dueAt }];
+  }).sort((a, b) => a.dueAt - b.dueAt);
   const due = pending.find((reminder) => reminder.dueAt <= now);
-  if (due) return { ...line, title: "Reminder", body: due.title };
+  if (due) return { ...line, title: "Reminder", body: due.title, reminderId: due.id };
   const upcoming = pending.find((reminder) => reminder.dueAt > now);
   if (!upcoming || line.mode !== "idle") return line;
   const minutes = Math.ceil((upcoming.dueAt - now) / 60000);
