@@ -181,7 +181,7 @@ export default function ScreenCompanion({
       left = Math.min(max, Math.max(min, left + dir * 8));
       if (left <= min || left >= max) dir = dir === 1 ? -1 : 1;
       remaining -= 8;
-      if (remaining <= 0) pausedUntil = time + 4000 + Math.round(Math.random() * 3000);
+      if (remaining <= 0) pausedUntil = time + 1400 + Math.round(Math.random() * 1000);
       setFacing(dir);
       setWalking(true);
       setSpot({ left, ready: true });
