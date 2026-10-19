@@ -53,23 +53,17 @@ function productIcon() {
 }
 
 function trayIcon() {
-  const branded = productIcon();
-  if (branded) return branded.resize({ width: 18, height: 18 });
-  const size = 16;
-  const buffer = Buffer.alloc(size * size * 4);
-  for (let y = 0; y < size; y += 1) {
-    for (let x = 0; x < size; x += 1) {
-      const dx = x - 7.5;
-      const dy = y - 7.5;
-      if (Math.sqrt(dx * dx + dy * dy) >= 6.5) continue;
-      const offset = (y * size + x) * 4;
-      buffer[offset] = 245;
-      buffer[offset + 1] = 215;
-      buffer[offset + 2] = 122;
-      buffer[offset + 3] = 255;
+  const base = process.env.VITE_PUBLIC;
+  if (process.platform === "darwin") {
+    const image = nativeImage.createFromPath(path.join(base, "trayTemplate.png"));
+    if (!image.isEmpty()) {
+      image.setTemplateImage(true);
+      return image;
     }
   }
-  return nativeImage.createFromBitmap(buffer, { width: size, height: size });
+  const image = nativeImage.createFromPath(path.join(base, "tray.png"));
+  if (!image.isEmpty()) return image;
+  return nativeImage.createEmpty();
 }
 
 function isAllowedNavigation(url: string) {
