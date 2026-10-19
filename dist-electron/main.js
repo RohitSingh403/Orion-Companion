@@ -1,113 +1,110 @@
-import { app as d, globalShortcut as G, session as ie, ipcMain as u, screen as A, Notification as P, autoUpdater as p, BrowserWindow as N, Tray as re, nativeImage as H, Menu as se } from "electron";
-import { execFile as E } from "node:child_process";
+import { app as d, globalShortcut as z, session as ie, ipcMain as u, screen as F, Notification as T, autoUpdater as m, BrowserWindow as W, Tray as re, nativeImage as I, Menu as se } from "electron";
+import { execFile as L } from "node:child_process";
 import X from "node:fs";
 import { fileURLToPath as ae } from "node:url";
 import f from "node:path";
 const J = f.dirname(ae(import.meta.url));
 d.commandLine.appendSwitch("force-gpu-mem-available-mb", "1024");
 process.env.APP_ROOT = f.join(J, "..");
-const w = process.env.VITE_DEV_SERVER_URL, De = f.join(process.env.APP_ROOT, "dist-electron"), Q = f.join(process.env.APP_ROOT, "dist");
-process.env.VITE_PUBLIC = w ? f.join(process.env.APP_ROOT, "public") : Q;
-let i = null, l = null, o = null, Y = "idle", W = !1, K = !1, I = null, k = -1, S = 0, L = 0, v = null, Z = [], g = !1, C = null, F = !1, O = !1, R = "Ready", z = !1, b = null, y = null;
-function D() {
-  const n = H.createFromPath(f.join(process.env.VITE_PUBLIC, "icon.png"));
+const p = process.env.VITE_DEV_SERVER_URL, Pe = f.join(process.env.APP_ROOT, "dist-electron"), Q = f.join(process.env.APP_ROOT, "dist");
+process.env.VITE_PUBLIC = p ? f.join(process.env.APP_ROOT, "public") : Q;
+let i = null, l = null, t = null, Y = "idle", j = !1, K = !1, v = null, k = -1, P = 0, U = 0, D = null, Z = [], b = !1, x = null, A = !1, M = !1, O = "Ready", H = !1, h = null, w = null;
+function R() {
+  const n = I.createFromPath(f.join(process.env.VITE_PUBLIC, "icon.png"));
   return n.isEmpty() ? null : n;
 }
 function le() {
-  const n = D();
-  if (n) return n.resize({ width: 18, height: 18 });
-  const e = 16, t = Buffer.alloc(e * e * 4);
-  for (let r = 0; r < e; r += 1)
-    for (let s = 0; s < e; s += 1) {
-      const a = s - 7.5, m = r - 7.5;
-      if (Math.sqrt(a * a + m * m) >= 6.5) continue;
-      const h = (r * e + s) * 4;
-      t[h] = 245, t[h + 1] = 215, t[h + 2] = 122, t[h + 3] = 255;
-    }
-  return H.createFromBitmap(t, { width: e, height: e });
+  const n = process.env.VITE_PUBLIC;
+  if (process.platform === "darwin") {
+    const o = I.createFromPath(f.join(n, "trayTemplate.png"));
+    if (!o.isEmpty())
+      return o.setTemplateImage(!0), o;
+  }
+  const e = I.createFromPath(f.join(n, "tray.png"));
+  return e.isEmpty() ? I.createEmpty() : e;
 }
 function ue(n) {
   if (n.startsWith("file://")) return !0;
-  if (!w) return !1;
+  if (!p) return !1;
   try {
-    return new URL(n).origin === new URL(w).origin;
+    return new URL(n).origin === new URL(p).origin;
   } catch {
     return !1;
   }
 }
 function V(n) {
-  n.webContents.setWindowOpenHandler(() => ({ action: "deny" })), n.webContents.on("will-navigate", (e, t) => {
-    ue(t) || e.preventDefault();
+  n.webContents.setWindowOpenHandler(() => ({ action: "deny" })), n.webContents.on("will-navigate", (e, o) => {
+    ue(o) || e.preventDefault();
   });
 }
 function c(n) {
-  return [i, l, o].some((e) => e && !e.isDestroyed() && e.webContents.id === n.sender.id);
+  return [i, l, t].some((e) => e && !e.isDestroyed() && e.webContents.id === n.sender.id);
 }
-function B(n, e) {
-  return typeof n != "string" ? "" : [...n].map((t) => {
-    const r = t.charCodeAt(0);
-    return r < 32 || r === 127 ? " " : t;
+function _(n, e) {
+  return typeof n != "string" ? "" : [...n].map((o) => {
+    const r = o.charCodeAt(0);
+    return r < 32 || r === 127 ? " " : o;
   }).join("").trim().slice(0, e);
 }
-const j = {
+const $ = {
   preload: f.join(J, "preload.mjs"),
   contextIsolation: !0,
   nodeIntegration: !1,
   sandbox: !0,
   webSecurity: !0
 };
-function $(n, e, t = {}) {
-  if (w) {
-    const r = w.endsWith("/") ? w : `${w}/`, s = new URL(e.replace(/^\//, ""), r);
-    Object.entries(t).forEach(([a, m]) => s.searchParams.set(a, m)), n.loadURL(s.toString());
+function q(n, e, o = {}) {
+  if (p) {
+    const r = p.endsWith("/") ? p : `${p}/`, s = new URL(e.replace(/^\//, ""), r);
+    Object.entries(o).forEach(([a, g]) => s.searchParams.set(a, g)), n.loadURL(s.toString());
     return;
   }
-  n.loadFile(f.join(Q, "index.html"), { query: t });
+  n.loadFile(f.join(Q, "index.html"), { query: o });
 }
-function x() {
+function y() {
   if (!i || i.isDestroyed()) {
-    q();
+    G();
     return;
   }
   i.isMinimized() && i.restore(), i.show(), i.focus();
 }
-function _() {
-  C && (C.setToolTip(`Orion Companion — ${R}`), C.setContextMenu(
+function N() {
+  x && (x.setToolTip(`Orion Companion — ${O}`), x.setContextMenu(
     se.buildFromTemplate([
-      { label: R, enabled: !1 },
-      { label: "Show Orion", click: () => x() },
+      { label: O, enabled: !1 },
+      { label: "Show Orion", click: () => y() },
       { label: "Start focus", click: () => i == null ? void 0 : i.webContents.send("tray-start-focus") },
       { label: "Pause", click: () => i == null ? void 0 : i.webContents.send("tray-pause-focus") },
       { label: "Mini timer", click: () => we() },
       {
-        label: o && !o.isDestroyed() && o.isVisible() ? "Hide companion" : "Show companion",
+        label: t && !t.isDestroyed() && t.isVisible() ? "Hide companion" : "Show companion",
         click: () => {
-          o && !o.isDestroyed() && o.isVisible() ? ne() : T();
+          t && !t.isDestroyed() && t.isVisible() ? ne() : C();
         }
       },
       {
         label: "Quick add",
         click: () => {
-          x(), i == null || i.webContents.send("tray-quick-add-task");
+          y(), i == null || i.webContents.send("tray-quick-add-task");
         }
       },
       { type: "separator" },
       {
         label: "Close dashboard",
         click: () => {
-          i == null || i.hide(), T();
+          i == null || i.hide(), C();
         }
       },
       {
         label: "Quit completely",
         click: () => {
-          i == null || i.hide(), T();
+          i == null || i.hide(), C();
         }
       },
       {
         label: "Exit Orion",
         click: () => {
-          F = !0, d.quit();
+          A = !0, d.quit();
         }
       }
     ])
@@ -115,9 +112,9 @@ function _() {
 }
 function ce() {
   try {
-    C = new re(le()), O = !0, _(), C.on("click", () => x());
+    x = new re(le()), M = !0, N(), x.on("click", () => y());
   } catch (n) {
-    console.error("Tray unavailable:", n), O = !1;
+    console.error("Tray unavailable:", n), M = !1;
   }
 }
 function ee() {
@@ -133,26 +130,26 @@ function de() {
   return null;
 }
 function fe() {
-  if (!o || o.isDestroyed()) return;
-  const [n, e] = o.getPosition();
+  if (!t || t.isDestroyed()) return;
+  const [n, e] = t.getPosition();
   try {
     X.writeFileSync(ee(), JSON.stringify({ x: n, y: e }));
   } catch {
   }
 }
 function me(n) {
-  const r = de(), s = r ?? { x: 0, y: 0 }, a = A.getDisplayNearestPoint(s).workArea, m = a.x + a.width - 300 - 24, h = a.y + a.height - 360 - 24, te = r ? Math.min(Math.max(a.x, r.x), a.x + a.width - 300) : m, oe = r ? Math.min(Math.max(a.y, r.y), a.y + a.height - 360) : h;
+  const r = de(), s = r ?? { x: 0, y: 0 }, a = F.getDisplayNearestPoint(s).workArea, g = a.x + a.width - 300 - 24, E = a.y + a.height - 360 - 24, te = r ? Math.min(Math.max(a.x, r.x), a.x + a.width - 300) : g, oe = r ? Math.min(Math.max(a.y, r.y), a.y + a.height - 360) : E;
   n.setBounds({ x: Math.round(te), y: Math.round(oe), width: 300, height: 360 });
 }
-function M() {
-  !o || o.isDestroyed() || (o.setAlwaysOnTop(!0, "floating"), o.setVisibleOnAllWorkspaces(!0, { visibleOnFullScreen: !0 }));
+function S() {
+  !t || t.isDestroyed() || (t.setAlwaysOnTop(!0, "floating"), t.setVisibleOnAllWorkspaces(!0, { visibleOnFullScreen: !0 }));
 }
-function T() {
-  if (o && !o.isDestroyed()) {
-    o.isVisible() || o.showInactive(), M(), y && o.webContents.send("timer-state", y);
+function C() {
+  if (t && !t.isDestroyed()) {
+    t.isVisible() || t.showInactive(), S(), w && t.webContents.send("timer-state", w);
     return;
   }
-  o = new N({
+  t = new W({
     width: 300,
     height: 360,
     frame: !1,
@@ -165,66 +162,66 @@ function T() {
     title: "Orion Companion",
     backgroundColor: "#00000000",
     ...process.platform === "darwin" ? { type: "panel" } : {},
-    icon: D() ?? void 0,
+    icon: R() ?? void 0,
     webPreferences: {
-      ...j,
+      ...$,
       backgroundThrottling: !1
     }
-  }), V(o), me(o), M(), $(o, "companion", { surface: "companion" }), o.once("ready-to-show", () => {
-    o == null || o.showInactive(), M();
-  }), o.webContents.on("did-finish-load", () => {
-    y && o && !o.isDestroyed() && o.webContents.send("timer-state", y);
-  }), o.on("moved", () => {
+  }), V(t), me(t), S(), q(t, "companion", { surface: "companion" }), t.once("ready-to-show", () => {
+    t == null || t.showInactive(), S();
+  }), t.webContents.on("did-finish-load", () => {
+    w && t && !t.isDestroyed() && t.webContents.send("timer-state", w);
+  }), t.on("moved", () => {
     K || fe();
-  }), o.on("closed", () => {
-    o = null;
+  }), t.on("closed", () => {
+    t = null;
   });
 }
 function ne() {
-  o && !o.isDestroyed() && o.hide();
+  t && !t.isDestroyed() && t.hide();
 }
-function U(n) {
+function B(n) {
   K = n;
   const e = { walking: n, facing: k };
-  v && v.walking === e.walking && v.facing === e.facing || (v = e, o && !o.isDestroyed() && o.webContents.send("companion-walk", e));
+  D && D.walking === e.walking && D.facing === e.facing || (D = e, t && !t.isDestroyed() && t.webContents.send("companion-walk", e));
 }
-function he() {
-  if (!o || o.isDestroyed() || !o.isVisible()) return;
-  if (W) {
-    g && (o.setIgnoreMouseEvents(!1), g = !1);
+function pe() {
+  if (!t || t.isDestroyed() || !t.isVisible()) return;
+  if (j) {
+    b && (t.setIgnoreMouseEvents(!1), b = !1);
     return;
   }
-  const n = A.getCursorScreenPoint(), e = o.getBounds(), t = Z.some((r) => {
+  const n = F.getCursorScreenPoint(), e = t.getBounds(), o = Z.some((r) => {
     const s = e.x + r.x, a = e.y + r.y;
     return n.x >= s && n.x <= s + r.width && n.y >= a && n.y <= a + r.height;
   });
-  t !== !g && (g = !t, process.platform === "linux" ? o.setIgnoreMouseEvents(g) : o.setIgnoreMouseEvents(g, { forward: !0 }));
+  o !== !b && (b = !o, process.platform === "linux" ? t.setIgnoreMouseEvents(b) : t.setIgnoreMouseEvents(b, { forward: !0 }));
 }
-function pe() {
-  I || (L = Date.now() + 1600, I = setInterval(() => {
-    if (!o || o.isDestroyed() || !o.isVisible() || W || Y !== "idle") {
-      U(!1);
+function he() {
+  v || (U = Date.now() + 1600, v = setInterval(() => {
+    if (!t || t.isDestroyed() || !t.isVisible() || j || Y !== "idle") {
+      B(!1);
       return;
     }
     const n = Date.now();
-    if (n < L) {
-      U(!1);
+    if (n < U) {
+      B(!1);
       return;
     }
-    S <= 0 && (S = 280 + Math.round(Math.random() * 240), k = Math.random() > 0.5 ? 1 : -1);
-    const e = o.getBounds(), t = A.getDisplayNearestPoint({ x: e.x, y: e.y }).workArea;
+    P <= 0 && (P = 280 + Math.round(Math.random() * 240), k = Math.random() > 0.5 ? 1 : -1);
+    const e = t.getBounds(), o = F.getDisplayNearestPoint({ x: e.x, y: e.y }).workArea;
     let r = e.x + k * 4;
-    r <= t.x + 8 && (r = t.x + 8, k = 1);
-    const s = t.x + t.width - e.width - 8;
-    r >= s && (r = s, k = -1), o.setPosition(Math.round(r), e.y), S -= 4, S <= 0 && (L = n + 5e3 + Math.round(Math.random() * 5e3)), U(!0);
-  }, 140), setInterval(he, 40));
+    r <= o.x + 8 && (r = o.x + 8, k = 1);
+    const s = o.x + o.width - e.width - 8;
+    r >= s && (r = s, k = -1), t.setPosition(Math.round(r), e.y), P -= 4, P <= 0 && (U = n + 5e3 + Math.round(Math.random() * 5e3)), B(!0);
+  }, 140), setInterval(pe, 40));
 }
 function we() {
   if (l && !l.isDestroyed()) {
     l.show(), l.focus();
     return;
   }
-  l = new N({
+  l = new W({
     width: 280,
     height: 188,
     frame: !1,
@@ -233,22 +230,22 @@ function we() {
     skipTaskbar: !0,
     title: "Orion Mini Timer",
     backgroundColor: "#121418",
-    icon: D() ?? void 0,
-    webPreferences: j
-  }), V(l), $(l, "mini-timer", { surface: "mini" }), l.webContents.on("did-finish-load", () => {
-    y && l && !l.isDestroyed() && l.webContents.send("timer-state", y);
+    icon: R() ?? void 0,
+    webPreferences: $
+  }), V(l), q(l, "mini-timer", { surface: "mini" }), l.webContents.on("did-finish-load", () => {
+    w && l && !l.isDestroyed() && l.webContents.send("timer-state", w);
   }), l.on("closed", () => {
     l = null;
   });
 }
 function be() {
   return new Promise((n) => {
-    const e = (t) => {
-      if (!t) {
+    const e = (o) => {
+      if (!o) {
         n(null);
         return;
       }
-      const r = t.replace(/\s+/g, " ").trim();
+      const r = o.replace(/\s+/g, " ").trim();
       if (!r || /orion companion/i.test(r)) {
         n(null);
         return;
@@ -256,16 +253,16 @@ function be() {
       n(r.slice(0, 80));
     };
     if (process.platform === "darwin") {
-      E(
+      L(
         "osascript",
         ["-e", 'tell application "System Events" to get name of first application process whose frontmost is true'],
         { timeout: 2e3 },
-        (t, r) => e(t ? null : r)
+        (o, r) => e(o ? null : r)
       );
       return;
     }
     if (process.platform === "win32") {
-      E(
+      L(
         "powershell",
         [
           "-NoProfile",
@@ -273,12 +270,12 @@ function be() {
           `Add-Type -TypeDefinition 'using System; using System.Text; using System.Runtime.InteropServices; public class OrionForeground { [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow(); [DllImport("user32.dll")] public static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count); }'; $handle = [OrionForeground]::GetForegroundWindow(); $builder = New-Object System.Text.StringBuilder 256; [void][OrionForeground]::GetWindowText($handle, $builder, 256); $builder.ToString()`
         ],
         { timeout: 2500 },
-        (t, r) => e(t ? null : r)
+        (o, r) => e(o ? null : r)
       );
       return;
     }
-    E("xdotool", ["getactivewindow", "getwindowname"], { timeout: 2e3 }, (t, r) => {
-      if (t || !r.trim()) {
+    L("xdotool", ["getactivewindow", "getwindowname"], { timeout: 2e3 }, (o, r) => {
+      if (o || !r.trim()) {
         e(null);
         return;
       }
@@ -288,18 +285,18 @@ function be() {
   });
 }
 function ye(n) {
-  if (z = n, !n) {
-    b && clearInterval(b), b = null;
+  if (H = n, !n) {
+    h && clearInterval(h), h = null;
     return;
   }
-  b || (b = setInterval(() => {
+  h || (h = setInterval(() => {
     be().then((e) => {
-      !z || !e || !i || i.isDestroyed() || i.webContents.send("activity-sample", e);
+      !H || !e || !i || i.isDestroyed() || i.webContents.send("activity-sample", e);
     });
   }, 15e3));
 }
-function q() {
-  i = new N({
+function G() {
+  i = new W({
     width: 1280,
     height: 820,
     minWidth: 1100,
@@ -307,89 +304,89 @@ function q() {
     title: "Orion Companion",
     backgroundColor: "#121418",
     autoHideMenuBar: !0,
-    icon: D() ?? void 0,
+    icon: R() ?? void 0,
     webPreferences: {
-      ...j,
+      ...$,
       backgroundThrottling: !1
     }
   }), V(i);
-  const n = D();
+  const n = R();
   n && process.platform === "darwin" && d.dock && d.dock.setIcon(n), i.webContents.on("did-finish-load", () => {
     i == null || i.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
   }), i.on("close", (e) => {
-    F || !O || (e.preventDefault(), i == null || i.hide());
+    A || !M || (e.preventDefault(), i == null || i.hide());
   }), i.on("hide", () => {
-    !o || o.isDestroyed() || !o.isVisible() || (o.showInactive(), M());
-  }), $(i, "app");
+    !t || t.isDestroyed() || !t.isVisible() || (t.showInactive(), S());
+  }), q(i, "app");
 }
 d.on("window-all-closed", () => {
-  !O && process.platform !== "darwin" && (d.quit(), i = null);
+  !M && process.platform !== "darwin" && (d.quit(), i = null);
 });
 d.on("activate", () => {
-  !i || i.isDestroyed() ? q() : x();
+  !i || i.isDestroyed() ? G() : y();
 });
 d.on("before-quit", () => {
-  F = !0;
+  A = !0;
 });
 d.on("will-quit", () => {
-  G.unregisterAll(), b && clearInterval(b), I && clearInterval(I);
+  z.unregisterAll(), h && clearInterval(h), v && clearInterval(v);
 });
 d.whenReady().then(() => {
-  q(), ce(), T(), pe();
+  G(), ce(), C(), he();
   try {
-    G.register("CommandOrControl+Shift+Space", () => {
-      x(), i == null || i.webContents.send("global-shortcut-quick-capture");
+    z.register("CommandOrControl+Shift+Space", () => {
+      y(), i == null || i.webContents.send("global-shortcut-quick-capture");
     });
   } catch (n) {
     console.error("Shortcut unavailable:", n);
   }
-  ie.defaultSession.setPermissionRequestHandler((n, e, t) => {
-    t(!1);
+  ie.defaultSession.setPermissionRequestHandler((n, e, o) => {
+    o(!1);
   }), u.on("update-tray-status", (n, e) => {
-    c(n) && (R = B(e, 80) || "Ready", _());
+    c(n) && (O = _(e, 80) || "Ready", N());
   }), u.on("report-timer", (n, e) => {
     if (!c(n) || !e || e.session !== "focus" && e.session !== "break" || typeof e.remainingTime != "number" || !Number.isFinite(e.remainingTime)) return;
-    y = e;
-    const t = Math.floor(e.remainingTime / 60), r = e.remainingTime % 60, s = `${t}:${r.toString().padStart(2, "0")}`;
-    R = e.running ? `${e.session === "focus" ? "Focus" : "Break"} ${s}` : "Ready", _(), l && !l.isDestroyed() && l.webContents.send("timer-state", e), o && !o.isDestroyed() && o.webContents.send("timer-state", e);
+    w = e;
+    const o = Math.floor(e.remainingTime / 60), r = e.remainingTime % 60, s = `${o}:${r.toString().padStart(2, "0")}`;
+    O = e.running ? `${e.session === "focus" ? "Focus" : "Break"} ${s}` : "Ready", N(), l && !l.isDestroyed() && l.webContents.send("timer-state", e), t && !t.isDestroyed() && t.webContents.send("timer-state", e);
   }), u.on("companion-activity", (n, e) => {
-    c(n) && (((e == null ? void 0 : e.mode) === "idle" || (e == null ? void 0 : e.mode) === "focus" || (e == null ? void 0 : e.mode) === "break") && (Y = e.mode), W = !!(e != null && e.dragging));
-  }), u.on("companion-nudge", (n, e, t) => {
-    if (!o || o.isDestroyed() || n.sender.id !== o.webContents.id) return;
-    const r = o;
-    if (!Number.isFinite(e) || !Number.isFinite(t)) return;
-    const s = r.getBounds(), a = A.getDisplayNearestPoint({ x: s.x, y: s.y }).workArea, m = Math.min(Math.max(a.x, s.x + e), a.x + a.width - s.width), h = Math.min(Math.max(a.y, s.y + t), a.y + a.height - s.height);
-    r.setPosition(Math.round(m), Math.round(h));
+    c(n) && (((e == null ? void 0 : e.mode) === "idle" || (e == null ? void 0 : e.mode) === "focus" || (e == null ? void 0 : e.mode) === "break") && (Y = e.mode), j = !!(e != null && e.dragging));
+  }), u.on("companion-nudge", (n, e, o) => {
+    if (!t || t.isDestroyed() || n.sender.id !== t.webContents.id) return;
+    const r = t;
+    if (!Number.isFinite(e) || !Number.isFinite(o)) return;
+    const s = r.getBounds(), a = F.getDisplayNearestPoint({ x: s.x, y: s.y }).workArea, g = Math.min(Math.max(a.x, s.x + e), a.x + a.width - s.width), E = Math.min(Math.max(a.y, s.y + o), a.y + a.height - s.height);
+    r.setPosition(Math.round(g), Math.round(E));
   }), u.on("companion-hits", (n, e) => {
-    !c(n) || !Array.isArray(e) || (Z = e.filter((t) => Number.isFinite(t == null ? void 0 : t.x) && Number.isFinite(t == null ? void 0 : t.y) && t.width > 0 && t.height > 0 && t.width < 2e3 && t.height < 2e3).slice(0, 12));
+    !c(n) || !Array.isArray(e) || (Z = e.filter((o) => Number.isFinite(o == null ? void 0 : o.x) && Number.isFinite(o == null ? void 0 : o.y) && o.width > 0 && o.height > 0 && o.width < 2e3 && o.height < 2e3).slice(0, 12));
   }), u.on("companion-reminder-sync", (n) => {
     c(n) && i && !i.isDestroyed() && i.webContents.send("reminder-sync");
   }), u.on("companion-exit", (n) => {
-    c(n) && (F = !0, d.quit());
+    c(n) && (A = !0, d.quit());
   }), u.on("companion-show-main", (n) => {
-    c(n) && x();
+    c(n) && y();
   }), u.on("companion-visibility", (n, e) => {
-    c(n) && (e ? T() : ne(), i && !i.isDestroyed() && i.webContents.send("companion-visibility", !!e));
+    c(n) && (e ? C() : ne(), i && !i.isDestroyed() && i.webContents.send("companion-visibility", !!e));
   }), u.on("mini-command", (n, e) => {
     c(n) && (e !== "start" && e !== "pause" && e !== "reset" || i == null || i.webContents.send("mini-command", e));
   }), u.on("watch-activity", (n, e) => {
     c(n) && ye(!!e);
   }), u.on("show-break-notification", (n) => {
-    c(n) && new P({
+    c(n) && new T({
       title: "☕ Break Time!",
       body: "Great work! Stand up, stretch, and drink some water."
     }).show();
   }), u.on("show-focus-notification", (n) => {
-    c(n) && new P({
+    c(n) && new T({
       title: "🧠 Focus Time!",
       body: "Your break is over. Ready for another deep focus session?"
     }).show();
-  }), u.on("show-reminder-notification", (n, e, t) => {
+  }), u.on("show-reminder-notification", (n, e, o) => {
     if (!c(n)) return;
-    const r = B(e, 80);
-    r && new P({
+    const r = _(e, 80);
+    r && new T({
       title: r,
-      body: B(t, 180)
+      body: _(o, 180)
     }).show();
   }), u.handle("get-auto-launch-status", async (n) => {
     if (!c(n)) return !1;
@@ -405,36 +402,36 @@ d.whenReady().then(() => {
   }), u.handle("toggle-auto-launch", async (n, e) => {
     if (!c(n)) return !1;
     try {
-      const t = (await import("./index-BYV84ozA.js").then((s) => s.i)).default, r = new t({
+      const o = (await import("./index-BYV84ozA.js").then((s) => s.i)).default, r = new o({
         name: "Orion Companion",
         path: process.execPath
       });
       return e ? (await r.enable(), !0) : (await r.disable(), !1);
-    } catch (t) {
-      return console.error("Failed to toggle auto-launch:", t), !1;
+    } catch (o) {
+      return console.error("Failed to toggle auto-launch:", o), !1;
     }
-  }), w || (p.setFeedURL({
+  }), p || (m.setFeedURL({
     url: "https://github.com/RohitSingh403/Orion-Companion/releases/latest",
     headers: { Accept: "application/json" }
-  }), p.on("checking-for-update", () => {
+  }), m.on("checking-for-update", () => {
     console.log("Checking for update...");
-  }), p.on("update-available", (t) => {
-    console.log("Update available:", t);
-  }), p.on("update-not-available", (t) => {
-    console.log("Update not available:", t);
-  }), p.on("error", (t) => {
-    console.error("Auto-updater error:", t);
-  }), p.on("update-downloaded", (t) => {
-    console.log("Update downloaded:", t), new P({
+  }), m.on("update-available", (o) => {
+    console.log("Update available:", o);
+  }), m.on("update-not-available", (o) => {
+    console.log("Update not available:", o);
+  }), m.on("error", (o) => {
+    console.error("Auto-updater error:", o);
+  }), m.on("update-downloaded", (o) => {
+    console.log("Update downloaded:", o), new T({
       title: "Update Available",
       body: "A new version is ready to install. Restart to apply."
     }).show();
   }), setInterval(() => {
-    p.checkForUpdates();
-  }, 4 * 60 * 60 * 1e3), p.checkForUpdates());
+    m.checkForUpdates();
+  }, 4 * 60 * 60 * 1e3), m.checkForUpdates());
 });
 export {
-  De as MAIN_DIST,
+  Pe as MAIN_DIST,
   Q as RENDERER_DIST,
-  w as VITE_DEV_SERVER_URL
+  p as VITE_DEV_SERVER_URL
 };
