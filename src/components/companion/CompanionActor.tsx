@@ -1,23 +1,39 @@
 import { useEffect, useState } from "react";
 import "./companion.css";
 
-const SPRITES = {
-  idle: "/companion/front.png",
-  walk: "/companion/walk.png",
-  focus: "/companion/work.png",
-  break: "/companion/coffee.png",
-  react: "/companion/react.png",
-  sleep: "/companion/sleep.png",
-} as const;
+const FRAMES: Record<string, string[]> = {
+  idle: ["/companion/front.png", "/companion/front-blink.png"],
+  walk: ["/companion/walk.png", "/companion/walk-2.png"],
+  focus: [
+    "/companion/work.png",
+    "/companion/work-2.png",
+    "/companion/work-3.png",
+    "/companion/work-4.png",
+  ],
+  break: [
+    "/companion/coffee.png",
+    "/companion/coffee-2.png",
+    "/companion/coffee.png",
+    "/companion/coffee-3.png",
+  ],
+  react: [
+    "/companion/react.png",
+    "/companion/react-2.png",
+    "/companion/react.png",
+    "/companion/react-3.png",
+  ],
+  sleep: ["/companion/sleep.png", "/companion/sleep-2.png"],
+};
 
-const FOCUS_FRAMES = [
-  "/companion/work.png",
-  "/companion/work-2.png",
-  "/companion/work-3.png",
-  "/companion/work-4.png",
-];
+const DELAY: Record<string, number> = {
+  walk: 160,
+  focus: 140,
+  break: 320,
+  react: 130,
+  sleep: 1100,
+};
 
-export type CompanionPose = keyof typeof SPRITES;
+export type CompanionPose = "idle" | "walk" | "focus" | "break" | "react" | "sleep";
 
 export default function CompanionActor({
   mode,
@@ -29,26 +45,42 @@ export default function CompanionActor({
   const [step, setStep] = useState(0);
 
   useEffect(() => {
-    if (mode !== "walk" && mode !== "focus") return undefined;
+    setStep(0);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
-    const frames = mode === "walk" ? 2 : FOCUS_FRAMES.length;
-    const delay = mode === "walk" ? 180 : 150;
-    const id = window.setInterval(() => setStep((frame) => (frame + 1) % frames), delay);
+
+    if (mode === "idle") {
+      let alive = true;
+      let timer = 0;
+      const blink = () => {
+        if (!alive) return;
+        setStep(1);
+        timer = window.setTimeout(() => {
+          if (!alive) return;
+          setStep(0);
+          timer = window.setTimeout(blink, 2400 + Math.round(Math.random() * 900));
+        }, 140);
+      };
+      timer = window.setTimeout(blink, 1200);
+      return () => {
+        alive = false;
+        window.clearTimeout(timer);
+      };
+    }
+
+    const frames = FRAMES[mode];
+    const id = window.setInterval(() => {
+      setStep((frame) => (frame + 1) % frames.length);
+    }, DELAY[mode]);
     return () => window.clearInterval(id);
   }, [mode]);
 
   const flip = mode === "walk" && facing < 0;
-  const src =
-    mode === "walk" && step % 2 === 1
-      ? "/companion/walk-2.png"
-      : mode === "focus"
-        ? FOCUS_FRAMES[step % FOCUS_FRAMES.length]
-        : SPRITES[mode];
+  const frames = FRAMES[mode];
+  const src = frames[step % frames.length];
 
   return (
     <div className={`pet pet-${mode}`} style={flip ? { transform: "scaleX(-1)" } : undefined}>
       <img src={src} alt="" draggable={false} className="pet-body" />
-      {mode === "idle" && <span className="pet-blink" />}
     </div>
   );
 }
