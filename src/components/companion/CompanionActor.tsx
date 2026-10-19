@@ -10,6 +10,13 @@ const SPRITES = {
   sleep: "/companion/sleep.png",
 } as const;
 
+const FOCUS_FRAMES = [
+  "/companion/work.png",
+  "/companion/work-2.png",
+  "/companion/work-3.png",
+  "/companion/work-4.png",
+];
+
 export type CompanionPose = keyof typeof SPRITES;
 
 export default function CompanionActor({
@@ -22,13 +29,21 @@ export default function CompanionActor({
   const [step, setStep] = useState(0);
 
   useEffect(() => {
-    if (mode !== "walk") return undefined;
-    const id = window.setInterval(() => setStep((frame) => (frame + 1) % 2), 180);
+    if (mode !== "walk" && mode !== "focus") return undefined;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    const frames = mode === "walk" ? 2 : FOCUS_FRAMES.length;
+    const delay = mode === "walk" ? 180 : 150;
+    const id = window.setInterval(() => setStep((frame) => (frame + 1) % frames), delay);
     return () => window.clearInterval(id);
   }, [mode]);
 
   const flip = mode === "walk" && facing < 0;
-  const src = mode === "walk" && step === 1 ? "/companion/walk-2.png" : SPRITES[mode];
+  const src =
+    mode === "walk" && step % 2 === 1
+      ? "/companion/walk-2.png"
+      : mode === "focus"
+        ? FOCUS_FRAMES[step % FOCUS_FRAMES.length]
+        : SPRITES[mode];
 
   return (
     <div className={`pet pet-${mode}`} style={flip ? { transform: "scaleX(-1)" } : undefined}>

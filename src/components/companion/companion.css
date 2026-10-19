@@ -24,8 +24,14 @@
   animation: pet-step 0.36s steps(2, end) infinite;
 }
 
+.pet-focus {
+  width: 176px;
+  height: 168px;
+}
+
 .pet-focus .pet-body {
-  animation: pet-type 0.7s ease-in-out infinite;
+  height: 156px;
+  animation: none;
 }
 
 .pet-break .pet-body {
@@ -86,16 +92,6 @@
   }
   50% {
     transform: translateY(-3px);
-  }
-}
-
-@keyframes pet-type {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(1px);
   }
 }
 
