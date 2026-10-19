@@ -16,10 +16,6 @@
   -webkit-user-drag: none;
 }
 
-.pet-idle .pet-body {
-  animation: pet-breathe 3.4s ease-in-out infinite;
-}
-
 .pet-focus {
   width: 176px;
   height: 168px;
@@ -36,16 +32,6 @@
 
 .pet-sleep .pet-body {
   height: 124px;
-}
-
-@keyframes pet-breathe {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-2px);
-  }
 }
 
 @media (max-width: 760px) {
@@ -68,8 +54,3 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .pet-body {
-    animation: none;
-  }
-}

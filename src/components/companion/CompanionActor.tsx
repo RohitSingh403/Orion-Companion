@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./companion.css";
 
 const FRAMES: Record<string, string[]> = {
-  idle: ["/companion/front.png", "/companion/front-blink.png"],
+  idle: ["/companion/front.png", "/companion/front-half.png", "/companion/front-blink.png"],
   walk: ["/companion/walk.png", "/companion/walk-2.png"],
   focus: [
     "/companion/work.png",
@@ -13,8 +13,10 @@ const FRAMES: Record<string, string[]> = {
   break: [
     "/companion/coffee.png",
     "/companion/coffee-2.png",
+    "/companion/coffee-2.png",
     "/companion/coffee.png",
     "/companion/coffee-3.png",
+    "/companion/coffee-4.png",
   ],
   react: [
     "/companion/react.png",
@@ -26,11 +28,11 @@ const FRAMES: Record<string, string[]> = {
 };
 
 const DELAY: Record<string, number> = {
-  walk: 160,
-  focus: 140,
-  break: 320,
-  react: 130,
-  sleep: 1100,
+  walk: 180,
+  focus: 220,
+  break: 280,
+  react: 170,
+  sleep: 1500,
 };
 
 export type CompanionPose = "idle" | "walk" | "focus" | "break" | "react" | "sleep";
@@ -56,11 +58,19 @@ export default function CompanionActor({
         setStep(1);
         timer = window.setTimeout(() => {
           if (!alive) return;
-          setStep(0);
-          timer = window.setTimeout(blink, 2400 + Math.round(Math.random() * 900));
-        }, 140);
+          setStep(2);
+          timer = window.setTimeout(() => {
+            if (!alive) return;
+            setStep(1);
+            timer = window.setTimeout(() => {
+              if (!alive) return;
+              setStep(0);
+              timer = window.setTimeout(blink, 2000 + Math.round(Math.random() * 800));
+            }, 80);
+          }, 160);
+        }, 80);
       };
-      timer = window.setTimeout(blink, 1200);
+      timer = window.setTimeout(blink, 900);
       return () => {
         alive = false;
         window.clearTimeout(timer);

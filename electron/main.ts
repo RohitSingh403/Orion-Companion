@@ -342,7 +342,7 @@ function startCompanionWalk() {
     }
     companion.setPosition(Math.round(nextX), bounds.y);
     walkLeft -= 4;
-    if (walkLeft <= 0) walkPausedUntil = now + 5000 + Math.round(Math.random() * 5000);
+    if (walkLeft <= 0) walkPausedUntil = now + 1800 + Math.round(Math.random() * 1200);
     publishWalk(true);
   }, 140);
   setInterval(syncCompanionMouse, 40);

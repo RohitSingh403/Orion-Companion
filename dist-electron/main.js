@@ -213,7 +213,7 @@ function he() {
     let r = e.x + k * 4;
     r <= o.x + 8 && (r = o.x + 8, k = 1);
     const s = o.x + o.width - e.width - 8;
-    r >= s && (r = s, k = -1), t.setPosition(Math.round(r), e.y), P -= 4, P <= 0 && (U = n + 5e3 + Math.round(Math.random() * 5e3)), B(!0);
+    r >= s && (r = s, k = -1), t.setPosition(Math.round(r), e.y), P -= 4, P <= 0 && (U = n + 1800 + Math.round(Math.random() * 1200)), B(!0);
   }, 140), setInterval(pe, 40));
 }
 function we() {
