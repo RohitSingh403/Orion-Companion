@@ -1,0 +1,52 @@
+name: Desktop installers
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - cursor/linux-package-build-7bd1
+
+jobs:
+  build:
+    name: ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: Linux
+            command: npm run build:linux -- --publish never
+          - os: windows-latest
+            label: Windows
+            command: npm run build:win -- --publish never
+          - os: macos-latest
+            label: macOS
+            command: npm run build:mac -- --publish never -c.mac.identity=null
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build unsigned installer
+        run: ${{ matrix.command }}
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orion-${{ matrix.label }}
+          if-no-files-found: error
+          path: |
+            release/*.AppImage
+            release/*.deb
+            release/*.exe
+            release/*.dmg
+            release/*.zip
