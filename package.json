@@ -2,6 +2,8 @@
   "name": "focus-companion",
   "private": true,
   "version": "1.0.0",
+  "description": "A local focus app with a screen companion. Sessions, tasks, notes, and reminders stay on this computer.",
+  "author": "Rohit Singh <rohit.singh43@outlook.com>",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -110,7 +112,8 @@
         "deb"
       ],
       "icon": "public/icon.png",
-      "category": "Productivity"
+      "category": "Productivity",
+      "maintainer": "Rohit Singh <rohit.singh43@outlook.com>"
     },
     "nsis": {
       "oneClick": false,
