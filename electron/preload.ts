@@ -111,7 +111,7 @@ contextBridge.exposeInMainWorld("focusAPI", {
     return () => ipcRenderer.removeListener("reminder-sync", listener);
   },
 
-  setCompanionActivity(activity: { mode: "idle" | "focus" | "break"; dragging: boolean }) {
+  setCompanionActivity(activity: { mode: "idle" | "focus" | "break"; dragging: boolean; reduceMotion?: boolean }) {
     ipcRenderer.send("companion-activity", activity);
   },
 

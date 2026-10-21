@@ -64,6 +64,7 @@ export default function ScreenCompanion({
   const [asleep, setAsleep] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const scale = useSettingsStore((state) => state.companionScale);
+  const [reduceMotion, setReduceMotion] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   const drag = useRef<{ x: number; y: number; moved: boolean } | null>(null);
   const reactTimer = useRef<number | null>(null);
   const lastTouch = useRef(Date.now());
@@ -138,12 +139,20 @@ export default function ScreenCompanion({
   }, [line.mode, dragging, reacting]);
 
   useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = () => setReduceMotion(media.matches);
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
     if (!desktop) return;
     window.focusAPI?.setCompanionActivity({
       mode: line.mode,
       dragging: dragging || hovering || reacting || asleep || menuOpen,
+      reduceMotion,
     });
-  }, [desktop, line.mode, dragging, hovering, reacting, asleep, menuOpen]);
+  }, [desktop, line.mode, dragging, hovering, reacting, asleep, menuOpen, reduceMotion]);
 
   useEffect(() => {
     const onResize = () => setNarrow(window.innerWidth < 760);
@@ -153,7 +162,7 @@ export default function ScreenCompanion({
   }, []);
 
   useEffect(() => {
-    if (desktop || floating || narrow || line.mode !== "idle" || reacting || asleep) {
+    if (desktop || floating || narrow || reduceMotion || line.mode !== "idle" || reacting || asleep) {
       setWalking(false);
       return undefined;
     }
@@ -187,7 +196,7 @@ export default function ScreenCompanion({
       setSpot({ left, ready: true });
     }, 120);
     return () => window.clearInterval(id);
-  }, [desktop, floating, narrow, line.mode, reacting, asleep]);
+  }, [desktop, floating, narrow, reduceMotion, line.mode, reacting, asleep]);
 
   function toggle() {
     if (desktop) {

@@ -3,6 +3,7 @@ import { execFile } from "node:child_process";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { isAllowedNavigation } from "./navigation";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -25,6 +26,7 @@ let mini: BrowserWindow | null = null;
 let companion: BrowserWindow | null = null;
 let petMode: "idle" | "focus" | "break" = "idle";
 let petPaused = false;
+let reduceMotion = false;
 let walkingNow = false;
 let walkTimer: ReturnType<typeof setInterval> | null = null;
 let walkDirection: 1 | -1 = -1;
@@ -66,20 +68,15 @@ function trayIcon() {
   return nativeImage.createEmpty();
 }
 
-function isAllowedNavigation(url: string) {
-  if (url.startsWith("file://")) return true;
-  if (!VITE_DEV_SERVER_URL) return false;
-  try {
-    return new URL(url).origin === new URL(VITE_DEV_SERVER_URL).origin;
-  } catch {
-    return false;
-  }
-}
-
 function harden(target: BrowserWindow) {
   target.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
-  target.webContents.on("will-navigate", (event, url) => {
-    if (!isAllowedNavigation(url)) event.preventDefault();
+  const block = (event: { preventDefault: () => void }, url: string) => {
+    if (!isAllowedNavigation(url, RENDERER_DIST, VITE_DEV_SERVER_URL)) event.preventDefault();
+  };
+  target.webContents.on("will-navigate", block);
+  target.webContents.on("will-redirect", block);
+  target.webContents.on("will-attach-webview", (event) => {
+    event.preventDefault();
   });
 }
 
@@ -315,7 +312,7 @@ function startCompanionWalk() {
   if (walkTimer) return;
   walkPausedUntil = Date.now() + 1600;
   walkTimer = setInterval(() => {
-    if (!companion || companion.isDestroyed() || !companion.isVisible() || petPaused || petMode !== "idle") {
+    if (!companion || companion.isDestroyed() || !companion.isVisible() || petPaused || reduceMotion || petMode !== "idle") {
       publishWalk(false);
       return;
     }
@@ -548,10 +545,11 @@ app.whenReady().then(() => {
     if (companion && !companion.isDestroyed()) companion.webContents.send("timer-state", snapshot);
   });
 
-  ipcMain.on("companion-activity", (event, activity: { mode?: "idle" | "focus" | "break"; dragging?: boolean }) => {
+  ipcMain.on("companion-activity", (event, activity: { mode?: "idle" | "focus" | "break"; dragging?: boolean; reduceMotion?: boolean }) => {
     if (!fromApp(event)) return;
     if (activity?.mode === "idle" || activity?.mode === "focus" || activity?.mode === "break") petMode = activity.mode;
     petPaused = Boolean(activity?.dragging);
+    if (typeof activity?.reduceMotion === "boolean") reduceMotion = activity.reduceMotion;
   });
 
   ipcMain.on("companion-nudge", (event, dx: number, dy: number) => {
@@ -674,47 +672,41 @@ app.whenReady().then(() => {
     }
   });
 
-  // Auto-updater configuration
-  if (!VITE_DEV_SERVER_URL) {
-    const server = "https://github.com/RohitSingh403/Orion-Companion/releases";
-    const feed = `${server}/latest`;
+  // The built-in updater only exists on macOS and Windows, and it expects a
+  // Squirrel feed. These installers are NSIS, AppImage, deb, and DMG, so a
+  // failed check must not interrupt startup.
+  if (!VITE_DEV_SERVER_URL && process.platform !== "linux") {
+    try {
+      const server = "https://github.com/RohitSingh403/Orion-Companion/releases";
+      const feed = `${server}/latest`;
 
-    autoUpdater.setFeedURL({
-      url: feed,
-      headers: { "Accept": "application/json" },
-    });
+      autoUpdater.setFeedURL({
+        url: feed,
+        headers: { Accept: "application/json" },
+      });
 
-    autoUpdater.on("checking-for-update", () => {
-      console.log("Checking for update...");
-    });
+      autoUpdater.on("error", (err: Error) => {
+        console.error("Auto-updater error:", err);
+      });
 
-    autoUpdater.on("update-available", (info: { version: string; files: string[] }) => {
-      console.log("Update available:", info);
-    });
+      autoUpdater.on("update-downloaded", () => {
+        new Notification({
+          title: "Update Available",
+          body: "A new version is ready to install. Restart to apply.",
+        }).show();
+      });
 
-    autoUpdater.on("update-not-available", (info: { version: string }) => {
-      console.log("Update not available:", info);
-    });
-
-    autoUpdater.on("error", (err: Error) => {
-      console.error("Auto-updater error:", err);
-    });
-
-    autoUpdater.on("update-downloaded", (info: Record<string, unknown>) => {
-      console.log("Update downloaded:", info);
-      // Notify user that update is ready
-      new Notification({
-        title: "Update Available",
-        body: "A new version is ready to install. Restart to apply.",
-      }).show();
-    });
-
-    // Check for updates every 4 hours
-    setInterval(() => {
-      autoUpdater.checkForUpdates();
-    }, 4 * 60 * 60 * 1000);
-
-    // Initial check
-    autoUpdater.checkForUpdates();
+      const check = () => {
+        try {
+          autoUpdater.checkForUpdates();
+        } catch (error) {
+          console.error("Auto-updater unavailable:", error);
+        }
+      };
+      setInterval(check, 4 * 60 * 60 * 1000);
+      check();
+    } catch (error) {
+      console.error("Auto-updater unavailable:", error);
+    }
   }
 });
