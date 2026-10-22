@@ -25,6 +25,8 @@ export default function SettingsPage() {
   const {
     focusMinutes,
     breakMinutes,
+    longBreakMinutes,
+    sessionsBeforeLongBreak,
     dailyGoal,
     autoStartBreak,
     autoStartFocus,
@@ -35,6 +37,8 @@ export default function SettingsPage() {
     breakReminder,
     setFocusMinutes,
     setBreakMinutes,
+    setLongBreakMinutes,
+    setSessionsBeforeLongBreak,
     setDailyGoal,
     setAutoStartBreak,
     setAutoStartFocus,
@@ -51,7 +55,7 @@ export default function SettingsPage() {
     setCompanionScale,
   } = useSettingsStore();
 
-  const { setFocusDuration, setBreakDuration, setDailyGoal: setFocusDailyGoal, resetAllData } = useFocusStore();
+  const { setFocusDuration, setBreakDuration, setLongBreakDuration, setSessionsBeforeLongBreak: setFocusLongEvery, setDailyGoal: setFocusDailyGoal, resetAllData } = useFocusStore();
 
   // Load auto-launch status on mount
   useEffect(() => {
@@ -136,6 +140,50 @@ export default function SettingsPage() {
             <option value={5}>5 minutes (Standard)</option>
             <option value={10}>10 minutes</option>
             <option value={15}>15 minutes</option>
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <label className={`text-sm font-medium ${isDark ? "text-gray-500" : "text-gray-600"}`}>Long break (minutes)</label>
+          <select
+            value={longBreakMinutes}
+            onChange={(e) => {
+              const minutes = Number(e.target.value);
+              setLongBreakMinutes(minutes);
+              setLongBreakDuration(minutes);
+            }}
+            className={`w-full h-10 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
+              isDark
+                ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500"
+                : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500"
+            } border`}
+          >
+            <option value={10}>10 minutes</option>
+            <option value={15}>15 minutes</option>
+            <option value={20}>20 minutes</option>
+            <option value={30}>30 minutes</option>
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <label className={`text-sm font-medium ${isDark ? "text-gray-500" : "text-gray-600"}`}>Blocks before a long break</label>
+          <select
+            value={sessionsBeforeLongBreak}
+            onChange={(e) => {
+              const count = Number(e.target.value);
+              setSessionsBeforeLongBreak(count);
+              setFocusLongEvery(count);
+            }}
+            className={`w-full h-10 px-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/20 transition-all ${
+              isDark
+                ? "bg-gray-700 border-gray-600 text-gray-100 focus:border-violet-500"
+                : "bg-gray-50 border-gray-300 text-gray-900 focus:border-violet-500"
+            } border`}
+          >
+            <option value={2}>2 blocks</option>
+            <option value={3}>3 blocks</option>
+            <option value={4}>4 blocks</option>
+            <option value={6}>6 blocks</option>
           </select>
         </div>
 

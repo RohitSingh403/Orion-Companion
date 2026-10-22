@@ -23,7 +23,7 @@ interface TaskStore {
   tasks: Task[];
   activeTaskId: string | null;
 
-  addTask: (data: string | CreateTaskData) => void;
+  addTask: (data: string | CreateTaskData) => string | undefined;
   deleteTask: (id: string) => void;
   toggleTask: (id: string) => void;
   updateTask: (id: string, data: Partial<Task>) => void;
@@ -52,10 +52,11 @@ export const useTaskStore = create<TaskStore>()(
         const input: CreateTaskData =
           typeof data === "string" ? { title: data } : data;
 
-        if (!input.title.trim()) return;
+        if (!input.title.trim()) return undefined;
 
+        const id = crypto.randomUUID();
         const newTask: Task = {
-          id: crypto.randomUUID(),
+          id,
           title: input.title.trim(),
           description: input.description || "",
           projectId: input.projectId || null,
@@ -80,6 +81,7 @@ export const useTaskStore = create<TaskStore>()(
         set((state) => ({
           tasks: [newTask, ...state.tasks],
         }));
+        return id;
       },
 
       deleteTask: (id) =>

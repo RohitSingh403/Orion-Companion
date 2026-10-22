@@ -9,6 +9,7 @@ interface CreateEventData {
   endDate: string;
   type?: EventType;
   color?: string;
+  taskId?: string | null;
 }
 
 interface EventState {
@@ -43,6 +44,7 @@ export const useEventStore = create<EventState>()(
           endDate: data.endDate,
           type: data.type || "other",
           color: data.color || EVENT_COLORS[data.type || "other"],
+          taskId: data.taskId ?? null,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };

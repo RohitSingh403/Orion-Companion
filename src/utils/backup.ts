@@ -8,6 +8,7 @@ const BACKUP_KEYS = [
   "focus-companion-events",
   "focus-companion-projects",
   "ai-companion-storage",
+  "focus-companion-day",
 ];
 
 interface BackupFile {
