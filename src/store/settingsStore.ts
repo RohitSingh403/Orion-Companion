@@ -7,6 +7,8 @@ interface SettingsState {
   // Timer Settings
   focusMinutes: number;
   breakMinutes: number;
+  longBreakMinutes: number;
+  sessionsBeforeLongBreak: number;
   dailyGoal: number;
 
   // Auto-start Settings
@@ -31,6 +33,8 @@ interface SettingsState {
   // Actions
   setFocusMinutes: (minutes: number) => void;
   setBreakMinutes: (minutes: number) => void;
+  setLongBreakMinutes: (minutes: number) => void;
+  setSessionsBeforeLongBreak: (count: number) => void;
   setDailyGoal: (goal: number) => void;
   setAutoStartBreak: (enabled: boolean) => void;
   setAutoStartFocus: (enabled: boolean) => void;
@@ -51,6 +55,8 @@ export const useSettingsStore = create<SettingsState>()(
       // Timer Settings
       focusMinutes: 25,
       breakMinutes: 5,
+      longBreakMinutes: 15,
+      sessionsBeforeLongBreak: 4,
       dailyGoal: 8,
 
       // Auto-start Settings
@@ -81,6 +87,16 @@ export const useSettingsStore = create<SettingsState>()(
       setBreakMinutes: (minutes) =>
         set({
           breakMinutes: minutes,
+        }),
+
+      setLongBreakMinutes: (minutes) =>
+        set({
+          longBreakMinutes: minutes,
+        }),
+
+      setSessionsBeforeLongBreak: (count) =>
+        set({
+          sessionsBeforeLongBreak: count,
         }),
 
       setDailyGoal: (goal) =>

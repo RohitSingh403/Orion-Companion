@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { FiCalendar, FiChevronLeft, FiChevronRight, FiEdit2 } from "react-icons/fi";
+import DayStrip from "./DayStrip";
+import SessionReviewCard from "../focus/SessionReviewCard";
 import AppLayout from "../../layouts/AppLayout";
 import { useEventStore } from "../../store/eventStore";
 import { useFocusStore } from "../../store/focusStore";
@@ -206,6 +208,8 @@ export default function DashboardContent() {
   return (
     <AppLayout>
       <div className="space-y-4 px-4 pb-6 md:px-6">
+        <DayStrip />
+        <SessionReviewCard />
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs text-zinc-400">

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { FiChevronDown, FiEye, FiEyeOff, FiPlay, FiPlus, FiPower, FiSquare, FiVolume2 } from "react-icons/fi";
 import { useFocusStore } from "../../store/focusStore";
 import { useSettingsStore } from "../../store/settingsStore";
+import { useDayStore } from "../../store/dayStore";
 import { useTaskStore } from "../../store/taskStore";
 import { formatClock } from "../../utils/activity";
 import CommandSearch from "./CommandSearch";
@@ -18,6 +19,7 @@ export default function CommandBar() {
   const reset = useFocusStore((state) => state.reset);
   const ambient = useAmbient();
   const addTask = useTaskStore((state) => state.addTask);
+  const addCapture = useDayStore((state) => state.addCapture);
   const companionEnabled = useSettingsStore((state) => state.companionEnabled);
   const setCompanionEnabled = useSettingsStore((state) => state.setCompanionEnabled);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -61,6 +63,13 @@ export default function CommandBar() {
     event.preventDefault();
     if (!taskTitle.trim()) return;
     addTask({ title: taskTitle });
+    setTaskTitle("");
+    setQuickAddOpen(false);
+  };
+
+  const saveInbox = () => {
+    if (!taskTitle.trim()) return;
+    addCapture(taskTitle);
     setTaskTitle("");
     setQuickAddOpen(false);
   };
@@ -150,7 +159,7 @@ export default function CommandBar() {
           </button>
           {quickAddOpen ? (
             <form onSubmit={saveQuickAdd} className="absolute right-0 z-30 mt-2 w-72 rounded-2xl border border-white/10 bg-[#20242d] p-3 shadow-2xl">
-              <h2 className="text-xs font-semibold text-zinc-100">Quick add task</h2>
+              <h2 className="text-xs font-semibold text-zinc-100">Quick add</h2>
               <input
                 type="text"
                 value={taskTitle}
@@ -163,8 +172,11 @@ export default function CommandBar() {
                 <button type="button" onClick={() => setQuickAddOpen(false)} className="px-2 py-1 text-sm text-zinc-400">
                   Cancel
                 </button>
+                <button type="button" onClick={saveInbox} className="rounded-full border border-white/15 px-3 py-1 text-sm text-zinc-100">
+                  Inbox
+                </button>
                 <button type="submit" className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-[#14161c]">
-                  Save
+                  Task
                 </button>
               </div>
             </form>

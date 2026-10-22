@@ -53,4 +53,24 @@ describe("companionMessage", () => {
       body: "Call home in 10 minutes.",
     });
   });
+
+  it("names the next task, a long break, and a finished block", () => {
+    expect(
+      companionMessage({ remainingTime: 25 * 60, running: false, session: "focus" }, [], Date.now(), {
+        nextTaskTitle: "Write the chapter",
+      })
+    ).toMatchObject({ title: "Next", body: "Write the chapter" });
+
+    expect(
+      companionMessage({ remainingTime: 15 * 60, running: true, session: "break" }, [], Date.now(), {
+        breakKind: "long",
+      })
+    ).toMatchObject({ title: "Long break" });
+
+    expect(
+      companionMessage({ remainingTime: 5 * 60, running: true, session: "break" }, [], Date.now(), {
+        reviewTask: "Chapter",
+      })
+    ).toMatchObject({ title: "Block finished", review: true });
+  });
 });

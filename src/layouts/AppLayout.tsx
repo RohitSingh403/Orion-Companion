@@ -3,7 +3,11 @@ import { useEffect } from "react";
 import Sidebar from "./Sidebar";
 import CommandBar from "../components/shell/CommandBar";
 import ScreenCompanion from "../components/companion/ScreenCompanion";
+import { useDayStore } from "../store/dayStore";
+import { useEventStore } from "../store/eventStore";
+import { useFocusStore } from "../store/focusStore";
 import { useSettingsStore } from "../store/settingsStore";
+import { useTaskStore } from "../store/taskStore";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -25,7 +29,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
-      if (event.key === "focus-companion-settings") void useSettingsStore.persist.rehydrate();
+      if (!event.key || event.key === "focus-companion-settings") void useSettingsStore.persist.rehydrate();
+      if (!event.key || event.key === "focus-companion-tasks") void useTaskStore.persist.rehydrate();
+      if (!event.key || event.key === "focus-companion-storage") void useFocusStore.persist.rehydrate();
+      if (!event.key || event.key === "focus-companion-events") void useEventStore.persist.rehydrate();
+      if (!event.key || event.key === "focus-companion-day") void useDayStore.persist.rehydrate();
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);

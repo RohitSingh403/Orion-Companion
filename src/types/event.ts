@@ -8,6 +8,7 @@ export interface CalendarEvent {
   endDate: string; // ISO string
   type: EventType;
   color: string;
+  taskId?: string | null;
   createdAt: string;
   updatedAt: string;
 }

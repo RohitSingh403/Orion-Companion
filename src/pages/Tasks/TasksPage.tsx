@@ -6,6 +6,12 @@ import PageHeading from "../../components/shell/PageHeading";
 import { useTaskStore } from "../../store/taskStore";
 import { useProjectStore } from "../../store/projectStore";
 import { useSettingsStore } from "../../store/settingsStore";
+import { useDayStore } from "../../store/dayStore";
+import { useEventStore } from "../../store/eventStore";
+import { useFocusStore } from "../../store/focusStore";
+import { useNotesStore } from "../../store/notesStore";
+import { useReminderStore } from "../../store/reminderStore";
+import { nextHourPlan, WORK_TEMPLATES } from "../../utils/dayLoop";
 import type { TaskPriority, RecurrenceType } from "../../types/task";
 import {
   FiCalendar,
@@ -21,6 +27,11 @@ import {
 
 export default function TasksPage() {
   const { tasks, addTask, toggleTask, deleteTask, setActiveTask, activeTaskId } = useTaskStore();
+  const captures = useDayStore((state) => state.captures);
+  const removeCapture = useDayStore((state) => state.removeCapture);
+  const addNote = useNotesStore((state) => state.addNote);
+  const addReminder = useReminderStore((state) => state.addReminder);
+  const setFocusDuration = useFocusStore((state) => state.setFocusDuration);
   const { projects, addProject } = useProjectStore();
   const theme = useSettingsStore((s) => s.theme);
   const isDark = theme === "dark";
@@ -37,6 +48,36 @@ export default function TasksPage() {
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectColor, setNewProjectColor] = useState("#6366f1");
+
+  const startTemplate = (template: (typeof WORK_TEMPLATES)[number]) => {
+    const id = addTask({
+      title: template.label,
+      estimatedFocusSessions: template.sessions,
+      subtasks: template.steps.map((step) => ({
+        id: crypto.randomUUID(),
+        title: step,
+        completed: false,
+        completedAt: null,
+      })),
+    });
+    if (!id) return;
+    setActiveTask(id);
+    setFocusDuration(template.minutes);
+  };
+
+  const planTask = (taskId: string, title: string) => {
+    const events = useEventStore.getState().events;
+    if (events.some((event) => event.taskId === taskId && Date.parse(event.startDate) > Date.now())) return;
+    const minutes = Math.round(useFocusStore.getState().focusDuration / 60);
+    const slot = nextHourPlan(new Date(), minutes);
+    useEventStore.getState().addEvent({
+      title,
+      startDate: slot.start,
+      endDate: slot.end,
+      type: "focus",
+      taskId,
+    });
+  };
 
   const handleAddTask = (e: React.FormEvent) => {
     e.preventDefault();
@@ -297,6 +338,68 @@ export default function TasksPage() {
               </div>
             </div>
 
+            <div className="flex flex-wrap gap-2">
+              {WORK_TEMPLATES.map((template) => (
+                <button
+                  key={template.id}
+                  type="button"
+                  onClick={() => startTemplate(template)}
+                  className="rounded-full border border-white/10 bg-[#1b1f27] px-3 py-1.5 text-xs font-semibold text-zinc-100"
+                >
+                  {template.label} · {template.minutes}m
+                </button>
+              ))}
+            </div>
+
+            {captures.length > 0 ? (
+              <div className="rounded-lg border border-white/10 bg-[#1b1f27] p-3">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-[#7CFFD4]">Inbox</h3>
+                <ul className="mt-2 space-y-2">
+                  {captures.map((capture) => (
+                    <li key={capture.id} className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-sm text-zinc-100">{capture.text}</span>
+                      <span className="flex gap-1">
+                        <button
+                          type="button"
+                          className="rounded-full bg-white px-2 py-1 text-[11px] font-semibold text-[#14161c]"
+                          onClick={() => {
+                            addTask({ title: capture.text });
+                            removeCapture(capture.id);
+                          }}
+                        >
+                          Task
+                        </button>
+                        <button
+                          type="button"
+                          className="rounded-full border border-white/10 px-2 py-1 text-[11px] text-zinc-200"
+                          onClick={() => {
+                            addNote(capture.text, capture.text);
+                            removeCapture(capture.id);
+                          }}
+                        >
+                          Note
+                        </button>
+                        <button
+                          type="button"
+                          className="rounded-full border border-white/10 px-2 py-1 text-[11px] text-zinc-200"
+                          onClick={() => {
+                            addReminder({
+                              title: capture.text,
+                              dueDate: new Date().toISOString(),
+                              frequency: "once",
+                            });
+                            removeCapture(capture.id);
+                          }}
+                        >
+                          Reminder
+                        </button>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
             {/* Comprehensive Task Creation Form */}
             <form onSubmit={handleAddTask} className={`p-3 space-y-3 rounded-lg border ${
               isDark 
@@ -529,10 +632,17 @@ export default function TasksPage() {
                           ? "bg-gray-600 text-gray-400" 
                           : "bg-gray-100 text-gray-600"
                       }`}>
-                        {task.completedFocusSessions}/{task.estimatedFocusSessions}
+                        {task.completedFocusSessions} done · {task.estimatedFocusSessions} guessed
                       </span>
 
                       {/* Set Active Task for Timer */}
+                      <button
+                        type="button"
+                        onClick={() => planTask(task.id, task.title)}
+                        className="rounded-full border border-white/10 px-2 py-1 text-[11px] text-zinc-200"
+                      >
+                        Plan
+                      </button>
                       <button
                         onClick={() => setActiveTask(task.id)}
                         title="Set active for focus timer"

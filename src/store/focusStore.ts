@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { getTodayString, getYesterdayString } from "../utils/date";
+import { gapIsRest, isLongBreak, type AppSample } from "../utils/dayLoop";
+import { useTaskStore } from "./taskStore";
 
 export type SessionType = "focus" | "break";
 
@@ -11,6 +13,17 @@ export interface SessionHistoryItem {
   date: string; // YYYY-MM-DD format
   duration: number; // in seconds
   completedAt: string; // ISO timestamp
+  taskId?: string | null;
+  taskTitle?: string;
+  note?: string;
+}
+
+export interface SessionReview {
+  historyId: string;
+  taskId: string | null;
+  taskTitle: string;
+  note: string;
+  apps: AppSample[];
 }
 
 export interface DailyStats {
@@ -32,13 +45,18 @@ export interface ActivitySample {
 
 const DEFAULT_FOCUS_DURATION = 25 * 60;
 const DEFAULT_BREAK_DURATION = 5 * 60;
+const DEFAULT_LONG_BREAK_DURATION = 15 * 60;
 const DEFAULT_DAILY_GOAL = 8;
+const DEFAULT_SESSIONS_BEFORE_LONG_BREAK = 4;
 
 interface FocusState {
   session: SessionType;
 
   focusDuration: number;
   breakDuration: number;
+  longBreakDuration: number;
+  sessionsBeforeLongBreak: number;
+  breakKind: "short" | "long";
 
   dailyGoal: number;
 
@@ -47,6 +65,10 @@ interface FocusState {
   running: boolean;
 
   completedSessions: number;
+
+  sessionReview: SessionReview | null;
+  sessionApps: AppSample[];
+  restDates: string[];
 
   // Session History
   history: SessionHistoryItem[];
@@ -66,7 +88,7 @@ interface FocusState {
 
   tick: () => void;
 
-  addHistory: () => void;
+  addHistory: () => string;
   updateStreak: () => void;
   updateDailyStats: () => void;
   recordActivity: (name: string, seconds: number) => void;
@@ -76,7 +98,12 @@ interface FocusState {
 
   setFocusDuration: (minutes: number) => void;
   setBreakDuration: (minutes: number) => void;
+  setLongBreakDuration: (minutes: number) => void;
+  setSessionsBeforeLongBreak: (count: number) => void;
   setDailyGoal: (goal: number) => void;
+  settleReview: (note: string) => void;
+  dismissReview: () => void;
+  toggleRestDay: (date: string) => void;
 
   // ----------------------
   // Reset Actions
@@ -96,6 +123,9 @@ export const useFocusStore = create<FocusState>()(
 
       focusDuration: DEFAULT_FOCUS_DURATION,
       breakDuration: DEFAULT_BREAK_DURATION,
+      longBreakDuration: DEFAULT_LONG_BREAK_DURATION,
+      sessionsBeforeLongBreak: DEFAULT_SESSIONS_BEFORE_LONG_BREAK,
+      breakKind: "short",
 
       dailyGoal: DEFAULT_DAILY_GOAL,
 
@@ -104,6 +134,9 @@ export const useFocusStore = create<FocusState>()(
       running: false,
 
       completedSessions: 0,
+      sessionReview: null,
+      sessionApps: [],
+      restDates: [],
 
       history: [],
 
@@ -127,8 +160,10 @@ export const useFocusStore = create<FocusState>()(
       reset: () =>
         set((state) => ({
           session: "focus",
+          breakKind: "short",
           running: false,
           remainingTime: state.focusDuration,
+          sessionApps: [],
         })),
 
       tick: () => {
@@ -145,13 +180,26 @@ export const useFocusStore = create<FocusState>()(
 
         // Focus completed
         if (state.session === "focus") {
-          get().addHistory();
+          const historyId = get().addHistory();
           get().updateStreak();
+          const count = state.completedSessions + 1;
+          const long = isLongBreak(count, state.sessionsBeforeLongBreak);
+          const taskState = useTaskStore.getState();
+          const active = taskState.tasks.find((task) => task.id === taskState.activeTaskId);
 
           set({
             session: "break",
-            remainingTime: state.breakDuration,
-            completedSessions: state.completedSessions + 1,
+            breakKind: long ? "long" : "short",
+            remainingTime: long ? state.longBreakDuration : state.breakDuration,
+            completedSessions: count,
+            sessionApps: [],
+            sessionReview: {
+              historyId,
+              taskId: active?.id ?? null,
+              taskTitle: active?.title ?? "",
+              note: "",
+              apps: state.sessionApps,
+            },
           });
 
           return;
@@ -160,6 +208,7 @@ export const useFocusStore = create<FocusState>()(
         // Break completed
         set({
           session: "focus",
+          breakKind: "short",
           remainingTime: state.focusDuration,
         });
       },
@@ -175,20 +224,27 @@ export const useFocusStore = create<FocusState>()(
         const today = getTodayString();
         const completedAt = new Date().toISOString();
         const duration = state.focusDuration; // Duration in seconds
+        const id = crypto.randomUUID();
+        const taskState = useTaskStore.getState();
+        const task = taskState.tasks.find((item) => item.id === taskState.activeTaskId);
 
         set({
           history: [
             {
-              id: crypto.randomUUID(),
+              id,
               time: currentTime,
               type: "Focus Session",
               date: today,
               duration,
               completedAt,
+              taskId: task?.id ?? null,
+              taskTitle: task?.title ?? "",
+              note: "",
             },
             ...state.history,
           ],
         });
+        return id;
       },
 
       updateStreak: () => {
@@ -199,7 +255,7 @@ export const useFocusStore = create<FocusState>()(
 
         if (state.lastCompletedDate === today) return;
 
-        if (state.lastCompletedDate === yesterday) {
+        if (state.lastCompletedDate === yesterday || (state.lastCompletedDate && gapIsRest(state.lastCompletedDate, today, state.restDates))) {
           const newStreak = state.currentStreak + 1;
           set({
             currentStreak: newStreak,
@@ -260,18 +316,36 @@ export const useFocusStore = create<FocusState>()(
         const label = trimmed.slice(0, 80);
         set((state) => {
           const existing = state.activityLog.find((item) => item.date === today && item.name === label);
-          if (existing) {
-            return {
-              activityLog: state.activityLog.map((item) =>
-                item === existing ? { ...item, seconds: item.seconds + seconds } : item
-              ),
-            };
-          }
-          return {
-            activityLog: [...state.activityLog, { name: label, seconds, date: today }],
-          };
+          const activityLog = existing
+            ? state.activityLog.map((item) => (item === existing ? { ...item, seconds: item.seconds + seconds } : item))
+            : [...state.activityLog, { name: label, seconds, date: today }];
+          if (!state.running || state.session !== "focus") return { activityLog };
+          const current = state.sessionApps.find((item) => item.name === label);
+          const sessionApps = current
+            ? state.sessionApps.map((item) => (item.name === label ? { ...item, seconds: item.seconds + seconds } : item))
+            : [...state.sessionApps, { name: label, seconds }];
+          return { activityLog, sessionApps };
         });
       },
+
+      settleReview: (note) => {
+        const review = get().sessionReview;
+        if (!review) return;
+        const text = note.trim().slice(0, 280);
+        set({
+          sessionReview: null,
+          history: get().history.map((item) => (item.id === review.historyId ? { ...item, note: text } : item)),
+        });
+      },
+
+      dismissReview: () => set({ sessionReview: null }),
+
+      toggleRestDay: (date) =>
+        set((state) => ({
+          restDates: state.restDates.includes(date)
+            ? state.restDates.filter((item) => item !== date)
+            : [...state.restDates, date],
+        })),
 
       getYesterdayStats: () => {
         const state = get();
@@ -439,8 +513,20 @@ export const useFocusStore = create<FocusState>()(
         set((state) => ({
           breakDuration: minutes * 60,
           remainingTime:
-            state.session === "break" ? minutes * 60 : state.remainingTime,
+            state.session === "break" && state.breakKind !== "long" ? minutes * 60 : state.remainingTime,
         })),
+
+      setLongBreakDuration: (minutes) =>
+        set((state) => ({
+          longBreakDuration: minutes * 60,
+          remainingTime:
+            state.session === "break" && state.breakKind === "long" ? minutes * 60 : state.remainingTime,
+        })),
+
+      setSessionsBeforeLongBreak: (count) =>
+        set({
+          sessionsBeforeLongBreak: Math.max(1, Math.round(count)),
+        }),
 
       setDailyGoal: (goal) =>
         set({
@@ -471,6 +557,8 @@ export const useFocusStore = create<FocusState>()(
         set({
           focusDuration: DEFAULT_FOCUS_DURATION,
           breakDuration: DEFAULT_BREAK_DURATION,
+          longBreakDuration: DEFAULT_LONG_BREAK_DURATION,
+          sessionsBeforeLongBreak: DEFAULT_SESSIONS_BEFORE_LONG_BREAK,
           dailyGoal: DEFAULT_DAILY_GOAL,
           remainingTime: DEFAULT_FOCUS_DURATION,
         }),
@@ -482,12 +570,18 @@ export const useFocusStore = create<FocusState>()(
 
           focusDuration: DEFAULT_FOCUS_DURATION,
           breakDuration: DEFAULT_BREAK_DURATION,
+          longBreakDuration: DEFAULT_LONG_BREAK_DURATION,
+          sessionsBeforeLongBreak: DEFAULT_SESSIONS_BEFORE_LONG_BREAK,
+          breakKind: "short",
 
           dailyGoal: DEFAULT_DAILY_GOAL,
 
           remainingTime: DEFAULT_FOCUS_DURATION,
 
           completedSessions: 0,
+          sessionReview: null,
+          sessionApps: [],
+          restDates: [],
 
           history: [],
           dailyStats: [],
@@ -504,12 +598,16 @@ export const useFocusStore = create<FocusState>()(
       partialize: (state) => ({
         focusDuration: state.focusDuration,
         breakDuration: state.breakDuration,
+        longBreakDuration: state.longBreakDuration,
+        sessionsBeforeLongBreak: state.sessionsBeforeLongBreak,
         dailyGoal: state.dailyGoal,
 
         completedSessions: state.completedSessions,
         history: state.history,
         dailyStats: state.dailyStats,
         activityLog: state.activityLog,
+        sessionReview: state.sessionReview,
+        restDates: state.restDates,
 
         currentStreak: state.currentStreak,
         bestStreak: state.bestStreak,

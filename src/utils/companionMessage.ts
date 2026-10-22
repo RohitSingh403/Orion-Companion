@@ -9,6 +9,16 @@ export interface CompanionLine {
   title: string;
   body: string;
   reminderId?: string;
+  review?: boolean;
+}
+
+export interface CompanionContext {
+  nextTaskTitle?: string;
+  intention?: string;
+  breakKind?: "short" | "long";
+  breakCard?: string;
+  reviewTask?: string;
+  plannedTitle?: string;
 }
 
 export interface CompanionReminderInput {
@@ -49,15 +59,26 @@ function withReminder(line: CompanionLine, reminders: CompanionReminderInput[], 
 export function companionMessage(
   snapshot: CompanionSnapshot,
   reminders: CompanionReminderInput[] = [],
-  now = Date.now()
+  now = Date.now(),
+  context: CompanionContext = {}
 ): CompanionLine {
-  return withReminder(timerLine(snapshot), reminders, now);
+  return withReminder(timerLine(snapshot, context), reminders, now);
 }
 
-function timerLine(snapshot: CompanionSnapshot): CompanionLine {
+function timerLine(snapshot: CompanionSnapshot, context: CompanionContext): CompanionLine {
   const minutes = Math.max(1, Math.ceil(snapshot.remainingTime / 60));
 
   if (snapshot.session === "break" && snapshot.running) {
+    if (context.reviewTask !== undefined) {
+      return {
+        mode: "break",
+        title: "Block finished",
+        body: context.reviewTask
+          ? `${context.reviewTask} can take one line in the app.`
+          : "Keep one line about that block, or leave it.",
+        review: true,
+      };
+    }
     if (snapshot.remainingTime <= 60) {
       return {
         mode: "break",
@@ -65,10 +86,17 @@ function timerLine(snapshot: CompanionSnapshot): CompanionLine {
         body: "Finish the coffee. The next block is close.",
       };
     }
+    if (context.breakKind === "long") {
+      return {
+        mode: "break",
+        title: "Long break",
+        body: "Leave the desk. This pause is the longer one.",
+      };
+    }
     return {
       mode: "break",
       title: "Coffee break",
-      body: "Step away from the laptop. The mug is yours for a few minutes.",
+      body: context.breakCard || "Step away from the laptop. The mug is yours for a few minutes.",
     };
   }
 
@@ -99,6 +127,30 @@ function timerLine(snapshot: CompanionSnapshot): CompanionLine {
       mode: "focus",
       title: "Focus is on",
       body: `${minutes} minutes left. Working through this block.`,
+    };
+  }
+
+  if (context.plannedTitle) {
+    return {
+      mode: "idle",
+      title: "Planned",
+      body: `${context.plannedTitle} is ready to start.`,
+    };
+  }
+
+  if (context.nextTaskTitle) {
+    return {
+      mode: "idle",
+      title: "Next",
+      body: context.nextTaskTitle,
+    };
+  }
+
+  if (context.intention) {
+    return {
+      mode: "idle",
+      title: "Today",
+      body: context.intention,
     };
   }
 

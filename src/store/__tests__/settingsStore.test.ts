@@ -10,6 +10,8 @@ describe("settingsStore", () => {
     useSettingsStore.setState({
       focusMinutes: 25,
       breakMinutes: 5,
+      longBreakMinutes: 15,
+      sessionsBeforeLongBreak: 4,
       dailyGoal: 8,
       autoStartBreak: false,
       autoStartFocus: false,

@@ -1,9 +1,14 @@
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { createElement } from "react";
+import { useDayStore, intentionFor } from "../../store/dayStore";
+import { useEventStore } from "../../store/eventStore";
 import { useFocusStore } from "../../store/focusStore";
 import { useReminderStore } from "../../store/reminderStore";
+import { useTaskStore } from "../../store/taskStore";
 import { companionMessage, type CompanionSnapshot } from "../../utils/companionMessage";
+import { breakCard, nextOpenTask, plannedFocus } from "../../utils/dayLoop";
+import { getTodayString } from "../../utils/date";
 import CompanionActor, { type CompanionPose } from "./CompanionActor";
 import CompanionControls from "./CompanionControls";
 import { useSettingsStore } from "../../store/settingsStore";
@@ -51,6 +56,16 @@ export default function ScreenCompanion({
   const start = useFocusStore((state) => state.start);
   const pause = useFocusStore((state) => state.pause);
   const reminders = useReminderStore((state) => state.reminders);
+  const tasks = useTaskStore((state) => state.tasks);
+  const activeTaskId = useTaskStore((state) => state.activeTaskId);
+  const events = useEventStore((state) => state.events);
+  const sessionReview = useFocusStore((state) => state.sessionReview);
+  const breakKind = useFocusStore((state) => state.breakKind);
+  const completedSessions = useFocusStore((state) => state.completedSessions);
+  const settleReview = useFocusStore((state) => state.settleReview);
+  const dismissReview = useFocusStore((state) => state.dismissReview);
+  const intentionDate = useDayStore((state) => state.intentionDate);
+  const storedIntention = useDayStore((state) => state.intention);
   const [remote, setRemote] = useState<CompanionSnapshot | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [floated, setFloated] = useState(false);
@@ -89,6 +104,10 @@ export default function ScreenCompanion({
     const refresh = () => {
       void useReminderStore.persist.rehydrate();
       void useSettingsStore.persist.rehydrate();
+      void useFocusStore.persist.rehydrate();
+      void useTaskStore.persist.rehydrate();
+      void useEventStore.persist.rehydrate();
+      void useDayStore.persist.rehydrate();
       setNow(Date.now());
     };
     window.addEventListener("storage", refresh);
@@ -115,7 +134,16 @@ export default function ScreenCompanion({
   }, [desktop, reacting, asleep]);
 
   const snapshot = remote ?? { remainingTime, running, session };
-  const line = companionMessage(snapshot, reminders, now);
+  const next = nextOpenTask(tasks, activeTaskId);
+  const planned = plannedFocus(events, now);
+  const line = companionMessage(snapshot, reminders, now, {
+    nextTaskTitle: next?.title,
+    intention: intentionFor(getTodayString(), intentionDate, storedIntention),
+    breakKind,
+    breakCard: breakCard(completedSessions),
+    reviewTask: sessionReview ? sessionReview.taskTitle : undefined,
+    plannedTitle: planned?.title,
+  });
   const pose: CompanionPose =
     line.mode === "focus" || line.mode === "break"
       ? line.mode
@@ -198,13 +226,23 @@ export default function ScreenCompanion({
     return () => window.clearInterval(id);
   }, [desktop, floating, narrow, reduceMotion, line.mode, reacting, asleep]);
 
+  function chooseTask() {
+    if (snapshot.running || snapshot.session !== "focus") return;
+    if (planned?.taskId) useTaskStore.getState().setActiveTask(planned.taskId);
+    else if (!useTaskStore.getState().activeTaskId && next) useTaskStore.getState().setActiveTask(next.id);
+  }
+
   function toggle() {
     if (desktop) {
+      chooseTask();
       window.focusAPI?.sendMiniCommand(snapshot.running ? "pause" : "start");
       return;
     }
     if (snapshot.running) pause();
-    else start();
+    else if (snapshot.session === "focus") {
+      chooseTask();
+      start();
+    } else start();
   }
 
   function wake() {
@@ -302,6 +340,24 @@ export default function ScreenCompanion({
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#7CFFD4]">{line.title}</p>
           <p className="mt-1 text-xs leading-relaxed text-zinc-300">{line.body}</p>
           <p className="mt-2 font-semibold tabular-nums text-[#8AF6FF]">{clock(snapshot.remainingTime)}</p>
+          {line.review ? (
+            <div className="mt-2 flex gap-1.5">
+              <button
+                type="button"
+                onClick={() => settleReview("")}
+                className="rounded-full bg-[#7CFFD4] px-2.5 py-1 text-[11px] font-semibold text-[#14161c] focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                Keep
+              </button>
+              <button
+                type="button"
+                onClick={() => dismissReview()}
+                className="rounded-full border border-white/15 px-2.5 py-1 text-[11px] font-semibold text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7CFFD4]"
+              >
+                Leave
+              </button>
+            </div>
+          ) : null}
           {line.reminderId && (
             <div className="mt-2 flex gap-1.5">
               <button
