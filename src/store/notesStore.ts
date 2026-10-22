@@ -70,6 +70,9 @@ export const useNotesStore = create<NotesState>()(
       },
 
       addAttachment: async (noteId, file) => {
+        if (file.size > 1_500_000) {
+          throw new Error("Attachments stay under 1.5 MB so they fit on this computer.");
+        }
         const reader = new FileReader();
         reader.readAsDataURL(file);
         

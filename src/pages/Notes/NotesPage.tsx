@@ -7,6 +7,7 @@ import { useNotesStore } from "../../store/notesStore";
 import { useTaskStore } from "../../store/taskStore";
 import { useSettingsStore } from "../../store/settingsStore";
 import ReactMarkdown from "react-markdown";
+import { safeNoteImage, safeNoteLink } from "../../utils/safeUrl";
 import {
   FiSearch,
   FiPlus,
@@ -36,6 +37,7 @@ export default function NotesPage() {
   const [showQuickNoteToast, setShowQuickNoteToast] = useState(false);
   const [showTaskPicker, setShowTaskPicker] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState("");
 
   const activeNote = notes.find((n) => n.id === activeNoteId);
 
@@ -79,10 +81,11 @@ export default function NotesPage() {
     if (!file || !activeNoteId) return;
 
     setIsUploading(true);
+    setUploadMessage("");
     try {
       await addAttachment(activeNoteId, file);
     } catch (error) {
-      console.error("Failed to upload file:", error);
+      setUploadMessage(error instanceof Error ? error.message : "That file could not be attached.");
     } finally {
       setIsUploading(false);
     }
@@ -442,14 +445,21 @@ export default function NotesPage() {
                       : "bg-gray-50 border-gray-200 text-gray-900 hover:border-gray-300 prose-headings:text-gray-900 prose-p:text-gray-600 prose-strong:text-gray-900 prose-code:text-violet-600 prose-pre:bg-white prose-pre:border-gray-200"
                   }`}>
                     <ReactMarkdown
+                      urlTransform={(url) => (safeNoteLink(url) || safeNoteImage(url) ? url : "")}
                       components={{
                         a: ({ href, children }) => {
-                          const safe = href && /^(https?:|mailto:)/i.test(href) ? href : undefined;
+                          const safe = safeNoteLink(href);
+                          if (!safe) return <span>{children}</span>;
                           return (
                             <a href={safe} rel="noreferrer noopener" target="_blank">
                               {children}
                             </a>
                           );
+                        },
+                        img: ({ src, alt }) => {
+                          const safe = safeNoteImage(typeof src === "string" ? src : undefined);
+                          if (!safe) return null;
+                          return <img src={safe} alt={alt ?? ""} />;
                         },
                       }}
                     >
@@ -533,6 +543,9 @@ export default function NotesPage() {
                     />
                   </label>
                 </div>
+                {uploadMessage ? (
+                  <span className="text-[10px] text-red-400">{uploadMessage}</span>
+                ) : null}
                 {activeNote.attachments?.length === 0 ? (
                   <span className={`text-[10px] ${
                     isDark ? "text-gray-500" : "text-gray-500"

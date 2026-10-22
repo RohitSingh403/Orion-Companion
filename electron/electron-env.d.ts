@@ -50,7 +50,7 @@ interface Window {
     syncReminders: () => void;
     exitCompanion: () => void;
     onReminderSync: (callback: () => void) => () => void;
-    setCompanionActivity: (activity: { mode: "idle" | "focus" | "break"; dragging: boolean }) => void;
+    setCompanionActivity: (activity: { mode: "idle" | "focus" | "break"; dragging: boolean; reduceMotion?: boolean }) => void;
     onCompanionWalk: (callback: (state: { walking: boolean; facing: 1 | -1 }) => void) => () => void;
     onCompanionVisibility: (callback: (visible: boolean) => void) => () => void;
     getAutoLaunchStatus: () => Promise<boolean>;
