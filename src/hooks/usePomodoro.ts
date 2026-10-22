@@ -65,7 +65,11 @@ export default function usePomodoro() {
       if (soundEnabled) playSound(breakSound || "break.mp3");
       if (desktopNotifications) notifySession("break");
       updateDailyStats();
-      if (activeTaskId) incrementTaskFocusSession(activeTaskId);
+      if (activeTaskId) {
+        incrementTaskFocusSession(activeTaskId);
+        const minutes = Math.max(1, Math.round(useFocusStore.getState().focusDuration / 60));
+        useTaskStore.getState().addTimeSpent(activeTaskId, minutes);
+      }
       addXP(10);
       checkFocusAchievements();
       if (autoStartBreak) start();

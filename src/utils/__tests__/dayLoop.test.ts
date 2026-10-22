@@ -2,9 +2,15 @@ import { describe, expect, it } from "vitest";
 import {
   breakCard,
   buildDayLog,
+  buildFocusEvent,
+  focusSlot,
+  formatMinutes,
+  fromLocalInput,
   gapIsRest,
+  guessedMinutes,
   interruptionNames,
   isLongBreak,
+  nextHourPlan,
   nextOpenTask,
   plannedFocus,
 } from "../dayLoop";
@@ -68,5 +74,39 @@ describe("day loop", () => {
     expect(note).toContain("Outline done");
     expect(note).toContain("1 of 2 sessions");
     expect(note).toContain("Stand");
+  });
+
+  it("places a focus block on the chosen minute and skips the same slot", () => {
+    const start = fromLocalInput("2026-10-23T14:30");
+    expect(start).not.toBeNull();
+    const slot = focusSlot(start!, 25);
+    expect(slot?.end).toBe(new Date(start!.getTime() + 25 * 60_000).toISOString());
+    const first = buildFocusEvent({
+      taskId: "t1",
+      title: "Chapter",
+      start: start!,
+      minutes: 25,
+      existing: [],
+    });
+    expect(first?.type).toBe("focus");
+    expect(
+      buildFocusEvent({
+        taskId: "t1",
+        title: "Chapter",
+        start: start!,
+        minutes: 25,
+        existing: [first!],
+      })
+    ).toBeNull();
+    const hour = nextHourPlan(new Date("2026-10-23T09:20:00"), 25);
+    expect(new Date(hour.start).getMinutes()).toBe(0);
+  });
+
+  it("keeps a stored hour guess and prints hours beside minutes", () => {
+    expect(guessedMinutes({ estimatedMinutes: 50, estimatedFocusSessions: 1 })).toBe(50);
+    expect(guessedMinutes({ estimatedFocusSessions: 2 })).toBe(50);
+    expect(formatMinutes(0)).toBe("0m");
+    expect(formatMinutes(90)).toBe("1h 30m");
+    expect(formatMinutes(120)).toBe("2h");
   });
 });

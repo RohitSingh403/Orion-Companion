@@ -11,7 +11,7 @@ import { useEventStore } from "../../store/eventStore";
 import { useFocusStore } from "../../store/focusStore";
 import { useNotesStore } from "../../store/notesStore";
 import { useReminderStore } from "../../store/reminderStore";
-import { nextHourPlan, WORK_TEMPLATES } from "../../utils/dayLoop";
+import { buildFocusEvent, formatMinutes, fromLocalInput, guessedMinutes, toLocalInput, WORK_TEMPLATES } from "../../utils/dayLoop";
 import type { TaskPriority, RecurrenceType } from "../../types/task";
 import {
   FiCalendar,
@@ -26,12 +26,14 @@ import {
 } from "react-icons/fi";
 
 export default function TasksPage() {
-  const { tasks, addTask, toggleTask, deleteTask, setActiveTask, activeTaskId } = useTaskStore();
+  const { tasks, addTask, toggleTask, deleteTask, setActiveTask, updateTask, activeTaskId } = useTaskStore();
   const captures = useDayStore((state) => state.captures);
   const removeCapture = useDayStore((state) => state.removeCapture);
   const addNote = useNotesStore((state) => state.addNote);
   const addReminder = useReminderStore((state) => state.addReminder);
   const setFocusDuration = useFocusStore((state) => state.setFocusDuration);
+  const focusDuration = useFocusStore((state) => state.focusDuration);
+  const blockMinutes = Math.max(1, Math.round(focusDuration / 60));
   const { projects, addProject } = useProjectStore();
   const theme = useSettingsStore((s) => s.theme);
   const isDark = theme === "dark";
@@ -48,11 +50,18 @@ export default function TasksPage() {
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectColor, setNewProjectColor] = useState("#6366f1");
+  const [planAt, setPlanAt] = useState(() => {
+    const start = new Date();
+    start.setMinutes(0, 0, 0);
+    start.setHours(start.getHours() + 1);
+    return toLocalInput(start);
+  });
 
   const startTemplate = (template: (typeof WORK_TEMPLATES)[number]) => {
     const id = addTask({
       title: template.label,
       estimatedFocusSessions: template.sessions,
+      estimatedMinutes: template.minutes * template.sessions,
       subtasks: template.steps.map((step) => ({
         id: crypto.randomUUID(),
         title: step,
@@ -66,17 +75,23 @@ export default function TasksPage() {
   };
 
   const planTask = (taskId: string, title: string) => {
-    const events = useEventStore.getState().events;
-    if (events.some((event) => event.taskId === taskId && Date.parse(event.startDate) > Date.now())) return;
+    const chosen = fromLocalInput(planAt);
+    const start = chosen ?? new Date();
+    if (!chosen) {
+      start.setMinutes(0, 0, 0);
+      start.setHours(start.getHours() + 1);
+    }
     const minutes = Math.round(useFocusStore.getState().focusDuration / 60);
-    const slot = nextHourPlan(new Date(), minutes);
-    useEventStore.getState().addEvent({
-      title,
-      startDate: slot.start,
-      endDate: slot.end,
-      type: "focus",
+    const event = buildFocusEvent({
       taskId,
+      title,
+      start,
+      minutes,
+      existing: useEventStore.getState().events,
     });
+    if (!event) return;
+    useEventStore.getState().addEvent(event);
+    updateTask(taskId, { dueDate: event.startDate });
   };
 
   const handleAddTask = (e: React.FormEvent) => {
@@ -87,6 +102,7 @@ export default function TasksPage() {
       title,
       priority,
       estimatedFocusSessions: estimatedSessions,
+      estimatedMinutes: estimatedSessions * blockMinutes,
       tags: [selectedTag],
       dueDate: "Today",
       recurrence,
@@ -336,6 +352,16 @@ export default function TasksPage() {
                   {filteredTasks.length} tasks scheduled
                 </p>
               </div>
+              <label className="flex items-center gap-2 text-xs text-zinc-400" htmlFor="plan-at">
+                Place at
+                <input
+                  id="plan-at"
+                  type="datetime-local"
+                  value={planAt}
+                  onChange={(event) => setPlanAt(event.target.value)}
+                  className="h-9 rounded-lg border border-white/10 bg-[#121418] px-2 text-sm text-zinc-100"
+                />
+              </label>
             </div>
 
             <div className="flex flex-wrap gap-2">
@@ -450,10 +476,10 @@ export default function TasksPage() {
                           : "bg-white border-gray-300 text-gray-900 focus:border-violet-500"
                       } border`}
                     >
-                      <option value={1}>1 Session (25m)</option>
-                      <option value={2}>2 Sessions (50m)</option>
-                      <option value={3}>3 Sessions (75m)</option>
-                      <option value={4}>4 Sessions (100m)</option>
+                      <option value={1}>1 Session ({blockMinutes}m)</option>
+                      <option value={2}>2 Sessions ({blockMinutes * 2}m)</option>
+                      <option value={3}>3 Sessions ({blockMinutes * 3}m)</option>
+                      <option value={4}>4 Sessions ({blockMinutes * 4}m)</option>
                     </select>
                   </div>
 
@@ -620,19 +646,24 @@ export default function TasksPage() {
                             </span>
                           )}
 
-                          <span className={`text-[10px] ${isDark ? "text-gray-500" : "text-gray-500"}`}>Due: Today</span>
+                          <span className={`text-[10px] ${isDark ? "text-gray-500" : "text-gray-500"}`}>
+                            {task.dueDate && Number.isFinite(Date.parse(task.dueDate))
+                              ? `Due ${new Date(task.dueDate).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}`
+                              : "Due: Today"}
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3">
                       {/* Focus Session Counter */}
-                      <span className={`text-[11px] font-mono font-medium px-2.5 py-1 rounded-lg ${
+                      <span className={`text-right text-[11px] font-mono font-medium px-2.5 py-1 rounded-lg leading-4 ${
                         isDark 
                           ? "bg-gray-600 text-gray-400" 
                           : "bg-gray-100 text-gray-600"
                       }`}>
-                        {task.completedFocusSessions} done · {task.estimatedFocusSessions} guessed
+                        <span className="block">{task.completedFocusSessions} done · {task.estimatedFocusSessions} guessed</span>
+                        <span className="block">{formatMinutes(task.timeSpent || 0)} spent · {formatMinutes(guessedMinutes(task))} guessed</span>
                       </span>
 
                       {/* Set Active Task for Timer */}

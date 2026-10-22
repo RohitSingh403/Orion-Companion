@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useFocusStore } from "../../store/focusStore";
 import { useDayStore, intentionFor } from "../../store/dayStore";
 import { useReminderStore } from "../../store/reminderStore";
@@ -10,6 +11,9 @@ export default function DayStrip() {
   const intentionDate = useDayStore((state) => state.intentionDate);
   const storedIntention = useDayStore((state) => state.intention);
   const setIntention = useDayStore((state) => state.setIntention);
+  const logs = useDayStore((state) => state.logs);
+  const saveDay = useDayStore((state) => state.saveDay);
+  const [openDate, setOpenDate] = useState<string | null>(null);
   const intention = intentionFor(today, intentionDate, storedIntention);
   const restDates = useFocusStore((state) => state.restDates);
   const toggleRestDay = useFocusStore((state) => state.toggleRestDay);
@@ -39,6 +43,7 @@ export default function DayStrip() {
       })),
       reminders: reminders.map((reminder) => ({ title: reminder.title, status: reminder.status })),
     });
+    saveDay(today, note);
     const blob = new Blob([note], { type: "text/markdown" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -83,6 +88,30 @@ export default function DayStrip() {
           </button>
         </div>
       </div>
+      {logs.length > 0 ? (
+        <div className="mt-4 border-t border-white/10 pt-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#7CFFD4]">Saved days</p>
+          <ul className="mt-2 space-y-2">
+            {logs.map((log) => (
+              <li key={log.date}>
+                <button
+                  type="button"
+                  aria-expanded={openDate === log.date}
+                  onClick={() => setOpenDate(openDate === log.date ? null : log.date)}
+                  className="rounded-full border border-white/10 px-3 py-1 text-xs font-semibold text-zinc-200"
+                >
+                  {log.date}
+                </button>
+                {openDate === log.date ? (
+                  <pre className="mt-2 whitespace-pre-wrap rounded-xl bg-[#121418] p-3 text-xs leading-relaxed text-zinc-300">
+                    {log.markdown}
+                  </pre>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </section>
   );
 }

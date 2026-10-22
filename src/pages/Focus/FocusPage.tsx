@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "../../layouts/AppLayout";
 import PageHeading from "../../components/shell/PageHeading";
 import SessionReviewCard from "../../components/focus/SessionReviewCard";
+import BreakChecklist from "../../components/focus/BreakChecklist";
+import DistractionNote from "../../components/focus/DistractionNote";
 import FocusTimer from "../../components/timer/FocusTimer";
 import { useTaskStore } from "../../store/taskStore";
 import { useFocusStore } from "../../store/focusStore";
@@ -98,6 +100,8 @@ export default function FocusPage() {
 
       <div className="relative space-y-4 px-4 pb-6 md:px-6">
         <SessionReviewCard />
+        {session === "break" ? <BreakChecklist /> : null}
+        {session === "focus" ? <DistractionNote /> : null}
         <PageHeading title="Focus" subtitle="Today's sessions stay with the timer">
           <div className="flex items-center gap-3">
             {/* Ambient Effect Selector */}

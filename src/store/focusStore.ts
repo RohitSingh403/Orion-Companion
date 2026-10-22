@@ -92,6 +92,7 @@ interface FocusState {
   updateStreak: () => void;
   updateDailyStats: () => void;
   recordActivity: (name: string, seconds: number) => void;
+  noteDistraction: (name: string) => void;
   getYesterdayStats: () => DailyStats | undefined;
   getProductivityComparison: () => { percentage: number; label: string };
   getFocusInsights: () => string[];
@@ -307,6 +308,21 @@ export const useFocusStore = create<FocusState>()(
             ],
           });
         }
+      },
+
+      noteDistraction: (name) => {
+        const label = name.trim().slice(0, 80);
+        if (!label) return;
+        set((state) => {
+          if (state.session !== "focus") return {};
+          const current = state.sessionApps.find((item) => item.name.toLowerCase() === label.toLowerCase());
+          const sessionApps = current
+            ? state.sessionApps.map((item) =>
+                item.name.toLowerCase() === label.toLowerCase() ? { ...item, seconds: item.seconds + 1 } : item
+              )
+            : [...state.sessionApps, { name: label, seconds: 1 }];
+          return { sessionApps };
+        });
       },
 
       recordActivity: (name, seconds) => {

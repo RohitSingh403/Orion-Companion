@@ -9,6 +9,8 @@ import { useTaskStore } from "../../store/taskStore";
 import { companionMessage, type CompanionSnapshot } from "../../utils/companionMessage";
 import { breakCard, nextOpenTask, plannedFocus } from "../../utils/dayLoop";
 import { getTodayString } from "../../utils/date";
+import BreakChecklist from "../focus/BreakChecklist";
+import DistractionNote from "../focus/DistractionNote";
 import CompanionActor, { type CompanionPose } from "./CompanionActor";
 import CompanionControls from "./CompanionControls";
 import { useSettingsStore } from "../../store/settingsStore";
@@ -340,6 +342,8 @@ export default function ScreenCompanion({
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#7CFFD4]">{line.title}</p>
           <p className="mt-1 text-xs leading-relaxed text-zinc-300">{line.body}</p>
           <p className="mt-2 font-semibold tabular-nums text-[#8AF6FF]">{clock(snapshot.remainingTime)}</p>
+          {snapshot.session === "break" && !line.review ? <BreakChecklist compact /> : null}
+          {snapshot.session === "focus" && snapshot.running ? <DistractionNote compact /> : null}
           {line.review ? (
             <div className="mt-2 flex gap-1.5">
               <button
