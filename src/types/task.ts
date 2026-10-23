@@ -35,6 +35,8 @@ export interface Task {
 
   estimatedFocusSessions: number;
 
+  estimatedMinutes?: number;
+
   completedFocusSessions: number;
 
   tags: string[];

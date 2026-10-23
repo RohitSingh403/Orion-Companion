@@ -5,8 +5,10 @@ import AppLayout from "../../layouts/AppLayout";
 import PageHeading from "../../components/shell/PageHeading";
 import { useTaskStore } from "../../store/taskStore";
 import { useEventStore } from "../../store/eventStore";
+import { useFocusStore } from "../../store/focusStore";
 import { useSettingsStore } from "../../store/settingsStore";
 import type { EventType } from "../../types/event";
+import { buildFocusEvent } from "../../utils/dayLoop";
 import { FiChevronLeft, FiChevronRight, FiClock, FiPlus, FiMoreVertical, FiX, FiDownload } from "react-icons/fi";
 
 export default function CalendarPage() {
@@ -180,19 +182,42 @@ export default function CalendarPage() {
     URL.revokeObjectURL(url);
   };
 
+  const placeOnCalendar = (taskId: string, start: Date) => {
+    const task = tasks.find((item) => item.id === taskId);
+    if (!task) return;
+    const minutes = Math.max(1, Math.round(useFocusStore.getState().focusDuration / 60));
+    const event = buildFocusEvent({
+      taskId,
+      title: task.title,
+      start,
+      minutes,
+      existing: useEventStore.getState().events,
+    });
+    updateTask(taskId, { dueDate: start.toISOString() });
+    if (event) addEvent(event);
+  };
+
   const handleDrop = (e: React.DragEvent, dayIndex: number, hour: number) => {
     e.preventDefault();
     const taskId = e.dataTransfer.getData("taskId");
     if (!taskId) return;
 
-    // Calculate the target date based on the day index
     const targetDate = new Date(currentWeekStart);
     targetDate.setDate(targetDate.getDate() + dayIndex);
     targetDate.setHours(hour, 0, 0, 0);
-
-    // Update the task's due date
-    updateTask(taskId, { dueDate: targetDate.toISOString() });
+    placeOnCalendar(taskId, targetDate);
   };
+
+  const handleDayDrop = (e: React.DragEvent, hour: number) => {
+    e.preventDefault();
+    const taskId = e.dataTransfer.getData("taskId");
+    if (!taskId) return;
+    const targetDate = new Date(currentDay);
+    targetDate.setHours(hour, 0, 0, 0);
+    placeOnCalendar(taskId, targetDate);
+  };
+
+  const openTasks = tasks.filter((task) => !task.completed && !Number.isFinite(Date.parse(task.dueDate || "")));
 
   // Filter tasks for the current view
   const filteredTasks = useMemo(() => {
@@ -410,77 +435,42 @@ export default function CalendarPage() {
                     <span className={`w-16 text-sm font-medium ${
                       isDark ? "text-gray-500" : "text-gray-500"
                     }`}>{time}</span>
-                    <div className={`flex-1 min-h-[48px] rounded-lg border border-dashed p-2 relative transition-all cursor-pointer group ${
-                      isDark 
-                        ? "bg-gray-700 border-gray-600 hover:border-gray-500" 
-                        : "bg-gray-50 border-gray-200 hover:border-gray-300"
-                    }`}>
+                    <div className="grid flex-1 grid-cols-7 gap-1">
                       {weekDates.map((_, dayIdx) => (
                         <div
                           key={`${dayIdx}-${timeIdx}`}
                           onDragOver={(e) => e.preventDefault()}
                           onDrop={(e) => handleDrop(e, dayIdx, timeIdx + 6)}
-                          className="absolute inset-0"
-                        />
+                          data-cal-day={dayIdx}
+                          data-cal-hour={timeIdx + 6}
+                          className={`min-h-[48px] rounded-lg border border-dashed p-1 ${
+                            isDark
+                              ? "border-gray-600 bg-gray-700"
+                              : "border-gray-200 bg-gray-50"
+                          }`}
+                        >
+                          {filteredEvents
+                            .filter((event) => {
+                              const eventDate = new Date(event.startDate);
+                              const eventDay = eventDate.getDay();
+                              const dayIndex = eventDay === 0 ? 6 : eventDay - 1;
+                              return eventDate.getHours() === timeIdx + 6 && dayIndex === dayIdx;
+                            })
+                            .map((event) => (
+                              <div
+                                key={event.id}
+                                className="mb-1 rounded-lg border p-1.5 text-[11px] font-medium"
+                                style={{
+                                  backgroundColor: `${event.color}20`,
+                                  borderColor: event.color,
+                                  color: event.color,
+                                }}
+                              >
+                                {event.title}
+                              </div>
+                            ))}
+                        </div>
                       ))}
-                      {/* Render events for this time slot */}
-                      {filteredEvents
-                        .filter((event) => {
-                          const eventDate = new Date(event.startDate);
-                          const eventHour = eventDate.getHours();
-                          const eventDay = eventDate.getDay();
-                          const dayIndex = eventDay === 0 ? 6 : eventDay - 1;
-                          return eventHour === timeIdx + 6 && dayIndex === weekDates.findIndex((_, idx) => {
-                            const d = new Date(currentWeekStart);
-                            d.setDate(d.getDate() + idx);
-                            return d.getDay() === eventDay;
-                          });
-                        })
-                        .map((event) => (
-                          <div
-                            key={event.id}
-                            className="mb-1 p-2 rounded-lg text-sm font-medium shadow-sm border badge"
-                            style={{
-                              backgroundColor: `${event.color}20`,
-                              borderColor: event.color,
-                              color: event.color
-                            }}
-                          >
-                            {event.title}
-                          </div>
-                        ))}
-                      {timeIdx === 2 && (
-                        <div className={`mb-1 p-2.5 rounded-lg text-sm font-medium shadow-sm ${
-                          isDark 
-                            ? "bg-violet-500/20 border-violet-500/40 text-violet-400" 
-                            : "bg-violet-50 border-violet-200 text-violet-600"
-                        }`}>
-                          🎯 Deep Focus Session — Build Workspace UI (9:00 AM - 11:00 AM)
-                        </div>
-                      )}
-                      {timeIdx === 4 && (
-                        <div className={`mb-1 p-2.5 rounded-lg text-sm font-medium shadow-sm ${
-                          isDark 
-                            ? "bg-purple-500/20 border-purple-500/40 text-purple-400" 
-                            : "bg-purple-50 border-purple-200 text-purple-600"
-                        }`}>
-                          🎨 Design Review Meeting (11:00 AM - 12:00 PM)
-                        </div>
-                      )}
-                      {timeIdx === 5 && (
-                        <div className={`mb-1 p-2 rounded-lg text-sm font-medium shadow-sm ${
-                          isDark 
-                            ? "bg-blue-500/20 border-blue-500/40 text-blue-400" 
-                            : "bg-blue-50 border-blue-200 text-blue-600"
-                        }`}>
-                          ☕ Scheduled Rest Break (1:00 PM - 1:15 PM)
-                        </div>
-                      )}
-                      <div className={`absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition ${
-                        isDark ? "text-gray-500" : "text-gray-500"
-                      }`}>
-                        <span className="text-[10px]">+ Add</span>
-                      </div>
                     </div>
                   </div>
                 ))}
@@ -608,11 +598,15 @@ export default function CalendarPage() {
                   <span className={`w-16 text-sm font-medium ${
                     isDark ? "text-gray-500" : "text-gray-500"
                   }`}>{time}</span>
-                  <div className={`flex-1 min-h-[48px] rounded-lg border border-dashed p-2 relative transition-all cursor-pointer group ${
+                  <div
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => handleDayDrop(e, timeIdx + 6)}
+                    className={`flex-1 min-h-[48px] rounded-lg border border-dashed p-2 relative transition-all cursor-pointer group ${
                     isDark 
                       ? "bg-gray-700 border-gray-600 hover:border-gray-500" 
                       : "bg-gray-50 border-gray-200 hover:border-gray-300"
-                  }`}>
+                  }`}
+                  >
                     {/* Render events for this time slot */}
                     {filteredEvents
                       .filter((event) => {
@@ -657,7 +651,7 @@ export default function CalendarPage() {
                           {task.title}
                         </div>
                       ))}
-                    <div className={`absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition ${
+                    <div className={`pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition ${
                       isDark ? "text-gray-500" : "text-gray-500"
                     }`}>
                       <span className="text-[10px]">+ Add</span>
@@ -668,6 +662,33 @@ export default function CalendarPage() {
             </div>
           </div>
         )}
+
+        {openTasks.length > 0 ? (
+          <div className={`p-6 space-y-4 rounded-xl border shadow-sm ${
+            isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+          }`}>
+            <h3 className={`text-sm font-semibold ${isDark ? "text-gray-100" : "text-gray-900"}`}>
+              Waiting for a time
+            </h3>
+            <p className={`text-xs ${isDark ? "text-gray-500" : "text-gray-500"}`}>
+              Drag a task onto an hour. That hour becomes a focus block.
+            </p>
+            <div className="space-y-2">
+              {openTasks.map((task) => (
+                <div
+                  key={task.id}
+                  draggable
+                  onDragStart={(e) => e.dataTransfer.setData("taskId", task.id)}
+                  className={`cursor-move rounded-lg p-3 text-sm ${
+                    isDark ? "bg-gray-700 text-gray-100" : "bg-gray-50 text-gray-900"
+                  }`}
+                >
+                  {task.title}
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         {/* Tasks for Current View */}
         <div className={`p-6 space-y-4 rounded-xl border shadow-sm ${

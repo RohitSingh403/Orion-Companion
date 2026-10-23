@@ -47,6 +47,21 @@ describe("taskStore", () => {
     expect(result.current.tasks[0].title).toBe("Test Task");
     expect(result.current.tasks[0].priority).toBe("high");
     expect(result.current.tasks[0].estimatedFocusSessions).toBe(3);
+    expect(result.current.tasks[0].estimatedMinutes).toBe(75);
+  });
+
+  it("stores an explicit hour guess", () => {
+    const { result } = renderHook(() => useTaskStore());
+
+    act(() => {
+      result.current.addTask({
+        title: "Study",
+        estimatedFocusSessions: 2,
+        estimatedMinutes: 100,
+      });
+    });
+
+    expect(result.current.tasks[0].estimatedMinutes).toBe(100);
   });
 
   it("should delete a task", () => {

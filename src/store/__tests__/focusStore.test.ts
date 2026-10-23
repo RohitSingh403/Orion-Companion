@@ -129,6 +129,27 @@ describe("focusStore", () => {
     expect(result.current.history[0]?.note).toBe("Outline done");
   });
 
+  it("keeps a written distraction with the block and ignores one during a break", () => {
+    const { result } = renderHook(() => useFocusStore());
+
+    act(() => {
+      result.current.noteDistraction("Phone");
+    });
+    expect(result.current.sessionApps.map((item) => item.name)).toEqual(["Phone"]);
+
+    act(() => {
+      useFocusStore.setState({ session: "break" });
+      result.current.noteDistraction("Mail");
+    });
+    expect(result.current.sessionApps.map((item) => item.name)).toEqual(["Phone"]);
+
+    act(() => {
+      useFocusStore.setState({ session: "focus", running: true, remainingTime: 1, completedSessions: 0 });
+      result.current.tick();
+    });
+    expect(result.current.sessionReview?.apps.map((item) => item.name)).toEqual(["Phone"]);
+  });
+
   it("keeps the streak across a marked rest day", () => {
     const { result } = renderHook(() => useFocusStore());
     const older = new Date();

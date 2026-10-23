@@ -10,6 +10,7 @@ export interface CreateTaskData {
   description?: string;
   priority?: TaskPriority;
   estimatedFocusSessions?: number;
+  estimatedMinutes?: number;
   dueDate?: string | null;
   projectId?: string | null;
   tags?: string[];
@@ -65,6 +66,10 @@ export const useTaskStore = create<TaskStore>()(
           dueDate: input.dueDate || null,
           reminder: null,
           estimatedFocusSessions: input.estimatedFocusSessions || 1,
+          estimatedMinutes:
+            input.estimatedMinutes && input.estimatedMinutes > 0
+              ? Math.round(input.estimatedMinutes)
+              : (input.estimatedFocusSessions || 1) * 25,
           completedFocusSessions: 0,
           tags: input.tags || [],
           completed: false,

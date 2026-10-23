@@ -95,12 +95,93 @@ export function plannedFocus(events: readonly PlannedEvent[], now: number) {
   };
 }
 
+export const BREAK_STEPS = [
+  { id: "water", label: "Water" },
+  { id: "stretch", label: "Stretch" },
+  { id: "look", label: "Look away" },
+] as const;
+
+export type BreakStepId = (typeof BREAK_STEPS)[number]["id"];
+
+export function focusSlot(start: Date, minutes: number) {
+  const begin = new Date(start.getTime());
+  if (Number.isNaN(begin.getTime())) return null;
+  begin.setSeconds(0, 0);
+  const end = new Date(begin.getTime() + Math.max(1, minutes) * 60_000);
+  return { start: begin.toISOString(), end: end.toISOString() };
+}
+
 export function nextHourPlan(now: Date, minutes: number) {
   const start = new Date(now);
   start.setMinutes(0, 0, 0);
   start.setHours(start.getHours() + 1);
-  const end = new Date(start.getTime() + Math.max(1, minutes) * 60_000);
-  return { start: start.toISOString(), end: end.toISOString() };
+  const slot = focusSlot(start, minutes);
+  return slot ?? { start: start.toISOString(), end: start.toISOString() };
+}
+
+export function toLocalInput(date: Date) {
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+export function fromLocalInput(value: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value.trim());
+  if (!match) return null;
+  const date = new Date(
+    Number(match[1]),
+    Number(match[2]) - 1,
+    Number(match[3]),
+    Number(match[4]),
+    Number(match[5]),
+    0,
+    0
+  );
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+export interface FocusEventDraft {
+  title: string;
+  startDate: string;
+  endDate: string;
+  type: "focus";
+  taskId: string;
+}
+
+export function buildFocusEvent(input: {
+  taskId: string;
+  title: string;
+  start: Date;
+  minutes: number;
+  existing: readonly { taskId?: string | null; type?: string; startDate: string }[];
+}): FocusEventDraft | null {
+  const slot = focusSlot(input.start, input.minutes);
+  const title = input.title.trim();
+  if (!slot || !input.taskId || !title) return null;
+  const duplicate = input.existing.some(
+    (event) => event.taskId === input.taskId && event.type === "focus" && event.startDate === slot.start
+  );
+  if (duplicate) return null;
+  return {
+    title,
+    startDate: slot.start,
+    endDate: slot.end,
+    type: "focus",
+    taskId: input.taskId,
+  };
+}
+
+export function formatMinutes(minutes: number) {
+  const safe = Math.max(0, Math.round(minutes));
+  const hours = Math.floor(safe / 60);
+  const rest = safe % 60;
+  if (hours <= 0) return `${rest}m`;
+  if (rest === 0) return `${hours}h`;
+  return `${hours}h ${rest}m`;
+}
+
+export function guessedMinutes(task: { estimatedMinutes?: number | null; estimatedFocusSessions?: number }) {
+  if (typeof task.estimatedMinutes === "number" && task.estimatedMinutes > 0) return Math.round(task.estimatedMinutes);
+  return Math.max(1, task.estimatedFocusSessions || 1) * 25;
 }
 
 export const WORK_TEMPLATES = [
