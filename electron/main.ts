@@ -1,9 +1,18 @@
-import { app, BrowserWindow, Menu, Notification, Tray, autoUpdater, globalShortcut, ipcMain, nativeImage, screen, session, type IpcMainEvent, type IpcMainInvokeEvent } from "electron";
+import { app, BrowserWindow, Menu, Notification, Tray, dialog, globalShortcut, ipcMain, nativeImage, net, protocol, screen, session, type IpcMainEvent, type IpcMainInvokeEvent } from "electron";
 import { execFile } from "node:child_process";
 import fs from "node:fs";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import path from "node:path";
+import { rendererFileForRequest } from "./appProtocol";
+import { claimInstance, handoffSocketPath } from "./handoff";
 import { isAllowedNavigation } from "./navigation";
+
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: "app",
+    privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true },
+  },
+]);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -42,6 +51,9 @@ let trayLabel = "Ready";
 let watchingActivity = false;
 let activityTimer: ReturnType<typeof setInterval> | null = null;
 let latestTimer: TimerSnapshot | null = null;
+let updateReady = false;
+let installDownloadedUpdate: (() => void) | null = null;
+let closeHandoff: (() => Promise<void>) | null = null;
 
 interface TimerSnapshot {
   remainingTime: number;
@@ -108,7 +120,9 @@ function loadSurface(target: BrowserWindow, route: string, search: Record<string
     void target.loadURL(url.toString());
     return;
   }
-  void target.loadFile(path.join(RENDERER_DIST, "index.html"), { query: search });
+  const packaged = new URL(`app://orion/${route.replace(/^\//, "") || "app"}`);
+  Object.entries(search).forEach(([key, value]) => packaged.searchParams.set(key, value));
+  void target.loadURL(packaged.toString());
 }
 
 function showMain() {
@@ -146,6 +160,20 @@ function rebuildTray() {
         },
       },
       { type: "separator" },
+      ...(updateReady
+        ? [{
+            label: "Install update and restart",
+            click: () => installDownloadedUpdate?.(),
+          }]
+        : []),
+      {
+        label: "Restart Orion",
+        click: () => {
+          app.relaunch();
+          quitting = true;
+          app.quit();
+        },
+      },
       {
         label: "Close dashboard",
         click: () => {
@@ -504,9 +532,92 @@ app.on("will-quit", () => {
   globalShortcut.unregisterAll();
   if (activityTimer) clearInterval(activityTimer);
   if (walkTimer) clearInterval(walkTimer);
+  void closeHandoff?.();
 });
 
-app.whenReady().then(() => {
+function registerAppProtocol() {
+  protocol.handle("app", (request) => {
+    const candidate = rendererFileForRequest(RENDERER_DIST, request.url);
+    if (!candidate) return new Response("forbidden", { status: 403 });
+    const file = fs.existsSync(candidate) && fs.statSync(candidate).isFile()
+      ? candidate
+      : path.join(RENDERER_DIST, "index.html");
+    return net.fetch(pathToFileURL(file).toString());
+  });
+}
+
+function thisInstance() {
+  return { execPath: process.execPath, version: app.getVersion() };
+}
+
+async function startUpdater() {
+  if (VITE_DEV_SERVER_URL) return;
+  try {
+    const updaterModule = (await import("electron-updater")) as {
+      autoUpdater?: {
+        autoDownload: boolean;
+        autoInstallOnAppQuit: boolean;
+        on: (event: string, listener: (...args: unknown[]) => void) => void;
+        checkForUpdates: () => Promise<unknown>;
+        quitAndInstall: (isSilent?: boolean, isForceRunAfter?: boolean) => void;
+      };
+    };
+    const updater = updaterModule.autoUpdater;
+    if (!updater) return;
+    updater.autoDownload = true;
+    updater.autoInstallOnAppQuit = true;
+    updater.on("error", (...args) => {
+      console.error("Auto-updater unavailable:", args[0]);
+    });
+    updater.on("update-downloaded", () => {
+      updateReady = true;
+      installDownloadedUpdate = () => {
+        quitting = true;
+        updater.quitAndInstall(false, true);
+      };
+      rebuildTray();
+      new Notification({
+        title: "Update ready",
+        body: "Install update and restart is in the tray menu.",
+      }).show();
+    });
+    const check = () => {
+      void updater.checkForUpdates().catch((error: unknown) => {
+        console.error("Auto-updater unavailable:", error);
+      });
+    };
+    setInterval(check, 4 * 60 * 60 * 1000);
+    check();
+  } catch (error) {
+    console.error("Auto-updater unavailable:", error);
+  }
+}
+
+app.whenReady().then(async () => {
+  const place = handoffSocketPath(app.getPath("userData"), process.platform);
+  const running = thisInstance();
+  const claim = await claimInstance({
+    socketPath: place,
+    platform: process.platform,
+    incoming: running,
+    onFocus: () => showMain(),
+    onReplace: () => {
+      quitting = true;
+      app.quit();
+    },
+    onOwned: (close) => {
+      closeHandoff = close;
+    },
+  });
+  if (claim !== "owner") {
+    if (claim === "blocked") {
+      dialog.showErrorBox("Orion is already open", "Choose Exit Orion in the tray, then open Orion again.");
+    }
+    app.quit();
+    return;
+  }
+
+  registerAppProtocol();
   createWindow();
   createTray();
   showCompanion();
@@ -672,41 +783,5 @@ app.whenReady().then(() => {
     }
   });
 
-  // The built-in updater only exists on macOS and Windows, and it expects a
-  // Squirrel feed. These installers are NSIS, AppImage, deb, and DMG, so a
-  // failed check must not interrupt startup.
-  if (!VITE_DEV_SERVER_URL && process.platform !== "linux") {
-    try {
-      const server = "https://github.com/RohitSingh403/Orion-Companion/releases";
-      const feed = `${server}/latest`;
-
-      autoUpdater.setFeedURL({
-        url: feed,
-        headers: { Accept: "application/json" },
-      });
-
-      autoUpdater.on("error", (err: Error) => {
-        console.error("Auto-updater error:", err);
-      });
-
-      autoUpdater.on("update-downloaded", () => {
-        new Notification({
-          title: "Update Available",
-          body: "A new version is ready to install. Restart to apply.",
-        }).show();
-      });
-
-      const check = () => {
-        try {
-          autoUpdater.checkForUpdates();
-        } catch (error) {
-          console.error("Auto-updater unavailable:", error);
-        }
-      };
-      setInterval(check, 4 * 60 * 60 * 1000);
-      check();
-    } catch (error) {
-      console.error("Auto-updater unavailable:", error);
-    }
-  }
+  void startUpdater();
 });

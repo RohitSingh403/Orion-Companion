@@ -7,6 +7,9 @@ on:
       - main
       - cursor/linux-package-build-7bd1
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: ${{ matrix.label }}
@@ -17,13 +20,13 @@ jobs:
         include:
           - os: ubuntu-latest
             label: Linux
-            command: npm run build:linux -- --publish never
+            script: build:linux
           - os: windows-latest
             label: Windows
-            command: npm run build:win -- --publish never
+            script: build:win
           - os: macos-latest
             label: macOS
-            command: npm run build:mac -- --publish never -c.mac.identity=null
+            script: build:mac
 
     steps:
       - uses: actions/checkout@v4
@@ -35,10 +38,41 @@ jobs:
 
       - run: npm ci
 
-      - name: Build unsigned installer
-        run: ${{ matrix.command }}
+      - name: Build installer
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARGS=(--publish never)
+          if [ -z "${CSC_LINK:-}" ]; then
+            export CSC_IDENTITY_AUTO_DISCOVERY=false
+            if [ "${{ matrix.label }}" = "macOS" ]; then
+              ARGS+=(-c.mac.identity=null)
+            fi
+          fi
+          npm run "${{ matrix.script }}" -- "${ARGS[@]}"
+          if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
+            tag="v$(node -p "require('./package.json').version")"
+            if ! gh release view "$tag" >/dev/null 2>&1; then
+              gh release create "$tag" --title "Orion Companion $tag" --notes "Desktop packages for $tag." || true
+            fi
+            mapfile -t files < <(find release -maxdepth 1 -type f ! -name 'builder-debug.yml')
+            uploaded=0
+            for _try in 1 2 3 4 5; do
+              if gh release upload "$tag" "${files[@]}" --clobber; then
+                uploaded=1
+                break
+              fi
+              sleep 5
+            done
+            test "$uploaded" = 1
+          fi
         env:
-          CSC_IDENTITY_AUTO_DISCOVERY: false
+          GH_TOKEN: ${{ github.token }}
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
       - uses: actions/upload-artifact@v4
         with:
@@ -50,3 +84,6 @@ jobs:
             release/*.exe
             release/*.dmg
             release/*.zip
+            release/*.yml
+            release/*.yaml
+            release/*.blockmap
