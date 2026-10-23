@@ -43,11 +43,18 @@ jobs:
         run: |
           set -euo pipefail
           ARGS=(--publish never)
+          # GitHub exports a missing secret as an empty string. electron-builder
+          # treats that string as a certificate path and resolves it to the repo
+          # directory, which fails the Windows build. Drop the variables instead.
           if [ -z "${CSC_LINK:-}" ]; then
+            unset CSC_LINK CSC_KEY_PASSWORD WIN_CSC_LINK
             export CSC_IDENTITY_AUTO_DISCOVERY=false
             if [ "${{ matrix.label }}" = "macOS" ]; then
               ARGS+=(-c.mac.identity=null)
             fi
+          fi
+          if [ -z "${APPLE_ID:-}" ]; then
+            unset APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID
           fi
           npm run "${{ matrix.script }}" -- "${ARGS[@]}"
           if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
@@ -55,7 +62,15 @@ jobs:
             if ! gh release view "$tag" >/dev/null 2>&1; then
               gh release create "$tag" --title "Orion Companion $tag" --notes "Desktop packages for $tag." || true
             fi
-            mapfile -t files < <(find release -maxdepth 1 -type f ! -name 'builder-debug.yml')
+            # macOS runners ship bash 3.2, which has no mapfile.
+            files=()
+            while IFS= read -r file; do
+              files+=("$file")
+            done < <(find release -maxdepth 1 -type f ! -name 'builder-debug.yml')
+            if [ "${#files[@]}" -eq 0 ]; then
+              echo "No installer files found in release/" >&2
+              exit 1
+            fi
             uploaded=0
             for _try in 1 2 3 4 5; do
               if gh release upload "$tag" "${files[@]}" --clobber; then
