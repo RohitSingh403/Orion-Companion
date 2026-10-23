@@ -1,16 +1,35 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import path from 'node:path'
 import electron from 'vite-plugin-electron/simple'
 import react from '@vitejs/plugin-react'
+import { productionDocumentPolicy } from './electron/csp'
+
+function productionCsp(): Plugin {
+  return {
+    name: 'production-csp',
+    apply: 'build',
+    transformIndexHtml(html) {
+      return productionDocumentPolicy(html)
+    },
+  }
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    productionCsp(),
     electron({
       main: {
         // Shortcut of `build.lib.entry`.
         entry: 'electron/main.ts',
+        vite: {
+          build: {
+            rollupOptions: {
+              external: ['electron-updater'],
+            },
+          },
+        },
       },
       preload: {
         // Shortcut of `build.rollupOptions.input`.

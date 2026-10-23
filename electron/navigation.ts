@@ -9,6 +9,8 @@ export function isAllowedNavigation(url: string, rendererDist: string, devServer
     return false;
   }
 
+  if (parsed.protocol === "app:") return parsed.hostname === "orion";
+
   if (parsed.protocol === "file:") {
     let filePath: string;
     try {
