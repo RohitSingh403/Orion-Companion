@@ -30,6 +30,8 @@ describe("ErrorBoundary", () => {
     );
 
     expect(screen.getByText("Something went wrong")).toBeDefined();
+    expect(screen.getByText("This error stays on this computer.")).toBeDefined();
+    expect(screen.queryByText(/notified/)).toBeNull();
     expect(screen.getByText("Try Again")).toBeDefined();
     expect(screen.getByText("Go Home")).toBeDefined();
 
@@ -52,7 +54,7 @@ describe("ErrorBoundary", () => {
       </ErrorBoundary>
     );
 
-    expect(screen.getByText(/Test error/)).toBeDefined();
+    expect(screen.getAllByText(/Test error/).length).toBeGreaterThan(0);
 
     (import.meta.env as { DEV?: boolean }).DEV = false;
     consoleSpy.mockRestore();

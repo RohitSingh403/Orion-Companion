@@ -57,6 +57,7 @@ jobs:
             unset APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID
           fi
           npm run "${{ matrix.script }}" -- "${ARGS[@]}"
+          node scripts/check-update-names.mjs release
           if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
             tag="v$(node -p "require('./package.json').version")"
             if ! gh release view "$tag" >/dev/null 2>&1; then
@@ -102,3 +103,49 @@ jobs:
             release/*.yml
             release/*.yaml
             release/*.blockmap
+
+  tidy:
+    name: Drop stale release files
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Remove assets the update manifests do not name
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="v$(node -p "require('./package.json').version")"
+          notes="$(mktemp -d)"
+          gh release download "$tag" --pattern 'latest*.yml' --dir "$notes"
+          node --input-type=module -e '
+            import fs from "node:fs";
+            import path from "node:path";
+            import { execFileSync } from "node:child_process";
+            import { assetsToRemove } from "./scripts/check-update-names.mjs";
+            const notes = process.argv[1];
+            const tag = process.argv[2];
+            const manifests = fs.readdirSync(notes).filter((name) => name.endsWith(".yml")).map((name) => ({
+              name,
+              yaml: fs.readFileSync(path.join(notes, name), "utf8"),
+            }));
+            const required = ["latest.yml", "latest-linux.yml", "latest-mac.yml"];
+            const present = new Set(manifests.map((manifest) => manifest.name));
+            const absent = required.filter((name) => !present.has(name));
+            if (absent.length > 0) {
+              console.error(`Missing update manifests: ${absent.join(", ")}`);
+              process.exit(1);
+            }
+            const listed = JSON.parse(execFileSync("gh", ["release", "view", tag, "--json", "assets"], { encoding: "utf8" }));
+            const stale = assetsToRemove(listed.assets.map((asset) => asset.name), manifests);
+            for (const name of stale) {
+              execFileSync("gh", ["release", "delete-asset", tag, name, "--yes"], { stdio: "inherit" });
+            }
+          ' "$notes" "$tag"

@@ -37,12 +37,7 @@ export class ErrorBoundary extends Component<Props, State> {
       errorInfo,
     });
 
-    // Log error to console in development
-    if (import.meta.env.DEV) {
-      console.error("Error caught by ErrorBoundary:", error, errorInfo);
-    }
-
-    // TODO: Send error to error tracking service (e.g., Sentry)
+    console.error("Error caught by ErrorBoundary:", error, errorInfo);
   }
 
   handleReset = () => {
@@ -70,8 +65,11 @@ export class ErrorBoundary extends Component<Props, State> {
               Something went wrong
             </h1>
             <p className="text-sm text-secondary mb-6">
-              An unexpected error occurred. We've been notified and are working to fix it.
+              This error stays on this computer.
             </p>
+            {this.state.error ? (
+              <p className="mb-6 text-sm text-red-300">{this.state.error.message}</p>
+            ) : null}
 
             {import.meta.env.DEV && this.state.error && (
               <div className="card p-4 mb-6 text-left overflow-auto max-h-48">
