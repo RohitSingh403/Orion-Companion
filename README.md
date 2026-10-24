@@ -2,7 +2,7 @@
 
 A local productivity app for focus sessions. Tasks, notes, reminders, and the day log stay on this computer. A pixel character walks the desktop, sits while a timer runs, and rests when you leave it alone.
 
-**Version:** 1.0.1  
+**Version:** 1.0.2  
 **Updated:** 24 Oct 2026
 
 Orion does not create an account. The name on the dashboard is stored on this computer. Suggestions are calculated here from sessions and tasks.
@@ -42,7 +42,7 @@ The desktop window adds the tray, a walking companion, a mini timer, launch at s
 - **Shortcut.** Ctrl+Shift+Space, or Cmd+Shift+Space on Mac, opens quick add.
 - **Browser Float.** In a browser that supports Document Picture-in-Picture, Float opens the character in a small window owned by that browser.
 
-Packaged builds check GitHub Releases every 4 hours. A downloaded update is installed from **Install update and restart** in the tray, and also when you choose **Exit Orion**. macOS updates use the zip. The DMG is the installer you open by hand. The Linux AppImage checks for updates. The deb package is installed with the package manager.
+Packaged builds check GitHub Releases every 4 hours. A downloaded update is installed from **Install update and restart** in the tray, and also when you choose **Exit Orion**. The AppImage replaces itself. The deb package downloads the checked update and asks for administrator approval to install it. macOS updates use the zip. The DMG is the installer you open by hand. Each update manifest names the same files the release contains.
 
 Installers are unsigned. Windows and macOS show the system first-open warning until `CSC_LINK` and `CSC_KEY_PASSWORD` are set as repository secrets. macOS notarization also needs `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, and `APPLE_TEAM_ID`.
 
@@ -123,3 +123,7 @@ Stores persist in the browser profile, or in the desktop app's profile on this c
 Notes only open `https` and `mailto` links. Note images are `data:image` only. Attachments are capped at 1.5 MB.
 
 Built by Rohit Singh.
+
+## License
+
+MIT. Copyright 2026 Rohit Singh. See [LICENSE](LICENSE).
